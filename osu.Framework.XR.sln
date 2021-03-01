@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30907.101
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Framework.XR", "osu.Framework.XR\osu.Framework.XR.csproj", "{0E416829-B762-420F-A34F-07E6D4E63247}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0E416829-B762-420F-A34F-07E6D4E63247}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E416829-B762-420F-A34F-07E6D4E63247}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E416829-B762-420F-A34F-07E6D4E63247}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E416829-B762-420F-A34F-07E6D4E63247}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2553B23D-A026-4FA5-801A-009B14E59583}
+	EndGlobalSection
+EndGlobal
