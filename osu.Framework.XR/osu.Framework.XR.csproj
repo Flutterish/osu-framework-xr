@@ -4,4 +4,12 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="ppy.osu.Framework" Version="2021.302.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\OpenVR.NET\OpenVR.NET\OpenVR.NET\OpenVR.NET.csproj" />
+  </ItemGroup>
+
 </Project>
