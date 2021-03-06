@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace osu.XR.Components {
+namespace osu.Framework.XR.Components {
 	/// <summary>
 	/// An <see cref="XrObject"/> is the 3D counterpart of a <see cref="Drawable"/>.
 	/// </summary>
@@ -17,7 +17,7 @@ namespace osu.XR.Components {
 			Transform = new Transform( transformKey );
 			RelativeSizeAxes = Axes.Both;
 		}
-		
+
 		private List<XrObject> children = new();
 		private XrObject parent;
 		new public XrObject Child {
@@ -38,7 +38,7 @@ namespace osu.XR.Components {
 			get => parent;
 			set {
 				if ( parent == value ) return;
-				
+
 				if ( parent is Container con ) {
 					parent.children.Remove( this );
 					con.Remove( this );
@@ -152,29 +152,29 @@ namespace osu.XR.Components {
 		public float ScaleY { get => Transform.ScaleY; set => Transform.ScaleY = value; }
 		public float ScaleZ { get => Transform.ScaleZ; set => Transform.ScaleZ = value; }
 
-		public Vector3 Offset { 
-			get => Transform.Offset; 
+		public Vector3 Offset {
+			get => Transform.Offset;
 			set {
 				AutoOffsetAxes = Axes3D.None;
 				Transform.Offset = value;
-			} 
+			}
 		}
-		public float OffsetX { 
-			get => Transform.OffsetX; 
+		public float OffsetX {
+			get => Transform.OffsetX;
 			set {
 				AutoOffsetAxes &= ~Axes3D.X;
 				Transform.OffsetX = value;
 			}
 		}
-		public float OffsetY { 
-			get => Transform.OffsetY; 
+		public float OffsetY {
+			get => Transform.OffsetY;
 			set {
 				AutoOffsetAxes &= ~Axes3D.Y;
 				Transform.OffsetY = value;
 			}
 		}
-		public float OffsetZ { 
-			get => Transform.OffsetZ; 
+		public float OffsetZ {
+			get => Transform.OffsetZ;
 			set {
 				AutoOffsetAxes &= ~Axes3D.Z;
 				Transform.OffsetZ = value;

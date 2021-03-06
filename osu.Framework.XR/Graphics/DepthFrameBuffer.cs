@@ -1,8 +1,5 @@
 ﻿using osu.Framework.Graphics.OpenGL.Buffers;
 using osuTK.Graphics.ES30;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace osu.Framework.XR.Graphics {
 	/// <summary>

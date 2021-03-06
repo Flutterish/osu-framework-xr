@@ -1,5 +1,4 @@
-﻿using NUnit.Framework.Constraints;
-using osu.Framework.Bindables;
+﻿using osu.Framework.Bindables;
 using osu.Framework.Graphics.OpenGL;
 using osu.Framework.XR.Maths;
 using osuTK;
@@ -8,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Valve.VR;
 
 namespace osu.Framework.XR.Graphics {
 	public class Mesh {
