@@ -16,7 +16,7 @@ namespace osu.Framework.XR.GameHosts {
 		public override ITextInputSource GetTextInput ()
 			=> TextInput;
 
-		XrClipboard clipboard = new();
+		VirtualClipboard clipboard = new();
 		public override Clipboard GetClipboard ()
 			=> clipboard;
 

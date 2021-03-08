@@ -17,8 +17,9 @@ namespace osu.XR.GameHosts {
 
 		public override string UserStoragePath => Environment.GetFolderPath( Environment.SpecialFolder.ApplicationData );
 
+		public override Clipboard GetClipboard () => new WindowsClipboard();
 #if NET5_0
-        [System.Runtime.Versioning.SupportedOSPlatform("windows")]
+		[System.Runtime.Versioning.SupportedOSPlatform("windows")]
 #endif
 		public override bool CapsLockEnabled => Console.CapsLock;
 
