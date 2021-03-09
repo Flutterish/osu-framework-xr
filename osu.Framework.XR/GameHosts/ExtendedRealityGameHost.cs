@@ -37,7 +37,6 @@ namespace osu.Framework.XR.GameHosts {
 			VR.Exit();
 		}
 
-		static EVRCompositorError[] errors = new EVRCompositorError[ 2 ];
 		protected override void DrawFrame () {
 			base.DrawFrame();
 			VR.UpdateDraw( SceneGraphClock.CurrentTime );

@@ -1,4 +1,5 @@
-﻿using osu.Framework.Input;
+﻿using osu.Framework.Bindables;
+using osu.Framework.Input;
 using System;
 
 namespace osu.Framework.XR.GameHosts {
@@ -18,9 +19,17 @@ namespace osu.Framework.XR.GameHosts {
 			}
 		}
 
-		public void Deactivate ( object sender ) { }
+		public void Deactivate ( object sender ) {
+			pending = "";
+			IsActiveBindable.Value = false;
+		}
 
-		public void Activate ( object sender ) { }
+		public void Activate ( object sender ) {
+			pending = "";
+			IsActiveBindable.Value = true;
+		}
+
+		public readonly BindableBool IsActiveBindable = new( false );
 
 		public bool ImeActive => false;
 
