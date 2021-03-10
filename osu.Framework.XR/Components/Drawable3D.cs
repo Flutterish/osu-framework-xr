@@ -9,17 +9,17 @@ using System.Linq;
 
 namespace osu.Framework.XR.Components {
 	/// <summary>
-	/// An <see cref="XrObject"/> is the 3D counterpart of a <see cref="Drawable"/>.
+	/// An <see cref="Drawable3D"/> is the 3D counterpart of a <see cref="Drawable"/>.
 	/// </summary>
-	public class XrObject : Container { // has to be a "Drawable" because it gives us cool stuff
+	public class Drawable3D : CompositeDrawable { // has to be a "Drawable" because it gives us cool stuff. It should eventually become a `(Composite)Component` when that is implemented
 		public override bool RemoveCompletedTransforms => true;
-		public XrObject () {
+		public Drawable3D () {
 			Transform = new Transform( transformKey );
 			RelativeSizeAxes = Axes.Both;
 		}
 
-		internal CompositeXrObject parent;
-		new public CompositeXrObject Parent {
+		internal CompositeDrawable3D parent;
+		new public CompositeDrawable3D Parent {
 			get => parent;
 			set {
 				if ( parent == value ) return;
@@ -34,7 +34,7 @@ namespace osu.Framework.XR.Components {
 				parent = value;
 				if ( parent is not null ) {
 					parent.children.Add( this );
-					parent.AddDrawable( this );
+					parent.AddDrawable( this ); // this is here so they actually exist in the framework heirerchy
 
 					parent.onChildAdded( this );
 					foreach ( var i in GetAllChildrenInHiererchy() ) parent.onChildAddedToHierarchy( i.parent, i );
@@ -43,10 +43,10 @@ namespace osu.Framework.XR.Components {
 			}
 		}
 
-		public IEnumerable<XrObject> GetAllChildrenInHiererchy () {
-			List<XrObject> all = new() { this };
+		public IEnumerable<Drawable3D> GetAllChildrenInHiererchy () {
+			List<Drawable3D> all = new() { this };
 			for ( int i = 0; i < all.Count; i++ ) {
-				if ( all[ i ] is CompositeXrObject current ) {
+				if ( all[ i ] is CompositeDrawable3D current ) {
 					for ( int k = 0; k < current.children.Count; k++ ) {
 						yield return current.children[ k ];
 						all.Add( current.children[ k ] );
@@ -56,13 +56,13 @@ namespace osu.Framework.XR.Components {
 		}
 
 		/// <summary>
-		/// The topmost <see cref="XrGroup"/> in the hierarchy. This operation performs upwards tree traveral and might be expensive.
+		/// The topmost <see cref="Container3D"/> in the hierarchy. This operation performs upwards tree traveral and might be expensive.
 		/// </summary>
-		public XrGroup Root => ( parent?.Root ?? ( parent as XrGroup ) ) ?? ( this as XrGroup );
-		public T FindObject<T> () where T : XrObject {
-			T find ( CompositeXrObject node ) {
+		public Container3D Root => ( parent?.Root ?? ( parent as Container3D ) ) ?? ( this as Container3D );
+		public T FindObject<T> () where T : Drawable3D {
+			T find ( CompositeDrawable3D node ) {
 				if ( node is T tnode ) return tnode;
-				foreach ( var i in node.children.OfType<CompositeXrObject>() ) {
+				foreach ( var i in node.children.OfType<CompositeDrawable3D>() ) {
 					var res = find( i );
 					if ( res is not null ) return res;
 				}
@@ -72,7 +72,7 @@ namespace osu.Framework.XR.Components {
 			return find( Root );
 		}
 
-		public virtual void BeforeDraw ( XrObjectDrawNode.DrawSettings settings ) { }
+		public virtual void BeforeDraw ( DrawNode3D.DrawSettings settings ) { }
 
 		private readonly object transformKey = new { };
 		public readonly Transform Transform;
@@ -221,32 +221,25 @@ namespace osu.Framework.XR.Components {
 			Dispose();
 		}
 
-		public override void Add ( Drawable drawable ) {
-			throw new InvalidOperationException( $"Wrong method. If you want to add an {nameof( XrObject )} you need to cast this to {nameof( CompositeXrObject )} or {nameof( XrGroup )}. To add a {nameof( Drawable )}, use {nameof( XrObject.AddDrawable )}." );
-		}
-		public override bool Remove ( Drawable drawable ) {
-			throw new InvalidOperationException( $"Wrong method. If you want to remove an {nameof( XrObject )} you need to cast this to {nameof( CompositeXrObject )} or {nameof( XrGroup )}. To remove a {nameof( Drawable )}, use {nameof( XrObject.RemoveDrawable )}." );
-		}
-
 		public void AddDrawable ( Drawable drawable ) {
-			base.Add( drawable );
+			base.AddInternal( drawable );
 		}
 		public void RemoveDrawable ( Drawable drawable ) {
-			base.Remove( drawable );
+			base.RemoveInternal( drawable );
 		}
 
-		private XrObjectDrawNode drawNode;
-		public XrObjectDrawNode DrawNode => drawNode ??= CreateDrawNode();
-		new protected virtual XrObjectDrawNode CreateDrawNode () => null;
+		private DrawNode3D drawNode;
+		public DrawNode3D DrawNode => drawNode ??= CreateDrawNode();
+		new protected virtual DrawNode3D CreateDrawNode () => null;
 
 		protected override void Dispose ( bool isDisposing ) {
 			base.Dispose( isDisposing );
 			drawNode?.Dispose();
 		}
-		public abstract class XrObjectDrawNode : IDisposable {
-			protected XrObject Source;
+		public abstract class DrawNode3D : IDisposable {
+			protected Drawable3D Source;
 			protected Transform Transform => Source.Transform;
-			public XrObjectDrawNode ( XrObject source ) {
+			public DrawNode3D ( Drawable3D source ) {
 				Source = source;
 			}
 
@@ -261,12 +254,12 @@ namespace osu.Framework.XR.Components {
 			}
 		}
 
-		public abstract class XrObjectDrawNode<T> : XrObjectDrawNode where T : XrObject {
+		public abstract class XrObjectDrawNode<T> : DrawNode3D where T : Drawable3D {
 			new protected T Source => base.Source as T;
 			public XrObjectDrawNode ( T source ) : base( source ) { }
 		}
 
-		public static implicit operator Transform ( XrObject xro )
+		public static implicit operator Transform ( Drawable3D xro )
 			=> xro?.Transform;
 	}
 	[Flags]

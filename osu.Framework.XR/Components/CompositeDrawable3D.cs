@@ -6,62 +6,62 @@ using System;
 using osu.Framework.Extensions.EnumExtensions;
 
 namespace osu.Framework.XR.Components {
-	public class CompositeXrObject : XrObject {
-		internal List<XrObject> children = new();
-		new public XrObject Child {
+	public class CompositeDrawable3D : Drawable3D {
+		internal List<Drawable3D> children = new();
+		public Drawable3D Child {
 			get => children.Single();
 			protected set {
 				foreach ( var i in children.ToArray() ) i.Parent = null;
 				value.Parent = this;
 			}
 		}
-		new public IReadOnlyList<XrObject> Children {
+		public IReadOnlyList<Drawable3D> Children {
 			get => children.AsReadOnly();
 			protected set {
 				foreach ( var i in children.ToArray() ) i.Parent = null;
 				foreach ( var i in value ) i.Parent = this;
 			}
 		}
-		protected void Add ( XrObject child ) {
+		protected void Add ( Drawable3D child ) {
 			child.Parent = this;
 		}
-		protected void Remove ( XrObject child ) {
+		protected void Remove ( Drawable3D child ) {
 			if ( child.parent != this ) throw new InvalidOperationException( "Tried to remove child which does not belong to this parent." );
 			child.Parent = null;
 		}
 
 		// These events are used for efficient hiererchy change scans used in for example the physics system.
-		public delegate void ChildChangedHandler ( XrObject parent, XrObject child );
+		public delegate void ChildChangedHandler ( Drawable3D parent, Drawable3D child );
 		/// <summary>
-		/// Occurs whenever a child is added to this <see cref="XrObject"/>
+		/// Occurs whenever a child is added to this <see cref="Drawable3D"/>
 		/// </summary>
 		public event ChildChangedHandler ChildAdded;
 		/// <summary>
-		/// Occurs whenever a child is removed from this <see cref="XrObject"/>
+		/// Occurs whenever a child is removed from this <see cref="Drawable3D"/>
 		/// </summary>
 		public event ChildChangedHandler ChildRemoved;
 		/// <summary>
-		/// Occurs whenever an <see cref="XrObject"/> is added under this <see cref="XrObject"/>
+		/// Occurs whenever an <see cref="Drawable3D"/> is added under this <see cref="Drawable3D"/>
 		/// </summary>
 		public event ChildChangedHandler ChildAddedToHierarchy;
 		/// <summary>
-		/// Occurs whenever an <see cref="XrObject"/> is removed from under this <see cref="XrObject"/>
+		/// Occurs whenever an <see cref="Drawable3D"/> is removed from under this <see cref="Drawable3D"/>
 		/// </summary>
 		public event ChildChangedHandler ChildRemovedFromHierarchy;
 
-		internal void onChildAdded ( XrObject child ) {
+		internal void onChildAdded ( Drawable3D child ) {
 			ChildAdded?.Invoke( this, child );
 			onChildAddedToHierarchy( this, child );
 		}
-		internal void onChildAddedToHierarchy ( XrObject parent, XrObject child ) {
+		internal void onChildAddedToHierarchy ( Drawable3D parent, Drawable3D child ) {
 			ChildAddedToHierarchy?.Invoke( parent, child );
 			this.parent?.onChildAddedToHierarchy( parent, child );
 		}
-		internal void onChildRemoved ( XrObject child ) {
+		internal void onChildRemoved ( Drawable3D child ) {
 			ChildRemoved?.Invoke( this, child );
 			onChildRemovedFromHierarchy( this, child );
 		}
-		internal void onChildRemovedFromHierarchy ( XrObject parent, XrObject child ) {
+		internal void onChildRemovedFromHierarchy ( Drawable3D parent, Drawable3D child ) {
 			ChildRemovedFromHierarchy?.Invoke( parent, child );
 			this.parent?.onChildRemovedFromHierarchy( parent, child );
 		}
@@ -86,7 +86,7 @@ namespace osu.Framework.XR.Components {
 		public override Vector3 Size { 
 			get => ChildSize; 
 			set {
-				if ( AutoSizeAxes != Axes3D.None ) throw new InvalidOperationException( $"Cannot modify size of an autosized {nameof(XrObject)}." );
+				if ( AutoSizeAxes != Axes3D.None ) throw new InvalidOperationException( $"Cannot modify size of an autosized {nameof(Drawable3D)}." );
 				ChildSize = value;
 			} 
 		}

@@ -2,6 +2,6 @@
 
 namespace osu.Framework.XR {
 	public abstract class XrGame : Game {
-		public XrScene Scene { get; protected set; }
+		public Scene Scene { get; protected set; }
 	}
 }

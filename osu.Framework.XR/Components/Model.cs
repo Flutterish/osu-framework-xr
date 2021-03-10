@@ -7,9 +7,9 @@ using System.Collections.Generic;
 
 namespace osu.Framework.XR.Components {
 	/// <summary>
-	/// An <see cref="XrObject"/> which renders a <see cref="Graphics.Mesh"/>.
+	/// A <see cref="Drawable3D"/> which renders a <see cref="Graphics.Mesh"/>.
 	/// </summary>
-	public class MeshedXrObject : XrObject {
+	public class Model : Drawable3D {
 		public bool IsVisible = true;
 		public Mesh Mesh { get; set; } = new();
 		public bool UseGammaCorrection = false;
@@ -18,23 +18,23 @@ namespace osu.Framework.XR.Components {
 			set => AllTextures[ 0 ] = value;
 		}
 		public readonly List<TextureGL> AllTextures = new();
-		public MeshedXrObject () {
+		public Model () {
 			Faces = new( i => Transform.Matrix * Mesh.Faces[ i ] );
 			AllTextures.Add( Framework.Graphics.Textures.Texture.WhitePixel.TextureGL );
 		}
-		protected override XrObjectDrawNode CreateDrawNode ()
-			=> new XrMeshDrawNode( this );
+		protected override DrawNode3D CreateDrawNode ()
+			=> new ModelDrawNode( this );
 
 		public readonly ReadonlyIndexer<int, Face> Faces;
 
-		public override Vector3 Size { get => Mesh.BoundingBox.Size; set => throw new InvalidOperationException( $"Cannot set size of a {nameof(MeshedXrObject)}." ); }
+		public override Vector3 Size { get => Mesh.BoundingBox.Size; set => throw new InvalidOperationException( $"Cannot set size of a {nameof(Model)}." ); }
 		public override Vector3 Centre => Mesh.BoundingBox.Min + Mesh.BoundingBox.Size / 2;
 	}
-	public class XrMeshDrawNode : XrMeshDrawNode<MeshedXrObject> {
-		public XrMeshDrawNode ( MeshedXrObject source ) : base( source ) { }
+	public class ModelDrawNode : ModelDrawNode<Model> {
+		public ModelDrawNode ( Model source ) : base( source ) { }
 	}
-	public class XrMeshDrawNode<T> : XrObject.XrObjectDrawNode<T> where T : MeshedXrObject {
-		public XrMeshDrawNode ( T source ) : base( source ) { }
+	public class ModelDrawNode<T> : Drawable3D.XrObjectDrawNode<T> where T : Model {
+		public ModelDrawNode ( T source ) : base( source ) { }
 		protected virtual Mesh GetMesh () => Source.Mesh;
 
 		private bool notInitialized = true;
@@ -50,7 +50,7 @@ namespace osu.Framework.XR.Components {
 				lastUpdateVersion = 0;
 			}
 
-			if ( !XrShader.Shader3D.IsLoaded ) return;
+			if ( !Shaders.Shader3D.IsLoaded ) return;
 			if ( mesh is null ) return;
 
 			if ( notInitialized ) {
@@ -67,20 +67,20 @@ namespace osu.Framework.XR.Components {
 				if ( !Source.AllTextures[ i ].Bind( osuTK.Graphics.ES30.TextureUnit.Texture0 + i ) ) return;
 			}
 
-			XrShader.Shader3D.Bind();
+			Shaders.Shader3D.Bind();
 			GL.BindVertexArray( VAO );
 
 			var a = settings.WorldToCamera;
 			var b = settings.CameraToClip;
 			var c = (Matrix4)Source.Transform.Matrix;
 
-			GL.UniformMatrix4( worldToCamera ??= GL.GetUniformLocation( XrShader.Shader3D, XrShader.VERTEX_3D.WorldToCameraMatrix ), true, ref a );
-			GL.UniformMatrix4( cameraToClip ??= GL.GetUniformLocation( XrShader.Shader3D, XrShader.VERTEX_3D.CameraToClipMatrix ), true, ref b );
-			GL.UniformMatrix4( localToWorld ??= GL.GetUniformLocation( XrShader.Shader3D, XrShader.VERTEX_3D.LocalToWorldMatrix ), true, ref c );
-			GL.Uniform1( useGamma ??= GL.GetUniformLocation( XrShader.Shader3D, XrShader.FRAGMENT_3D.UseGammaCorrection ), Source.UseGammaCorrection ? 1 : 0 );
+			GL.UniformMatrix4( worldToCamera ??= GL.GetUniformLocation( Shaders.Shader3D, Shaders.VERTEX_3D.WorldToCameraMatrix ), true, ref a );
+			GL.UniformMatrix4( cameraToClip ??= GL.GetUniformLocation( Shaders.Shader3D, Shaders.VERTEX_3D.CameraToClipMatrix ), true, ref b );
+			GL.UniformMatrix4( localToWorld ??= GL.GetUniformLocation( Shaders.Shader3D, Shaders.VERTEX_3D.LocalToWorldMatrix ), true, ref c );
+			GL.Uniform1( useGamma ??= GL.GetUniformLocation( Shaders.Shader3D, Shaders.FRAGMENT_3D.UseGammaCorrection ), Source.UseGammaCorrection ? 1 : 0 );
 			GL.DrawElements( PrimitiveType.Triangles, indiceCount, DrawElementsType.UnsignedInt, 0 );
 			GL.BindVertexArray( 0 );
-			XrShader.Shader3D.Unbind();
+			Shaders.Shader3D.Unbind();
 		}
 
 		private static int? worldToCamera;
@@ -113,7 +113,7 @@ namespace osu.Framework.XR.Components {
 		private Dictionary<string, int> attribs = new();
 		protected int AttribLocation ( string name ) {
 			if ( attribs.TryGetValue( name, out var handle ) ) return handle;
-			handle = GL.GetAttribLocation( XrShader.Shader3D, name );
+			handle = GL.GetAttribLocation( Shaders.Shader3D, name );
 			attribs.Add( name, handle );
 			return handle;
 		}

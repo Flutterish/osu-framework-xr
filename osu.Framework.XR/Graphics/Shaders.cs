@@ -1,7 +1,7 @@
 ﻿using osu.Framework.Graphics.Shaders;
 
 namespace osu.Framework.XR.Graphics {
-	public static class XrShader {
+	public static class Shaders {
 		public static readonly Vertex3DShaderDescription VERTEX_3D = new();
 		public static readonly Fragment3DShaderDescription FRAGMENT_3D = new();
 

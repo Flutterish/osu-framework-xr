@@ -6,24 +6,24 @@ using osuTK;
 namespace osu.Framework.XR.Components {
 	public static class TransformExtensions {
 		public static TransformSequence<T> MoveTo<T> ( this T drawable, Vector3 position, double duration = 0, Easing easing = Easing.None )
-			where T : XrObject
+			where T : Drawable3D
 			=> drawable.TransformTo( drawable.PopulateTransform( new PositionTransform( position ), default, duration, new DefaultEasingFunction( easing ) ) );
 
 		public static TransformSequence<T> ScaleTo<T> ( this T drawable, Vector3 scale, double duration = 0, Easing easing = Easing.None )
-			where T : XrObject
+			where T : Drawable3D
 			=> drawable.TransformTo( drawable.PopulateTransform( new ScaleTransform( scale ), default, duration, new DefaultEasingFunction( easing ) ) );
 		public static TransformSequence<T> ScaleTo<T> ( this TransformSequence<T> seq, Vector3 scale, double duration = 0, Easing easing = Easing.None )
-			where T : XrObject
+			where T : Drawable3D
 			=> seq.Append( o => o.ScaleTo( scale, duration, easing ) );
 
 		public static TransformSequence<T> RotateTo<T> ( this T drawable, Quaternion rotation, double duration = 0, Easing easing = Easing.None )
-			where T : XrObject
+			where T : Drawable3D
 			=> drawable.TransformTo( drawable.PopulateTransform( new RotationTransform( rotation ), default, duration, new DefaultEasingFunction( easing ) ) );
 
-		private class PositionTransform : Transform<Vector3, XrObject> {
+		private class PositionTransform : Transform<Vector3, Drawable3D> {
 			private readonly Vector3 target;
 
-			public override string TargetMember => nameof( XrObject.Position );
+			public override string TargetMember => nameof( Drawable3D.Position );
 
 			public PositionTransform ( Vector3 target ) {
 				this.target = target;
@@ -36,18 +36,18 @@ namespace osu.Framework.XR.Components {
 				return StartValue + Interpolation.ValueAt( time, 0f, 1f, StartTime, EndTime, Easing ) * ( EndValue - StartValue );
 			}
 
-			protected override void Apply ( XrObject d, double time ) => d.Position = positionAt( time );
+			protected override void Apply ( Drawable3D d, double time ) => d.Position = positionAt( time );
 
-			protected override void ReadIntoStartValue ( XrObject d ) {
+			protected override void ReadIntoStartValue ( Drawable3D d ) {
 				StartValue = d.Position;
 				EndValue = target;
 			}
 		}
 
-		private class ScaleTransform : Transform<Vector3, XrObject> {
+		private class ScaleTransform : Transform<Vector3, Drawable3D> {
 			private readonly Vector3 target;
 
-			public override string TargetMember => nameof( XrObject.Scale );
+			public override string TargetMember => nameof( Drawable3D.Scale );
 
 			public ScaleTransform ( Vector3 target ) {
 				this.target = target;
@@ -60,18 +60,18 @@ namespace osu.Framework.XR.Components {
 				return StartValue + Interpolation.ValueAt( time, 0f, 1f, StartTime, EndTime, Easing ) * ( EndValue - StartValue );
 			}
 
-			protected override void Apply ( XrObject d, double time ) => d.Scale = scaleAt( time );
+			protected override void Apply ( Drawable3D d, double time ) => d.Scale = scaleAt( time );
 
-			protected override void ReadIntoStartValue ( XrObject d ) {
+			protected override void ReadIntoStartValue ( Drawable3D d ) {
 				StartValue = d.Scale;
 				EndValue = target;
 			}
 		}
 
-		private class RotationTransform : Transform<Quaternion, XrObject> {
+		private class RotationTransform : Transform<Quaternion, Drawable3D> {
 			private readonly Quaternion target;
 
-			public override string TargetMember => nameof( XrObject.Rotation );
+			public override string TargetMember => nameof( Drawable3D.Rotation );
 
 			public RotationTransform ( Quaternion target ) {
 				this.target = target;
@@ -84,9 +84,9 @@ namespace osu.Framework.XR.Components {
 				return Quaternion.Slerp( StartValue, EndValue, Interpolation.ValueAt( time, 0f, 1f, StartTime, EndTime, Easing ) );
 			}
 
-			protected override void Apply ( XrObject d, double time ) => d.Rotation = rotationAt( time );
+			protected override void Apply ( Drawable3D d, double time ) => d.Rotation = rotationAt( time );
 
-			protected override void ReadIntoStartValue ( XrObject d ) {
+			protected override void ReadIntoStartValue ( Drawable3D d ) {
 				StartValue = d.Rotation;
 				EndValue = target;
 			}

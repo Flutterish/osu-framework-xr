@@ -12,7 +12,7 @@ namespace osu.Framework.XR.GameHosts {
 	public abstract class ExtendedRealityGameHost : GameHost {
 		protected ExtendedRealityGameHost ( string gameName = "", ToolkitOptions toolkitOptions = null ) : base( gameName, toolkitOptions ) { }
 
-		public XrTextInput TextInput { get; } = new XrTextInput();
+		public VirtualTextInput TextInput { get; } = new VirtualTextInput();
 		public override ITextInputSource GetTextInput ()
 			=> TextInput;
 
@@ -86,8 +86,8 @@ namespace osu.Framework.XR.GameHosts {
 				0, 0, 0, 1
 			);
 
-			runningGame.Scene.Camera.Render( runningGame.Scene, leftEye, new XrObject.XrObjectDrawNode.DrawSettings { WorldToCamera = headToLeftEye * runningGame.Scene.Camera.WorldCameraMatrix, CameraToClip = leftEyeMatrix } );
-			runningGame.Scene.Camera.Render( runningGame.Scene, rightEye, new XrObject.XrObjectDrawNode.DrawSettings { WorldToCamera = headToRightEye * runningGame.Scene.Camera.WorldCameraMatrix, CameraToClip = rightEyeMatrix } );
+			runningGame.Scene.Camera.Render( leftEye, new Drawable3D.DrawNode3D.DrawSettings { WorldToCamera = headToLeftEye * runningGame.Scene.Camera.WorldCameraMatrix, CameraToClip = leftEyeMatrix } );
+			runningGame.Scene.Camera.Render( rightEye, new Drawable3D.DrawNode3D.DrawSettings { WorldToCamera = headToRightEye * runningGame.Scene.Camera.WorldCameraMatrix, CameraToClip = rightEyeMatrix } );
 
 			Texture_t left = new Texture_t { eColorSpace = EColorSpace.Linear, eType = ETextureType.OpenGL, handle = (IntPtr)leftEye.Texture.TextureId };
 			Texture_t right = new Texture_t { eColorSpace = EColorSpace.Linear, eType = ETextureType.OpenGL, handle = (IntPtr)rightEye.Texture.TextureId };

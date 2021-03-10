@@ -14,14 +14,14 @@ namespace osu.Framework.XR.Components {
 	/// <summary>
 	/// A scene containing Xr objects.
 	/// </summary>
-	public class XrScene : Container {
-		public XrScene () {
-			Add( new XrSceneDrawer( this ) );
+	public class Scene : Container {
+		public Scene () {
+			Add( new SceneDrawer( this ) );
 			base.Add( Root );
 		}
 
 		public override void Add ( Drawable drawable ) {
-			if ( drawable is XrObject xro )
+			if ( drawable is Drawable3D xro )
 				Root.Add( xro );
 			else
 				base.Add( drawable );
@@ -29,17 +29,17 @@ namespace osu.Framework.XR.Components {
 
 		public bool RenderToScreen { get => RenderToScreenBindable.Value; set => RenderToScreenBindable.Value = value; }
 		public readonly BindableBool RenderToScreenBindable = new( true );
-		public readonly XrGroup Root = new XrGroup();
+		public readonly Container3D Root = new Container3D();
 		public Camera Camera;
 
-		public static implicit operator CompositeXrObject ( XrScene scene )
+		public static implicit operator CompositeDrawable3D ( Scene scene )
 			=> scene.Root;
 
 		private IShader TextureShader;
 		private DepthFrameBuffer depthBuffer = new();
 		[BackgroundDependencyLoader]
 		private void load ( ShaderManager shaders ) {
-			XrShader.Shader3D ??= shaders.Load( XrShader.VERTEX_3D, XrShader.FRAGMENT_3D ) as Shader;
+			Shaders.Shader3D ??= shaders.Load( Shaders.VERTEX_3D, Shaders.FRAGMENT_3D ) as Shader;
 			TextureShader = shaders.Load( VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE );
 		}
 
@@ -48,10 +48,10 @@ namespace osu.Framework.XR.Components {
 			depthBuffer.Dispose();
 		}
 
-		private class XrSceneDrawer : Drawable { // for whatever reason o!f doesnt use the XrScenes draw node ( prolly bc its a container )
-			public XrScene Scene;
+		private class SceneDrawer : Drawable { // for whatever reason o!f doesnt use the XrScenes draw node ( prolly bc its a container )
+			public Scene Scene;
 
-			public XrSceneDrawer ( XrScene scene ) {
+			public SceneDrawer ( Scene scene ) {
 				Scene = scene;
 			}
 
@@ -60,8 +60,8 @@ namespace osu.Framework.XR.Components {
 		}
 
 		private class XrSceneDrawNode : DrawNode {
-			new private XrScene Source;
-			public XrSceneDrawNode ( XrScene source ) : base( source ) {
+			new private Scene Source;
+			public XrSceneDrawNode ( Scene source ) : base( source ) {
 				Source = source;
 			}
 
@@ -81,7 +81,7 @@ namespace osu.Framework.XR.Components {
 
 				if ( Source.depthBuffer.Size != size ) Source.depthBuffer.Size = size;
 
-				Source.Camera?.Render( Source.Root, Source.depthBuffer );
+				Source.Camera?.Render( Source.depthBuffer );
 
 				base.Draw( vertexAction );
 				if ( Source.depthBuffer.Texture.Bind() ) {

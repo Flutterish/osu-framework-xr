@@ -3,7 +3,7 @@ using osu.Framework.Input;
 using System;
 
 namespace osu.Framework.XR.GameHosts {
-	public class XrTextInput : ITextInputSource {
+	public class VirtualTextInput : ITextInputSource {
 		private string pending;
 
 		public void AppendText ( string text ) {

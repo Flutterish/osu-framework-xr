@@ -11,7 +11,7 @@ using System;
 using System.Collections.Generic;
 
 namespace osu.Framework.XR.Projection {
-	public class Camera : XrObject {
+	public class Camera : Drawable3D {
 		public Camera () {
 			Fov = new Vector2( MathF.PI * 2 - 4 * MathF.Atan( 16f / 9 ), MathF.PI );
 			FovBindable.BindValueChanged( v => {
@@ -22,18 +22,18 @@ namespace osu.Framework.XR.Projection {
 			}, true );
 		}
 
-		List<XrObject> depthTestedRenderTargets = new();
-		List<XrObject> renderTargets = new();
-		private bool shoudBeDepthTested ( XrObject target ) {
+		List<Drawable3D> depthTestedRenderTargets = new();
+		List<Drawable3D> renderTargets = new();
+		private bool shoudBeDepthTested ( Drawable3D target ) {
 			return target is not IBehindEverything;
 		}
-		private void addRenderTarget ( XrObject parent, XrObject child ) {
+		private void addRenderTarget ( Drawable3D parent, Drawable3D child ) {
 			if ( shoudBeDepthTested( child ) )
 				lock ( depthTestedRenderTargets ) { depthTestedRenderTargets.Add( child ); }
 			else
 				lock ( renderTargets ) { renderTargets.Add( child ); }
 		}
-		private void removeRenderTarget ( XrObject parent, XrObject child ) {
+		private void removeRenderTarget ( Drawable3D parent, Drawable3D child ) {
 			if ( shoudBeDepthTested( child ) )
 				lock ( depthTestedRenderTargets ) { depthTestedRenderTargets.Remove( child ); }
 			else
@@ -73,7 +73,7 @@ namespace osu.Framework.XR.Projection {
 			return p.Z > 0;
 		}
 
-		public void Render ( XrObject xrObject, DepthFrameBuffer depthBuffer ) {
+		public void Render (  DepthFrameBuffer depthBuffer ) {
 			Vector2 scale;
 			if ( depthBuffer.Size.X / depthBuffer.Size.Y > AspectRatio ) {
 				scale = new( AspectRatio * AspectRatio, 1 ); // TODO why square?
@@ -82,16 +82,16 @@ namespace osu.Framework.XR.Projection {
 				scale = new( 1, 1 / AspectRatio / AspectRatio );
 			}
 
-			var settings = new XrObjectDrawNode.DrawSettings {
+			var settings = new DrawNode3D.DrawSettings {
 				Camera = this,
 				CameraToClip = CameraClipMatrix,
 				WorldToCamera = Matrix4x4.CreateScale( scale.X, scale.Y ) * WorldCameraMatrix
 			};
 
-			Render( xrObject, depthBuffer, settings );
+			Render( depthBuffer, settings );
 		}
 
-		public void Render ( XrObject xrObject, DepthFrameBuffer depthBuffer, XrObjectDrawNode.DrawSettings settings ) {
+		public void Render (  DepthFrameBuffer depthBuffer, DrawNode3D.DrawSettings settings ) {
 			settings = settings with { Camera = this };
 
 			GLWrapper.PushViewport( new RectangleI( 0, 0, (int)depthBuffer.Size.X, (int)depthBuffer.Size.Y ) );
