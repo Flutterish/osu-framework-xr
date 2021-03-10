@@ -29,10 +29,10 @@ namespace osu.Framework.XR.Components {
 
 		public bool RenderToScreen { get => RenderToScreenBindable.Value; set => RenderToScreenBindable.Value = value; }
 		public readonly BindableBool RenderToScreenBindable = new( true );
-		public readonly XrObject Root = new XrObject();
+		public readonly XrGroup Root = new XrGroup();
 		public Camera Camera;
 
-		public static implicit operator XrObject ( XrScene scene )
+		public static implicit operator CompositeXrObject ( XrScene scene )
 			=> scene.Root;
 
 		private IShader TextureShader;

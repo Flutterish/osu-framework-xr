@@ -2,6 +2,7 @@
 using osu.Framework.XR.Graphics;
 using osuTK;
 using osuTK.Graphics.OpenGL4;
+using System;
 using System.Collections.Generic;
 
 namespace osu.Framework.XR.Components {
@@ -26,7 +27,7 @@ namespace osu.Framework.XR.Components {
 
 		public readonly ReadonlyIndexer<int, Face> Faces;
 
-		protected override Vector3 RequiredParentSizeToFit => Mesh.BoundingBox.Size;
+		public override Vector3 Size { get => Mesh.BoundingBox.Size; set => throw new InvalidOperationException( $"Cannot set size of a {nameof(MeshedXrObject)}." ); }
 		public override Vector3 Centre => Mesh.BoundingBox.Min + Mesh.BoundingBox.Size / 2;
 	}
 	public class XrMeshDrawNode : XrMeshDrawNode<MeshedXrObject> {

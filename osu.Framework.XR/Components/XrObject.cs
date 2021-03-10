@@ -18,38 +18,23 @@ namespace osu.Framework.XR.Components {
 			RelativeSizeAxes = Axes.Both;
 		}
 
-		private List<XrObject> children = new();
-		private XrObject parent;
-		new public XrObject Child {
-			get => children.Single();
-			set {
-				foreach ( var i in children.ToArray() ) i.Parent = null;
-				value.Parent = this;
-			}
-		}
-		new public IReadOnlyList<XrObject> Children {
-			get => children.AsReadOnly();
-			set {
-				foreach ( var i in children.ToArray() ) i.Parent = null;
-				foreach ( var i in value ) i.Parent = this;
-			}
-		}
-		new public XrObject Parent {
+		internal CompositeXrObject parent;
+		new public CompositeXrObject Parent {
 			get => parent;
 			set {
 				if ( parent == value ) return;
 
-				if ( parent is Container con ) {
+				if ( parent is not null ) {
 					parent.children.Remove( this );
-					con.Remove( this );
+					parent.RemoveDrawable( this );
 
 					parent.onChildRemoved( this );
 					foreach ( var i in GetAllChildrenInHiererchy() ) parent.onChildRemovedFromHierarchy( i.parent, i );
 				}
 				parent = value;
-				if ( parent is Container con2 ) {
+				if ( parent is not null ) {
 					parent.children.Add( this );
-					con2.Add( this );
+					parent.AddDrawable( this );
 
 					parent.onChildAdded( this );
 					foreach ( var i in GetAllChildrenInHiererchy() ) parent.onChildAddedToHierarchy( i.parent, i );
@@ -57,72 +42,27 @@ namespace osu.Framework.XR.Components {
 				Transform.SetParent( parent?.Transform, transformKey );
 			}
 		}
-		// These events are used for efficient hiererchy change scans used in for example the physics system.
-		public delegate void ChildChangedHandler ( XrObject parent, XrObject child );
-		/// <summary>
-		/// Occurs whenever a child is added to this <see cref="XrObject"/>
-		/// </summary>
-		public event ChildChangedHandler ChildAdded;
-		/// <summary>
-		/// Occurs whenever a child is removed from this <see cref="XrObject"/>
-		/// </summary>
-		public event ChildChangedHandler ChildRemoved;
-		/// <summary>
-		/// Occurs whenever an <see cref="XrObject"/> is added under this <see cref="XrObject"/>
-		/// </summary>
-		public event ChildChangedHandler ChildAddedToHierarchy;
-		/// <summary>
-		/// Occurs whenever an <see cref="XrObject"/> is removed from under this <see cref="XrObject"/>
-		/// </summary>
-		public event ChildChangedHandler ChildRemovedFromHierarchy;
 
-		private void onChildAdded ( XrObject child ) {
-			ChildAdded?.Invoke( this, child );
-			onChildAddedToHierarchy( this, child );
-		}
-		private void onChildAddedToHierarchy ( XrObject parent, XrObject child ) {
-			ChildAddedToHierarchy?.Invoke( parent, child );
-			this.parent?.onChildAddedToHierarchy( parent, child );
-		}
-		private void onChildRemoved ( XrObject child ) {
-			ChildRemoved?.Invoke( this, child );
-			onChildRemovedFromHierarchy( this, child );
-		}
-		private void onChildRemovedFromHierarchy ( XrObject parent, XrObject child ) {
-			ChildRemovedFromHierarchy?.Invoke( parent, child );
-			this.parent?.onChildRemovedFromHierarchy( parent, child );
-		}
-		public void BindHierarchyChange ( ChildChangedHandler added, ChildChangedHandler removed, bool runOnAllChildrenImmediately = false ) {
-			if ( removed is not null ) ChildRemovedFromHierarchy += removed;
-			if ( added is not null ) {
-				ChildAddedToHierarchy += added;
-				if ( runOnAllChildrenImmediately ) {
-					foreach ( var i in GetAllChildrenInHiererchy() ) {
-						added( i.parent, i );
+		public IEnumerable<XrObject> GetAllChildrenInHiererchy () {
+			List<XrObject> all = new() { this };
+			for ( int i = 0; i < all.Count; i++ ) {
+				if ( all[ i ] is CompositeXrObject current ) {
+					for ( int k = 0; k < current.children.Count; k++ ) {
+						yield return current.children[ k ];
+						all.Add( current.children[ k ] );
 					}
 				}
 			}
 		}
 
-		public IEnumerable<XrObject> GetAllChildrenInHiererchy () {
-			List<XrObject> all = new() { this };
-			for ( int i = 0; i < all.Count; i++ ) {
-				var current = all[ i ];
-				for ( int k = 0; k < current.children.Count; k++ ) {
-					yield return current.children[ k ];
-					all.Add( current.children[ k ] );
-				}
-			}
-		}
-
 		/// <summary>
-		/// The topmost <see cref="XrObject"/> in the hierarchy. This operation performs upwards tree traveral and might be expensive.
+		/// The topmost <see cref="XrGroup"/> in the hierarchy. This operation performs upwards tree traveral and might be expensive.
 		/// </summary>
-		public XrObject Root => ( parent?.Root ?? parent ) ?? this;
+		public XrGroup Root => ( parent?.Root ?? ( parent as XrGroup ) ) ?? ( this as XrGroup );
 		public T FindObject<T> () where T : XrObject {
-			T find ( XrObject node ) {
+			T find ( CompositeXrObject node ) {
 				if ( node is T tnode ) return tnode;
-				foreach ( var i in node.children ) {
+				foreach ( var i in node.children.OfType<CompositeXrObject>() ) {
 					var res = find( i );
 					if ( res is not null ) return res;
 				}
@@ -130,12 +70,6 @@ namespace osu.Framework.XR.Components {
 			}
 
 			return find( Root );
-		}
-		public void Add ( XrObject child ) {
-			child.Parent = this;
-		}
-		public void Remove ( XrObject child ) {
-			child.Parent = null;
 		}
 
 		public virtual void BeforeDraw ( XrObjectDrawNode.DrawSettings settings ) { }
@@ -194,12 +128,9 @@ namespace osu.Framework.XR.Components {
 		public Vector3 Up => Transform.Up;
 		public Vector3 Down => Transform.Down;
 
-		protected virtual Vector3 RequiredParentSizeToFit => ChildSize;
-		/// <summary>
-		/// The size nescessary to fit all children
-		/// </summary>
-		new public Vector3 ChildSize { get; private set; } // ISSUE the "no separation between composite and regular xrobjects" makes this iffy bc theres "children size" and "self size"
-		new protected Axes3D AutoSizeAxes = Axes3D.All; // TODO invalidation mechanism for this
+		new public virtual Vector3 Size { get; set; }
+		public virtual Vector3 RequiredParentSizeToFit => Size;
+
 		public Axes3D AutoOffsetAxes = Axes3D.None;
 		new public Axes3D BypassAutoSizeAxes = Axes3D.None;
 		private Vector3 autoOffsetAnchor;
@@ -264,41 +195,44 @@ namespace osu.Framework.XR.Components {
 		/// <summary>
 		/// The centre of the object in local coordinates.
 		/// </summary>
-		public virtual Vector3 Centre => children.Any() ? children.Average( x => x.Position + x.Centre ) : Vector3.Zero;
+		public virtual Vector3 Centre => Vector3.Zero;
 		protected override void Update () {
 			base.Update();
-			if ( children.Any() ) {
-				ChildSize = new Vector3(
-					AutoSizeAxes.HasFlag( Axes3D.X ) ? children.Max( c => c.BypassAutoSizeAxes.HasFlag( Axes3D.X ) ? 0 : c.RequiredParentSizeToFit.X ) : 0,
-					AutoSizeAxes.HasFlag( Axes3D.Y ) ? children.Max( c => c.BypassAutoSizeAxes.HasFlag( Axes3D.Y ) ? 0 : c.RequiredParentSizeToFit.Y ) : 0,
-					AutoSizeAxes.HasFlag( Axes3D.Z ) ? children.Max( c => c.BypassAutoSizeAxes.HasFlag( Axes3D.Z ) ? 0 : c.RequiredParentSizeToFit.Z ) : 0
-				);
-			}
-			else {
-				ChildSize = RequiredParentSizeToFit;
-			}
 
 			if ( AutoOffsetAxes.HasFlag( Axes3D.X ) ) {
 				var parentSize = parent is null ? 0 : parent.ChildSize.X;
-				var ownSize = ChildSize.X;
+				var ownSize = Size.X;
 				Transform.OffsetX = autoOffsetAnchor.X * parentSize - autoOffsetOrigin.X * ownSize - Centre.X;
 			}
 			if ( AutoOffsetAxes.HasFlag( Axes3D.Y ) ) {
 				var parentSize = parent is null ? 0 : parent.ChildSize.Y;
-				var ownSize = ChildSize.Y;
+				var ownSize = Size.Y;
 				Transform.OffsetY = autoOffsetAnchor.Y * parentSize - autoOffsetOrigin.Y * ownSize - Centre.Y;
 			}
 			if ( AutoOffsetAxes.HasFlag( Axes3D.Z ) ) {
 				var parentSize = parent is null ? 0 : parent.ChildSize.Z;
-				var ownSize = ChildSize.Z;
+				var ownSize = Size.Z;
 				Transform.OffsetZ = autoOffsetAnchor.Z * parentSize - autoOffsetOrigin.Z * ownSize - Centre.Z;
 			}
 		}
 
-		public void Destroy () {
+		public virtual void Destroy () {
 			Parent = null;
-			foreach ( var i in children ) i.Destroy();
 			Dispose();
+		}
+
+		public override void Add ( Drawable drawable ) {
+			throw new InvalidOperationException( $"Wrong method. If you want to add an {nameof( XrObject )} you need to cast this to {nameof( CompositeXrObject )} or {nameof( XrGroup )}. To add a {nameof( Drawable )}, use {nameof( XrObject.AddDrawable )}." );
+		}
+		public override bool Remove ( Drawable drawable ) {
+			throw new InvalidOperationException( $"Wrong method. If you want to remove an {nameof( XrObject )} you need to cast this to {nameof( CompositeXrObject )} or {nameof( XrGroup )}. To remove a {nameof( Drawable )}, use {nameof( XrObject.RemoveDrawable )}." );
+		}
+
+		public void AddDrawable ( Drawable drawable ) {
+			base.Add( drawable );
+		}
+		public void RemoveDrawable ( Drawable drawable ) {
+			base.Remove( drawable );
 		}
 
 		private XrObjectDrawNode drawNode;

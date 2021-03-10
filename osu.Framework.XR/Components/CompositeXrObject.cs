@@ -1,0 +1,117 @@
+﻿using osuTK;
+using System.Collections.Generic;
+using System.Linq;
+using osu.Framework.XR.Maths;
+using System;
+using osu.Framework.Extensions.EnumExtensions;
+
+namespace osu.Framework.XR.Components {
+	public class CompositeXrObject : XrObject {
+		internal List<XrObject> children = new();
+		new public XrObject Child {
+			get => children.Single();
+			protected set {
+				foreach ( var i in children.ToArray() ) i.Parent = null;
+				value.Parent = this;
+			}
+		}
+		new public IReadOnlyList<XrObject> Children {
+			get => children.AsReadOnly();
+			protected set {
+				foreach ( var i in children.ToArray() ) i.Parent = null;
+				foreach ( var i in value ) i.Parent = this;
+			}
+		}
+		protected void Add ( XrObject child ) {
+			child.Parent = this;
+		}
+		protected void Remove ( XrObject child ) {
+			if ( child.parent != this ) throw new InvalidOperationException( "Tried to remove child which does not belong to this parent." );
+			child.Parent = null;
+		}
+
+		// These events are used for efficient hiererchy change scans used in for example the physics system.
+		public delegate void ChildChangedHandler ( XrObject parent, XrObject child );
+		/// <summary>
+		/// Occurs whenever a child is added to this <see cref="XrObject"/>
+		/// </summary>
+		public event ChildChangedHandler ChildAdded;
+		/// <summary>
+		/// Occurs whenever a child is removed from this <see cref="XrObject"/>
+		/// </summary>
+		public event ChildChangedHandler ChildRemoved;
+		/// <summary>
+		/// Occurs whenever an <see cref="XrObject"/> is added under this <see cref="XrObject"/>
+		/// </summary>
+		public event ChildChangedHandler ChildAddedToHierarchy;
+		/// <summary>
+		/// Occurs whenever an <see cref="XrObject"/> is removed from under this <see cref="XrObject"/>
+		/// </summary>
+		public event ChildChangedHandler ChildRemovedFromHierarchy;
+
+		internal void onChildAdded ( XrObject child ) {
+			ChildAdded?.Invoke( this, child );
+			onChildAddedToHierarchy( this, child );
+		}
+		internal void onChildAddedToHierarchy ( XrObject parent, XrObject child ) {
+			ChildAddedToHierarchy?.Invoke( parent, child );
+			this.parent?.onChildAddedToHierarchy( parent, child );
+		}
+		internal void onChildRemoved ( XrObject child ) {
+			ChildRemoved?.Invoke( this, child );
+			onChildRemovedFromHierarchy( this, child );
+		}
+		internal void onChildRemovedFromHierarchy ( XrObject parent, XrObject child ) {
+			ChildRemovedFromHierarchy?.Invoke( parent, child );
+			this.parent?.onChildRemovedFromHierarchy( parent, child );
+		}
+		public void BindHierarchyChange ( ChildChangedHandler added, ChildChangedHandler removed, bool runOnAllChildrenImmediately = false ) {
+			if ( removed is not null ) ChildRemovedFromHierarchy += removed;
+			if ( added is not null ) {
+				ChildAddedToHierarchy += added;
+				if ( runOnAllChildrenImmediately ) {
+					foreach ( var i in GetAllChildrenInHiererchy() ) {
+						added( i.parent, i );
+					}
+				}
+			}
+		}
+
+		private Vector3 childSize;
+		/// <summary>
+		/// The size nescessary to fit all children
+		/// </summary>
+		new public Vector3 ChildSize { get => childSize; private set => childSize = value; } // ISSUE the "no separation between composite and regular xrobjects" makes this iffy bc theres "children size" and "self size"
+		public override Vector3 RequiredParentSizeToFit => ChildSize;
+		public override Vector3 Size { 
+			get => ChildSize; 
+			set {
+				if ( AutoSizeAxes != Axes3D.None ) throw new InvalidOperationException( $"Cannot modify size of an autosized {nameof(XrObject)}." );
+				ChildSize = value;
+			} 
+		}
+		new protected Axes3D AutoSizeAxes = Axes3D.All; // TODO invalidation mechanism for this
+		public override Vector3 Centre => children.Any() ? children.Average( x => x.Position + x.Centre ) : Vector3.Zero;
+
+		protected override void Update () {
+			base.Update();
+			if ( children.Any() ) {
+				ChildSize = new Vector3(
+					AutoSizeAxes.HasFlagFast( Axes3D.X ) ? children.Max( c => c.BypassAutoSizeAxes.HasFlagFast( Axes3D.X ) ? 0 : c.RequiredParentSizeToFit.X ) : 0,
+					AutoSizeAxes.HasFlagFast( Axes3D.Y ) ? children.Max( c => c.BypassAutoSizeAxes.HasFlagFast( Axes3D.Y ) ? 0 : c.RequiredParentSizeToFit.Y ) : 0,
+					AutoSizeAxes.HasFlagFast( Axes3D.Z ) ? children.Max( c => c.BypassAutoSizeAxes.HasFlagFast( Axes3D.Z ) ? 0 : c.RequiredParentSizeToFit.Z ) : 0
+				);
+			}
+			else {
+				if ( AutoSizeAxes.HasFlagFast( Axes3D.X ) ) childSize.X = 0;
+				if ( AutoSizeAxes.HasFlagFast( Axes3D.Y ) ) childSize.Y = 0;
+				if ( AutoSizeAxes.HasFlagFast( Axes3D.Z ) ) childSize.Z = 0;
+			}
+		}
+
+		public override void Destroy () {
+			foreach ( var i in children ) i.Destroy();
+			base.Destroy();
+		}
+	}
+}
