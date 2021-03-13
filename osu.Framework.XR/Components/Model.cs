@@ -25,7 +25,12 @@ namespace osu.Framework.XR.Components {
 		protected override DrawNode3D CreateDrawNode ()
 			=> new ModelDrawNode( this );
 
-		public readonly ReadonlyIndexer<int, Face> Faces;
+		public readonly CachedReadonlyIndexer<int, Face> Faces;
+
+		protected override void Update () {
+			base.Update();
+			Faces.ClearCache();
+		}
 
 		public override Vector3 Size { get => Mesh.BoundingBox.Size; set => throw new InvalidOperationException( $"Cannot set size of a {nameof(Model)}." ); }
 		public override Vector3 Centre => Mesh.BoundingBox.Min + Mesh.BoundingBox.Size / 2;

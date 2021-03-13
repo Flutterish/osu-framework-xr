@@ -81,7 +81,7 @@ namespace osu.Framework.XR.Components {
 		/// <summary>
 		/// The size nescessary to fit all children
 		/// </summary>
-		new public Vector3 ChildSize { get => childSize; private set => childSize = value; } // ISSUE the "no separation between composite and regular xrobjects" makes this iffy bc theres "children size" and "self size"
+		new public Vector3 ChildSize { get => childSize; private set => childSize = value; }
 		public override Vector3 RequiredParentSizeToFit => ChildSize;
 		public override Vector3 Size { 
 			get => ChildSize; 

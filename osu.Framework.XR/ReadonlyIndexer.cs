@@ -2,13 +2,13 @@
 
 namespace osu.Framework.XR {
 	public class ReadonlyIndexer<Tin, Tout> {
-		Func<Tin, Tout> getter;
+		protected Func<Tin, Tout> Getter;
 
 		public ReadonlyIndexer ( Func<Tin, Tout> getter ) {
-			this.getter = getter;
+			this.Getter = getter;
 		}
 
-		public Tout this[ Tin index ]
-			=> getter( index );
+		public virtual Tout this[ Tin index ]
+			=> Getter( index );
 	}
 }

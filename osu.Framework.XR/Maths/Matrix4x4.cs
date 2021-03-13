@@ -291,5 +291,19 @@ namespace osu.Framework.XR.Maths {
 				0, 0, 0, 1
 			);
 		}
+
+		public static bool operator == ( Matrix4x4 l, Matrix4x4 r ) {
+			return l.Row0 == r.Row0
+				&& l.Row1 == r.Row1
+				&& l.Row2 == r.Row2
+				&& l.Row3 == r.Row3;
+		}
+
+		public static bool operator != ( Matrix4x4 l, Matrix4x4 r ) {
+			return l.Row0 != r.Row0
+				|| l.Row1 != r.Row1
+				|| l.Row2 != r.Row2
+				|| l.Row3 != r.Row3;
+		}
 	}
 }

@@ -99,6 +99,7 @@ namespace osu.Framework.XR.Maths {
 				isFinalMatrixInvalidated = true;
 			}
 		}
+
 		private void validateFinal () {
 			if ( isFinalMatrixInvalidated ) {
 				if ( parent is null )
