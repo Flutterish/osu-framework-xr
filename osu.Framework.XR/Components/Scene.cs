@@ -28,7 +28,7 @@ namespace osu.Framework.XR.Components {
 		}
 
 		public bool RenderToScreen { get => RenderToScreenBindable.Value; set => RenderToScreenBindable.Value = value; }
-		public readonly BindableBool RenderToScreenBindable = new( true );
+		public readonly BindableBool RenderToScreenBindable = new( false );
 		public readonly Container3D Root = new Container3D();
 		public Camera Camera;
 
