@@ -11,7 +11,7 @@ using Valve.VR;
 
 namespace osu.Framework.XR.GameHosts {
 	public abstract class ExtendedRealityGameHost : GameHost {
-		protected ExtendedRealityGameHost ( string gameName = "", ToolkitOptions toolkitOptions = null ) : base( gameName, toolkitOptions ) {
+		protected ExtendedRealityGameHost ( string gameName = "" ) : base( gameName ) {
 			IsActive.BindValueChanged( v => {
 				if ( v.NewValue == false ) { // this makes it so osu never caps our FPS
 					IsActive.UnbindFrom( Window.IsActive );
@@ -42,19 +42,9 @@ namespace osu.Framework.XR.GameHosts {
 		public void Run ( XrGame game ) {
 			runningGame = game;
 
-#if DEBUG
-			while ( runningGame is not null ) {
-				try {
-					base.Run( game );
-					runningGame = null;
-				}
-				catch ( Exception e ) {
-					Events.Exception( e, e.Message );
-				}
-			}
-#else
 			base.Run( game );
-#endif
+			runningGame = null;
+
 			VR.Exit();
 		}
 

@@ -16,8 +16,9 @@ namespace osu.Framework.XR.GameHosts {
 
 		internal bool UseOsuTK { get; }
 
-		protected ExtendedRealityDesktopGameHost ( string gameName = @"", bool bindIPCPort = false, ToolkitOptions toolkitOptions = default, bool portableInstallation = false, bool useOsuTK = false )
-			: base( gameName, toolkitOptions ) {
+		protected ExtendedRealityDesktopGameHost ( string gameName = @"", bool bindIPCPort = false, bool portableInstallation = false, bool useOsuTK = false )
+			: base( gameName ) 
+		{
 			this.bindIPCPort = bindIPCPort;
 			IsPortableInstallation = portableInstallation;
 			UseOsuTK = useOsuTK;
@@ -37,11 +38,6 @@ namespace osu.Framework.XR.GameHosts {
 				startIPC();
 
 			base.SetupForRun();
-		}
-
-		protected override void SetupToolkit () {
-			if ( UseOsuTK )
-				base.SetupToolkit();
 		}
 
 		private void startIPC () {

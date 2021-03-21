@@ -1,9 +1,9 @@
-﻿using osuTK;
+﻿using osu.Framework.Extensions.EnumExtensions;
+using osu.Framework.XR.Maths;
+using osuTK;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.XR.Maths;
-using System;
-using osu.Framework.Extensions.EnumExtensions;
 
 namespace osu.Framework.XR.Components {
 	public class CompositeDrawable3D : Drawable3D {

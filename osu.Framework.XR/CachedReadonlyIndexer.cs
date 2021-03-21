@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace osu.Framework.XR {
 	public class CachedReadonlyIndexer<Tin, Tout> : ReadonlyIndexer<Tin, Tout> {

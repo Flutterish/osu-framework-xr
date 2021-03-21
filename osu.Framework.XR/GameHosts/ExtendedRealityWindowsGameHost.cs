@@ -23,8 +23,8 @@ namespace osu.XR.GameHosts {
 #endif
 		public override bool CapsLockEnabled => Console.CapsLock;
 
-		public ExtendedRealityWindowsGameHost ( string gameName, bool bindIPC = false, ToolkitOptions toolkitOptions = default, bool portableInstallation = false, bool useOsuTK = false )
-			: base( gameName, bindIPC, toolkitOptions, portableInstallation, useOsuTK ) {
+		public ExtendedRealityWindowsGameHost ( string gameName, bool bindIPC = false, bool portableInstallation = false, bool useOsuTK = false )
+			: base( gameName, bindIPC, portableInstallation, useOsuTK ) {
 		}
 
 		public override void OpenFileExternally ( string filename ) {
