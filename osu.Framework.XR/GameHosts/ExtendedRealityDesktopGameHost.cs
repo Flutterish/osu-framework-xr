@@ -1,14 +1,10 @@
 ﻿using osu.Framework.Input.Handlers;
-using osu.Framework.Input.Handlers.Joystick;
-using osu.Framework.Input.Handlers.Keyboard;
-using osu.Framework.Input.Handlers.Midi;
-using osu.Framework.Input.Handlers.Mouse;
 using osu.Framework.Platform;
 using osuTK;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -73,25 +69,8 @@ namespace osu.Framework.XR.GameHosts {
 			UseShellExecute = true //see https://github.com/dotnet/corefx/issues/10361
 		} );
 
-		protected override IEnumerable<InputHandler> CreateAvailableInputHandlers () {
-			var defaultEnabled = new InputHandler[]
-			{
-				new KeyboardHandler(),
-				new MouseHandler(),
-				new JoystickHandler(),
-				new MidiInputHandler()
-			};
-
-			var defaultDisabled = new InputHandler[]
-			{
-				typeof( MouseHandler ).Assembly.CreateInstance( "osu.Framework.Input.Handlers.Mouse.OsuTKRawMouseHandler" ) as InputHandler
-			};
-
-			foreach ( var h in defaultDisabled )
-				h.Enabled.Value = false;
-
-			return defaultEnabled.Concat( defaultDisabled );
-		}
+		protected override IEnumerable<InputHandler> CreateAvailableInputHandlers ()
+			=> Array.Empty<InputHandler>();
 
 		public override Task SendMessageAsync ( IpcMessage message ) => ipcProvider.SendMessageAsync( message );
 

@@ -5,6 +5,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Shaders\sh_3DFrag.fs" />
+    <None Remove="Shaders\sh_3DVertex.vs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Shaders\sh_3DFrag.fs" />
+    <EmbeddedResource Include="Shaders\sh_3DVertex.vs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="ppy.osu.Framework" Version="2021.302.0" />
   </ItemGroup>
 
