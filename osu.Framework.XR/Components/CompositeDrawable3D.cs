@@ -33,19 +33,19 @@ namespace osu.Framework.XR.Components {
 		// These events are used for efficient hiererchy change scans used in for example the physics system.
 		public delegate void ChildChangedHandler ( Drawable3D parent, Drawable3D child );
 		/// <summary>
-		/// Occurs whenever a child is added to this <see cref="Drawable3D"/>
+		/// Occurs whenever a child is added to this <see cref="CompositeDrawable3D"/>
 		/// </summary>
 		public event ChildChangedHandler ChildAdded;
 		/// <summary>
-		/// Occurs whenever a child is removed from this <see cref="Drawable3D"/>
+		/// Occurs whenever a child is removed from this <see cref="CompositeDrawable3D"/>
 		/// </summary>
 		public event ChildChangedHandler ChildRemoved;
 		/// <summary>
-		/// Occurs whenever an <see cref="Drawable3D"/> is added under this <see cref="Drawable3D"/>
+		/// Occurs whenever an <see cref="Drawable3D"/> is added under this <see cref="CompositeDrawable3D"/>
 		/// </summary>
 		public event ChildChangedHandler ChildAddedToHierarchy;
 		/// <summary>
-		/// Occurs whenever an <see cref="Drawable3D"/> is removed from under this <see cref="Drawable3D"/>
+		/// Occurs whenever an <see cref="Drawable3D"/> is removed from under this <see cref="CompositeDrawable3D"/>
 		/// </summary>
 		public event ChildChangedHandler ChildRemovedFromHierarchy;
 

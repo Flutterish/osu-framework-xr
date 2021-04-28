@@ -18,6 +18,10 @@ namespace osu.Framework.XR.GameHosts {
 					( IsActive as Bindable<bool> ).Value = true;
 				}
 			} );
+
+			PlayerHeightOffset.ValueChanged += v => {
+				playerHeightOffsetApplyTime = SceneGraphClock.CurrentTime;
+			};
 		}
 
 		public VirtualTextInput TextInput { get; } = new VirtualTextInput();
@@ -41,6 +45,7 @@ namespace osu.Framework.XR.GameHosts {
 		DepthFrameBuffer rightEye = new();
 		public void Run ( XrGame game ) {
 			runningGame = game;
+			runningGame.OnLoadComplete += _ => VR.SetManifest( runningGame.XrManifest );
 
 			base.Run( game );
 			runningGame = null;
@@ -48,8 +53,17 @@ namespace osu.Framework.XR.GameHosts {
 			VR.Exit();
 		}
 
+		public readonly BindableFloat PlayerHeightOffset = new( 0 ) { MinValue = -0.5f, MaxValue = 0.5f };
+		private float playerHeightOffset = 0;
+		private double playerHeightOffsetApplyTime;
 		protected override void DrawFrame () {
 			base.DrawFrame();
+
+			if ( runningGame?.IsLoaded != true ) return;
+			if ( playerHeightOffsetApplyTime + 1000 < SceneGraphClock.CurrentTime ) {
+				playerHeightOffset = PlayerHeightOffset.Value;
+			}
+
 			VR.UpdateDraw( SceneGraphClock.CurrentTime );
 			if ( !VR.VrState.HasFlag( VrState.OK ) ) return;
 
@@ -77,7 +91,7 @@ namespace osu.Framework.XR.GameHosts {
 					rMatrix.m12, rMatrix.m13, -rMatrix.m14, rMatrix.m15
 				);
 
-			runningGame.Scene.Camera.Position = new Vector3( VR.Current.Headset.Position.X, VR.Current.Headset.Position.Y, VR.Current.Headset.Position.Z );
+			runningGame.Scene.Camera.Position = new Vector3( VR.Current.Headset.Position.X, VR.Current.Headset.Position.Y + playerHeightOffset, VR.Current.Headset.Position.Z );
 			runningGame.Scene.Camera.Rotation = new Quaternion( VR.Current.Headset.Rotation.X, VR.Current.Headset.Rotation.Y, VR.Current.Headset.Rotation.Z, VR.Current.Headset.Rotation.W );
 
 			var el = VR.CVRSystem.GetEyeToHeadTransform( EVREye.Eye_Left );

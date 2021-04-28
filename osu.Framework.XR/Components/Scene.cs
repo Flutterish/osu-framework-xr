@@ -5,6 +5,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shaders;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.XR.Graphics;
 using osu.Framework.XR.Projection;
 using osuTK;
@@ -17,6 +18,7 @@ namespace osu.Framework.XR.Components {
 	public class Scene : Container {
 		public Scene () {
 			Add( new SceneDrawer( this ) );
+
 			base.Add( Root );
 		}
 
@@ -27,7 +29,10 @@ namespace osu.Framework.XR.Components {
 				base.Add( drawable );
 		}
 
-		public bool RenderToScreen { get => RenderToScreenBindable.Value; set => RenderToScreenBindable.Value = value; }
+		public bool RenderToScreen { 
+			get => RenderToScreenBindable.Value; 
+			set => RenderToScreenBindable.Value = value; 
+		}
 		public readonly BindableBool RenderToScreenBindable = new( false );
 		public readonly Container3D Root = new Container3D();
 		public Camera Camera;
