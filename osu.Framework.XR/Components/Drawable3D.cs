@@ -74,7 +74,7 @@ namespace osu.Framework.XR.Components {
 
 		public virtual void BeforeDraw ( DrawNode3D.DrawSettings settings ) { }
 
-		private readonly object transformKey = new { };
+		protected readonly object transformKey = new { };
 		public readonly Transform Transform;
 		new public Vector3 Position { get => Transform.Position; set => Transform.Position = value; }
 		new public float X { get => Transform.X; set => Transform.X = value; }

@@ -1,4 +1,5 @@
 ﻿using OpenVR.NET.Manifests;
+using osu.Framework.Allocation;
 using osu.Framework.XR.Components;
 
 namespace osu.Framework.XR {

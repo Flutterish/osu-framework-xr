@@ -73,8 +73,8 @@ namespace osu.Framework.XR.GameHosts {
 				rightEye.Size = size;
 			}
 
-			var lMatrix = VR.CVRSystem.GetProjectionMatrix( EVREye.Eye_Left, 0.01f, 1000 );
-			var rMatrix = VR.CVRSystem.GetProjectionMatrix( EVREye.Eye_Right, 0.01f, 1000 );
+			var lMatrix = VR.CVRSystem.GetProjectionMatrix( EVREye.Eye_Left, 0.01f, 1200 );
+			var rMatrix = VR.CVRSystem.GetProjectionMatrix( EVREye.Eye_Right, 0.01f, 1200 );
 
 			var leftEyeMatrix =
 				new Matrix4x4(
