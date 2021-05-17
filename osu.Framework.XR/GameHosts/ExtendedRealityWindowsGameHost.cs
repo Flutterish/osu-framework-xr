@@ -7,20 +7,21 @@ using osuTK;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace osu.XR.GameHosts {
 	public class ExtendedRealityWindowsGameHost : ExtendedRealityDesktopGameHost { // this is a copy of DesktopGameHost and WindowsGameHost
+		[MaybeNull, NotNull]
 		private TimePeriod timePeriod;
 
 		public override string UserStoragePath => Environment.GetFolderPath( Environment.SpecialFolder.ApplicationData );
 
 		public override Clipboard GetClipboard () => new WindowsClipboard();
-#if NET5_0
+
 		[System.Runtime.Versioning.SupportedOSPlatform("windows")]
-#endif
 		public override bool CapsLockEnabled => Console.CapsLock;
 
 		public ExtendedRealityWindowsGameHost ( string gameName, bool bindIPC = false, bool portableInstallation = false, bool useOsuTK = false )

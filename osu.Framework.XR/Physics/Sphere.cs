@@ -155,9 +155,9 @@ namespace osu.Framework.XR.Physics {
 		public readonly double Radius;
 		public readonly Vector3 Point;
 		public readonly int TrisIndex;
-		public readonly IHasCollider Collider;
+		public readonly IHasCollider? Collider;
 
-		public SphereHit ( double distance, Vector3 origin, double radius, Vector3 point, int trisIndex = -1, IHasCollider collider = null ) {
+		public SphereHit ( double distance, Vector3 origin, double radius, Vector3 point, int trisIndex = -1, IHasCollider? collider = null ) {
 			Distance = distance;
 			Origin = origin;
 			Radius = radius;

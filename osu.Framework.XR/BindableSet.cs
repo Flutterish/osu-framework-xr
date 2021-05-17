@@ -9,9 +9,9 @@ namespace osu.Framework.XR {
 	public class BindableSet<T> : IEnumerable<T> {
 		private HashSet<T> set = new();
 
-		public event Action<T> ItemAdded;
-		public event Action<T> ItemRemoved;
-		public event Action CollectionChanged;
+		public event Action<T>? ItemAdded;
+		public event Action<T>? ItemRemoved;
+		public event Action? CollectionChanged;
 
 		public void BindCollectionChanged ( Action action, bool runOnceImmediately = false ) {
 			CollectionChanged += action;

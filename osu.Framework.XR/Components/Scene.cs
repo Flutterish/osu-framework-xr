@@ -10,6 +10,7 @@ using osu.Framework.XR.Graphics;
 using osu.Framework.XR.Projection;
 using osuTK;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace osu.Framework.XR.Components {
 	/// <summary>
@@ -35,16 +36,19 @@ namespace osu.Framework.XR.Components {
 		}
 		public readonly BindableBool RenderToScreenBindable = new( false );
 		public readonly Container3D Root = new Container3D();
-		public Camera Camera;
+		[MaybeNull] [NotNull]
+		public Camera Camera { get; init; }
 
 		public static implicit operator CompositeDrawable3D ( Scene scene )
 			=> scene.Root;
 
+#nullable disable // NULLABLE LOAD
 		private IShader TextureShader;
+#nullable restore
 		private DepthFrameBuffer depthBuffer = new();
 		[BackgroundDependencyLoader]
 		private void load ( ShaderManager shaders ) {
-			Shaders.Shader3D ??= shaders.Load( Shaders.VERTEX_3D, Shaders.FRAGMENT_3D ) as Shader;
+			Shaders.Shader3D ??= (Shader)shaders.Load( Shaders.VERTEX_3D, Shaders.FRAGMENT_3D );
 			TextureShader = shaders.Load( VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE );
 		}
 
@@ -72,6 +76,7 @@ namespace osu.Framework.XR.Components {
 
 			Vector2 size;
 			Quad quad;
+			[MaybeNull, NotNull]
 			IShader textureShader;
 			public override void ApplyState () {
 				base.ApplyState();
@@ -90,7 +95,7 @@ namespace osu.Framework.XR.Components {
 
 				base.Draw( vertexAction );
 				if ( Source.depthBuffer.Texture.Bind() ) {
-					textureShader.Bind();
+					textureShader!.Bind();
 					DrawQuad( Source.depthBuffer.Texture, quad, DrawColourInfo.Colour );
 					textureShader.Unbind();
 				}

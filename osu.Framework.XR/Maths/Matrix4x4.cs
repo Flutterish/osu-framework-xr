@@ -8,7 +8,7 @@ namespace osu.Framework.XR.Maths {
 	/// Matrix4x4 is a copy of osuTK.Matrix4 that actually works on the CPU
 	/// </summary>
 	[StructLayout( LayoutKind.Sequential )]
-	public struct Matrix4x4 {
+	public struct Matrix4x4 : IEquatable<Matrix4x4> {
 		public Vector4 Row0 => new Vector4( M00, M10, M20, M30 );
 		public Vector4 Row1 => new Vector4( M01, M11, M21, M31 );
 		public Vector4 Row2 => new Vector4( M02, M12, M22, M32 );
@@ -246,6 +246,50 @@ namespace osu.Framework.XR.Maths {
 
 		public override string ToString () {
 			return $"({M00}; {M10}; {M20}; {M30})\r\n({M01}; {M11}; {M21}; {M31})\r\n({M02}; {M12}; {M22}; {M32})\r\n({M03}; {M13}; {M23}; {M33})";
+		}
+
+		public override bool Equals ( object? obj ) {
+			return obj is Matrix4x4 x && Equals( x );
+		}
+
+		public bool Equals ( Matrix4x4 other ) {
+			return M00 == other.M00 &&
+					 M10 == other.M10 &&
+					 M20 == other.M20 &&
+					 M30 == other.M30 &&
+					 M01 == other.M01 &&
+					 M11 == other.M11 &&
+					 M21 == other.M21 &&
+					 M31 == other.M31 &&
+					 M02 == other.M02 &&
+					 M12 == other.M12 &&
+					 M22 == other.M22 &&
+					 M32 == other.M32 &&
+					 M03 == other.M03 &&
+					 M13 == other.M13 &&
+					 M23 == other.M23 &&
+					 M33 == other.M33;
+		}
+
+		public override int GetHashCode () {
+			HashCode hash = new HashCode();
+			hash.Add( M00 );
+			hash.Add( M10 );
+			hash.Add( M20 );
+			hash.Add( M30 );
+			hash.Add( M01 );
+			hash.Add( M11 );
+			hash.Add( M21 );
+			hash.Add( M31 );
+			hash.Add( M02 );
+			hash.Add( M12 );
+			hash.Add( M22 );
+			hash.Add( M32 );
+			hash.Add( M03 );
+			hash.Add( M13 );
+			hash.Add( M23 );
+			hash.Add( M33 );
+			return hash.ToHashCode();
 		}
 
 		public static implicit operator Matrix4 ( Matrix4x4 m ) {

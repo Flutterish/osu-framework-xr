@@ -2,7 +2,7 @@
 
 namespace osu.Framework.XR.GameHosts {
 	public class VirtualClipboard : Clipboard {
-		string copied;
+		string copied = string.Empty;
 		public override string GetText () {
 			return copied;
 		}

@@ -4,7 +4,7 @@ using System;
 
 namespace osu.Framework.XR.GameHosts {
 	public class VirtualTextInput : ITextInputSource {
-		private string pending;
+		private string pending = string.Empty;
 
 		public void AppendText ( string text ) {
 			pending += text;
@@ -33,7 +33,7 @@ namespace osu.Framework.XR.GameHosts {
 
 		public bool ImeActive => false;
 
-		public event Action<string> OnNewImeComposition;
-		public event Action<string> OnNewImeResult;
+		public event Action<string>? OnNewImeComposition;
+		public event Action<string>? OnNewImeResult;
 	}
 }

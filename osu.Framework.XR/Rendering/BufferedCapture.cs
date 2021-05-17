@@ -11,6 +11,7 @@ using osuTK;
 using osuTK.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace osu.Framework.XR.Rendering {
 	/// <summary>
@@ -44,6 +45,7 @@ namespace osu.Framework.XR.Rendering {
 
 		private class BufferedCaptureDrawNode : DrawNode, ICompositeDrawNode {
 			protected readonly FrameBuffer FrameBuffer;
+			[AllowNull]
 			protected CompositeDrawableDrawNode Child;
 			protected RectangleF DrawRectangle { get; private set; }
 			private Color4 backgroundColour;

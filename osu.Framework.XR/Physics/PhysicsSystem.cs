@@ -7,8 +7,8 @@ using static osu.Framework.XR.Physics.Raycast;
 namespace osu.Framework.XR.Physics {
 	public class PhysicsSystem : IDisposable {
 		private List<IHasCollider> colliders = new();
-		private CompositeDrawable3D root;
-		public CompositeDrawable3D Root {
+		private CompositeDrawable3D? root;
+		public CompositeDrawable3D? Root {
 			get => root;
 			set {
 				if ( root == value ) return;
@@ -39,13 +39,21 @@ namespace osu.Framework.XR.Physics {
 		/// </summary>
 		public bool TryHit ( Vector3 origin, Vector3 direction, out RaycastHit hit, bool includeBehind = false ) {
 			RaycastHit? closest = null;
-			IHasCollider closestCollider = null;
+			IHasCollider? closestCollider = null;
 			direction.Normalize();
 
 			for ( int i = 0; i < colliders.Count; i++ ) {
 				var collider = colliders[ i ];
 				if ( collider is Model model ) {
-					if ( collider.IsColliderEnabled && Raycast.TryHit( origin, direction, collider as Model, out hit, includeBehind ) ) {
+					if ( collider.IsColliderEnabled && Raycast.TryHit( origin, direction, model, out hit, includeBehind ) ) {
+						if ( closest is null || Math.Abs( closest.Value.Distance ) > Math.Abs( hit.Distance ) ) {
+							closest = hit;
+							closestCollider = collider;
+						}
+					}
+				}
+				else if ( collider is Drawable3D drawable ) {
+					if ( collider.IsColliderEnabled && Raycast.TryHit( origin, direction, collider.Mesh, drawable.Transform, out hit, includeBehind ) ) {
 						if ( closest is null || Math.Abs( closest.Value.Distance ) > Math.Abs( hit.Distance ) ) {
 							closest = hit;
 							closestCollider = collider;
@@ -53,12 +61,7 @@ namespace osu.Framework.XR.Physics {
 					}
 				}
 				else {
-					if ( collider.IsColliderEnabled && Raycast.TryHit( origin, direction, collider.Mesh, ( collider as Drawable3D ).Transform, out hit, includeBehind ) ) {
-						if ( closest is null || Math.Abs( closest.Value.Distance ) > Math.Abs( hit.Distance ) ) {
-							closest = hit;
-							closestCollider = collider;
-						}
-					}
+					throw new InvalidOperationException( "Unsupported collider type" );
 				}
 			}
 
@@ -86,7 +89,7 @@ namespace osu.Framework.XR.Physics {
 		/// </summary>
 		public bool TryHit ( Vector3 origin, double radius, out SphereHit hit ) {
 			SphereHit? closest = null;
-			IHasCollider closestCollider = null;
+			IHasCollider? closestCollider = null;
 
 			for ( int i = 0; i < colliders.Count; i++ ) {
 				var collider = colliders[ i ];
@@ -98,13 +101,16 @@ namespace osu.Framework.XR.Physics {
 						}
 					}
 				}
-				else {
-					if ( collider.IsColliderEnabled && Sphere.TryHit( origin, radius, collider.Mesh, ( collider as Drawable3D ).Transform, out hit ) ) {
+				else if ( collider is Drawable3D drawable ) {
+					if ( collider.IsColliderEnabled && Sphere.TryHit( origin, radius, collider.Mesh, drawable.Transform, out hit ) ) {
 						if ( closest is null || Math.Abs( closest.Value.Distance ) > Math.Abs( hit.Distance ) ) {
 							closest = hit;
 							closestCollider = collider;
 						}
 					}
+				}
+				else {
+					throw new InvalidOperationException( "Unsupported collider type" );
 				}
 			}
 

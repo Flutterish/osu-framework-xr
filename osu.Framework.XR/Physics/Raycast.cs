@@ -371,9 +371,9 @@ namespace osu.Framework.XR.Physics {
 			/// <summary>
 			/// The hit collider, if any.
 			/// </summary>
-			public readonly IHasCollider Collider;
+			public readonly IHasCollider? Collider;
 
-			public RaycastHit ( Vector3 point, Vector3 origin, Vector3 normal, Vector3 direction, double distance, int trisIndex = -1, IHasCollider collider = null ) {
+			public RaycastHit ( Vector3 point, Vector3 origin, Vector3 normal, Vector3 direction, double distance, int trisIndex = -1, IHasCollider? collider = null ) {
 				Point = point;
 				Origin = origin;
 				Normal = normal;

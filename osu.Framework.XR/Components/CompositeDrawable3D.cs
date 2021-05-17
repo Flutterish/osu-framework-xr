@@ -35,19 +35,19 @@ namespace osu.Framework.XR.Components {
 		/// <summary>
 		/// Occurs whenever a child is added to this <see cref="CompositeDrawable3D"/>
 		/// </summary>
-		public event ChildChangedHandler ChildAdded;
+		public event ChildChangedHandler? ChildAdded;
 		/// <summary>
 		/// Occurs whenever a child is removed from this <see cref="CompositeDrawable3D"/>
 		/// </summary>
-		public event ChildChangedHandler ChildRemoved;
+		public event ChildChangedHandler? ChildRemoved;
 		/// <summary>
 		/// Occurs whenever an <see cref="Drawable3D"/> is added under this <see cref="CompositeDrawable3D"/>
 		/// </summary>
-		public event ChildChangedHandler ChildAddedToHierarchy;
+		public event ChildChangedHandler? ChildAddedToHierarchy;
 		/// <summary>
 		/// Occurs whenever an <see cref="Drawable3D"/> is removed from under this <see cref="CompositeDrawable3D"/>
 		/// </summary>
-		public event ChildChangedHandler ChildRemovedFromHierarchy;
+		public event ChildChangedHandler? ChildRemovedFromHierarchy;
 
 		internal void onChildAdded ( Drawable3D child ) {
 			ChildAdded?.Invoke( this, child );
@@ -71,7 +71,7 @@ namespace osu.Framework.XR.Components {
 				ChildAddedToHierarchy += added;
 				if ( runOnAllChildrenImmediately ) {
 					foreach ( var i in GetAllChildrenInHiererchy() ) {
-						added( i.parent, i );
+						added( i.parent!, i );
 					}
 				}
 			}

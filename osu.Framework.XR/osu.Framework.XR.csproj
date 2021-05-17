@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+	<Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ppy.osu.Framework" Version="2021.410.0" />
+    <PackageReference Include="ppy.osu.Framework" Version="2021.513.0" />
   </ItemGroup>
 
   <ItemGroup>

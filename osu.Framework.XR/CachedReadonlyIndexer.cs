@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 namespace osu.Framework.XR {
-	public class CachedReadonlyIndexer<Tin, Tout> : ReadonlyIndexer<Tin, Tout> {
+	public class CachedReadonlyIndexer<Tin, Tout> : ReadonlyIndexer<Tin, Tout> where Tin : notnull {
 		Dictionary<Tin, Tout> cache = new();
 
 		public CachedReadonlyIndexer ( Func<Tin, Tout> getter ) : base( getter ) { }

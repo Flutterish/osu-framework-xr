@@ -15,7 +15,7 @@ namespace osu.Framework.XR.GameHosts {
 			IsActive.BindValueChanged( v => {
 				if ( v.NewValue == false ) { // this makes it so osu never caps our FPS
 					IsActive.UnbindFrom( Window.IsActive );
-					( IsActive as Bindable<bool> ).Value = true;
+					( (Bindable<bool>)IsActive ).Value = true; // NOTE check if this might cause the load fails
 				}
 			} );
 
@@ -40,7 +40,7 @@ namespace osu.Framework.XR.GameHosts {
 			throw new NotImplementedException( "Web browser panel is not yet implemented" );
 		}
 
-		XrGame runningGame;
+		XrGame? runningGame;
 		DepthFrameBuffer leftEye = new();
 		DepthFrameBuffer rightEye = new();
 		public void Run ( XrGame game ) {

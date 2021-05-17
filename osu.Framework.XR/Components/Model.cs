@@ -4,6 +4,7 @@ using osuTK;
 using osuTK.Graphics.OpenGL4;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace osu.Framework.XR.Components {
 	/// <summary>
@@ -43,7 +44,7 @@ namespace osu.Framework.XR.Components {
 		protected virtual Mesh GetMesh () => Source.Mesh;
 
 		private bool notInitialized = true;
-		private Mesh mesh;
+		private Mesh? mesh;
 		private ulong lastUpdateVersion;
 
 		public override void Draw ( DrawSettings settings ) {
@@ -64,7 +65,7 @@ namespace osu.Framework.XR.Components {
 			}
 
 			if ( lastUpdateVersion != mesh.UpdateVersion && mesh.IsReady ) {
-				UpdateMesh();
+				UpdateMesh( mesh );
 				lastUpdateVersion = mesh.UpdateVersion;
 			}
 
@@ -102,7 +103,7 @@ namespace osu.Framework.XR.Components {
 			buffer = GL.GenBuffer();
 			EBO = GL.GenBuffer();
 		}
-		protected void UpdateMesh () {
+		protected void UpdateMesh ( Mesh mesh ) {
 			GL.BindVertexArray( VAO );
 			indiceCount = mesh.UploadToGPU( AttribLocation( "vertex" ), AttribLocation( "UV" ), buffer, EBO );
 			GL.BindVertexArray( 0 );

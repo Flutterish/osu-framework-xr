@@ -5,6 +5,7 @@ using osu.Framework.XR.Projection;
 using osuTK;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace osu.Framework.XR.Components {
@@ -18,8 +19,8 @@ namespace osu.Framework.XR.Components {
 			RelativeSizeAxes = Axes.Both;
 		}
 
-		internal CompositeDrawable3D parent;
-		new public CompositeDrawable3D Parent {
+		internal CompositeDrawable3D? parent;
+		new public CompositeDrawable3D? Parent {
 			get => parent;
 			set {
 				if ( parent == value ) return;
@@ -29,7 +30,7 @@ namespace osu.Framework.XR.Components {
 					parent.RemoveDrawable( this );
 
 					parent.onChildRemoved( this );
-					foreach ( var i in GetAllChildrenInHiererchy() ) parent.onChildRemovedFromHierarchy( i.parent, i );
+					foreach ( var i in GetAllChildrenInHiererchy() ) parent.onChildRemovedFromHierarchy( i.parent!, i );
 				}
 				parent = value;
 				if ( parent is not null ) {
@@ -37,7 +38,7 @@ namespace osu.Framework.XR.Components {
 					parent.AddDrawable( this ); // this is here so they actually exist in the framework heirerchy
 
 					parent.onChildAdded( this );
-					foreach ( var i in GetAllChildrenInHiererchy() ) parent.onChildAddedToHierarchy( i.parent, i );
+					foreach ( var i in GetAllChildrenInHiererchy() ) parent.onChildAddedToHierarchy( i.parent!, i );
 				}
 				Transform.SetParent( parent?.Transform, transformKey );
 			}
@@ -58,9 +59,9 @@ namespace osu.Framework.XR.Components {
 		/// <summary>
 		/// The topmost <see cref="Container3D"/> in the hierarchy. This operation performs upwards tree traveral and might be expensive.
 		/// </summary>
-		public Container3D Root => ( parent?.Root ?? ( parent as Container3D ) ) ?? ( this as Container3D );
-		public T FindObject<T> () where T : Drawable3D {
-			T find ( CompositeDrawable3D node ) {
+		public Container3D Root => parent?.Root ?? ( this as Container3D ?? throw new Exception( $"The topmost element in the scene is not a {nameof(Container3D)}" ) );
+		public T? FindObject<T> () where T : Drawable3D {
+			T? find ( CompositeDrawable3D node ) {
 				if ( node is T tnode ) return tnode;
 				foreach ( var i in node.children.OfType<CompositeDrawable3D>() ) {
 					var res = find( i );
@@ -228,9 +229,9 @@ namespace osu.Framework.XR.Components {
 			base.RemoveInternal( drawable );
 		}
 
-		private DrawNode3D drawNode;
-		public DrawNode3D DrawNode => drawNode ??= CreateDrawNode();
-		new protected virtual DrawNode3D CreateDrawNode () => null;
+		private DrawNode3D? drawNode;
+		public DrawNode3D? DrawNode => drawNode ??= CreateDrawNode();
+		new protected virtual DrawNode3D? CreateDrawNode () => null;
 
 		protected override void Dispose ( bool isDisposing ) {
 			base.Dispose( isDisposing );
@@ -250,16 +251,17 @@ namespace osu.Framework.XR.Components {
 			public record DrawSettings { // TODO most of these should be in a global uniform block
 				public Matrix4 WorldToCamera { get; init; }
 				public Matrix4 CameraToClip { get; init; }
+				[MaybeNull, NotNull]
 				public Camera Camera { get; init; }
 			}
 		}
 
 		public abstract class XrObjectDrawNode<T> : DrawNode3D where T : Drawable3D {
-			new protected T Source => base.Source as T;
+			new protected T Source => (T)base.Source;
 			public XrObjectDrawNode ( T source ) : base( source ) { }
 		}
 
-		public static implicit operator Transform ( Drawable3D xro )
+		public static implicit operator Transform? ( Drawable3D? xro )
 			=> xro?.Transform;
 	}
 	[Flags]

@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 
 namespace osu.Framework.XR.GameHosts {
 	public abstract class ExtendedRealityDesktopGameHost : ExtendedRealityGameHost {
-		private TcpIpcProvider ipcProvider;
+		private TcpIpcProvider? ipcProvider;
 		private readonly bool bindIPCPort;
-		private Thread ipcThread;
+		private Thread? ipcThread;
 
 		internal bool UseOsuTK { get; }
 
@@ -68,7 +68,7 @@ namespace osu.Framework.XR.GameHosts {
 		protected override IEnumerable<InputHandler> CreateAvailableInputHandlers ()
 			=> Array.Empty<InputHandler>();
 
-		public override Task SendMessageAsync ( IpcMessage message ) => ipcProvider.SendMessageAsync( message );
+		public override Task SendMessageAsync ( IpcMessage message ) => (ipcProvider ?? throw new InvalidOperationException( $"Tried to send a message before starting IPC" )).SendMessageAsync( message );
 
 		protected override void Dispose ( bool isDisposing ) {
 			ipcProvider?.Dispose();

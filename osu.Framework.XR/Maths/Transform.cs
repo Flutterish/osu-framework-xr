@@ -7,14 +7,14 @@ namespace osu.Framework.XR.Maths {
 	/// Position, rotation and scale of an object with child-parent hiererchy.
 	/// </summary>
 	public class Transform {
-		private readonly object key;
+		private readonly object? key;
 		/// <param name="key">An optional key to lock modifying relationships by non-authorized sources.</param>
-		public Transform ( object key = null ) {
+		public Transform ( object? key = null ) {
 			this.key = key;
 		}
-		private Transform parent;
+		private Transform? parent;
 		private List<Transform> children = new();
-		public Transform Parent {
+		public Transform? Parent {
 			get => parent;
 			set {
 				if ( key is not null ) throw new InvalidOperationException( "This transform's relationships are locked." );
@@ -28,7 +28,7 @@ namespace osu.Framework.XR.Maths {
 			}
 		}
 		public IReadOnlyList<Transform> Children => children;
-		public void SetParent ( Transform value, object key = null ) {
+		public void SetParent ( Transform? value, object? key = null ) {
 			if ( key == this.key ) {
 				if ( parent == value ) return;
 				parent?.children.Remove( this );
