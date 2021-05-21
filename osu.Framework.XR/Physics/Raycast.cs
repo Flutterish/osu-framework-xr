@@ -4,6 +4,7 @@ using osu.Framework.XR.Maths;
 using static osu.Framework.XR.Maths.Extensions;
 using osuTK;
 using System;
+using OpenVR.NET;
 
 namespace osu.Framework.XR.Physics {
 	// TODO all of the physics methods should include both a regular and a prenormalized version for preformance
@@ -53,54 +54,28 @@ namespace osu.Framework.XR.Physics {
 			}
 		}
 
+		public static (Vector3 pointOnA, Vector3 pointOnB) FindClosestPointsBetween2Lines ( Vector3 pointOnLineA, Vector3 directionA, Vector3 pointOnLineB, Vector3 directionB ) {
+			// https://www.gamedev.net/forums/topic/520233-closest-point-on-a-line-to-another-line-in-3d/
+			var d = pointOnLineB - pointOnLineA;
+			var v1d = Vector3.Dot( directionA, d );
+			var v2d = Vector3.Dot( directionB, d );
+			var v1v2 = Vector3.Dot( directionA, directionB );
+			var v1v1 = Vector3.Dot( directionA, directionA );
+			var v2v2 = Vector3.Dot( directionB, directionB );
+
+			var b = ( v2d - v1v2 * v1d / v1v1 ) / ( v1v2 * v1v2 / v1v1 - v2v2 );
+			var a = ( v1d + v1v2 * b ) / v1v1;
+
+			return ( pointOnLineA + a * directionA, pointOnLineB + b * directionB );
+		}
+
 		/// <summary>
 		/// Intersect 2 3D lines.
 		/// </summary>
 		public static bool TryHitLine ( Vector3 pointOnLineA, Vector3 directionA, Vector3 pointOnLineB, Vector3 directionB, out Vector3 hit ) {
-			bool Approx ( float a, float b, float tolerance = 0.001f )
-				=> MathF.Abs( a - b ) <= tolerance;
-
-			float sum = 0;
-			int count = 0;
-			// p = (o2.y - o1.y) + (d2.y/d2.x)(o1.x - o2.x)/(d1.y - (d2.y/d2.x)(d1.x))
-			if ( directionB.X != 0 ) {
-				var div = directionA.Y - directionA.X * directionB.Y / directionB.X;
-				if ( !Approx( div, 0 ) ) {
-					var q = ( pointOnLineB.Y - pointOnLineA.Y + ( pointOnLineA.X - pointOnLineB.X ) * directionB.Y / directionB.X ) / div;
-					if ( count == 0 || Approx( sum / count, q ) ) {
-						sum += q;
-						count++;
-					}
-				}
-			}
-			if ( directionB.Y != 0 ) {
-				var div = directionA.Z - directionA.Y * directionB.Z / directionB.Y;
-				if ( !Approx( div, 0 ) ) {
-					var q = ( pointOnLineB.Z - pointOnLineA.Z + ( pointOnLineA.Y - pointOnLineB.Y ) * directionB.Z / directionB.Y ) / div;
-					if ( count == 0 || Approx( sum / count, q ) ) {
-						sum += q;
-						count++;
-					}
-				}
-			}
-			if ( directionB.Z != 0 ) {
-				var div = directionA.X - directionA.Z * directionB.X / directionB.Z;
-				if ( !Approx( div, 0 ) ) {
-					var q = ( pointOnLineB.X - pointOnLineA.X + ( pointOnLineA.Z - pointOnLineB.Z ) * directionB.X / directionB.Z ) / div;
-					if ( count == 0 || Approx( sum / count, q ) ) {
-						sum += q;
-						count++;
-					}
-				}
-			}
-
-			if ( sum != 0 ) {
-				hit = pointOnLineA + sum / count * directionA;
-				return true;
-			}
-
-			hit = default;
-			return false;
+			Vector3 b;
+			(hit, b) = FindClosestPointsBetween2Lines( pointOnLineA, directionA.Normalized(), pointOnLineB, directionB.Normalized() );
+			return (hit - b).LengthSquared < 0.01f;
 		}
 
 		/// <summary>
