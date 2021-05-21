@@ -9,6 +9,7 @@ using osuTK;
 using osuTK.Graphics.OpenGL4;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Framework.XR.Projection {
 	public class Camera : Drawable3D {
@@ -22,18 +23,27 @@ namespace osu.Framework.XR.Projection {
 			}, true );
 		}
 
+		List<Drawable3D> depthSortedRenderTargets = new();
 		List<Drawable3D> depthTestedRenderTargets = new();
 		List<Drawable3D> renderTargets = new();
 		private bool shoudBeDepthTested ( Drawable3D target ) {
 			return target is not IBehindEverything;
 		}
+		private bool shouldBeDepthSorted ( Drawable3D target ) {
+			return target.ShouldBeDepthSorted;
+		}
+
 		private void addRenderTarget ( Drawable3D parent, Drawable3D child ) {
+			if ( shouldBeDepthSorted( child ) )
+				lock ( depthSortedRenderTargets ) { depthSortedRenderTargets.Add( child ); }
 			if ( shoudBeDepthTested( child ) )
 				lock ( depthTestedRenderTargets ) { depthTestedRenderTargets.Add( child ); }
 			else
 				lock ( renderTargets ) { renderTargets.Add( child ); }
 		}
 		private void removeRenderTarget ( Drawable3D parent, Drawable3D child ) {
+			if ( shouldBeDepthSorted( child ) )
+				lock ( depthSortedRenderTargets ) { depthSortedRenderTargets.Remove( child ); }
 			if ( shoudBeDepthTested( child ) )
 				lock ( depthTestedRenderTargets ) { depthTestedRenderTargets.Remove( child ); }
 			else
@@ -73,7 +83,7 @@ namespace osu.Framework.XR.Projection {
 			return p.Z > 0;
 		}
 
-		public void Render (  DepthFrameBuffer depthBuffer ) {
+		public void Render ( DepthFrameBuffer depthBuffer ) {
 			Vector2 scale;
 			if ( depthBuffer.Size.X / depthBuffer.Size.Y > AspectRatio ) {
 				scale = new( AspectRatio * AspectRatio, 1 ); // TODO why square?
@@ -91,7 +101,7 @@ namespace osu.Framework.XR.Projection {
 			Render( depthBuffer, settings );
 		}
 
-		public void Render (  DepthFrameBuffer depthBuffer, DrawNode3D.DrawSettings settings ) {
+		public void Render ( DepthFrameBuffer depthBuffer, DrawNode3D.DrawSettings settings ) {
 			settings = settings with { Camera = this };
 
 			GLWrapper.PushViewport( new RectangleI( 0, 0, (int)depthBuffer.Size.X, (int)depthBuffer.Size.Y ) );
@@ -111,6 +121,15 @@ namespace osu.Framework.XR.Projection {
 			GL.Clear( ClearBufferMask.DepthBufferBit );
 			lock ( depthTestedRenderTargets ) {
 				foreach ( var i in depthTestedRenderTargets ) {
+					i.BeforeDraw( settings );
+					i.DrawNode?.Draw( settings );
+				}
+			}
+			lock ( depthSortedRenderTargets ) {
+				foreach ( var i in depthSortedRenderTargets.OrderByDescending( d => {
+					var p = settings.WorldToCamera * d.Transform.Matrix * new Vector4( d.Centre, 1 );
+					return p.Z / p.W;
+				} ) ) {
 					i.BeforeDraw( settings );
 					i.DrawNode?.Draw( settings );
 				}

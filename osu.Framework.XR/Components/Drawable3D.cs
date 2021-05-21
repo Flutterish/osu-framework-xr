@@ -229,6 +229,7 @@ namespace osu.Framework.XR.Components {
 			base.RemoveInternal( drawable );
 		}
 
+		public bool ShouldBeDepthSorted { get; init; } = false;
 		private DrawNode3D? drawNode;
 		public DrawNode3D? DrawNode => drawNode ??= CreateDrawNode();
 		new protected virtual DrawNode3D? CreateDrawNode () => null;
