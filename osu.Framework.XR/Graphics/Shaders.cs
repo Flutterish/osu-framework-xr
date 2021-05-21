@@ -29,5 +29,6 @@ namespace osu.Framework.XR.Graphics {
 	public class Fragment3DShaderDescription : ShaderDescription {
 		public Fragment3DShaderDescription () : base( "3DFrag" ) { }
 		public readonly string UseGammaCorrection = "useGammaCorrection";
+		public readonly string Tint = "tint";
 	}
 }

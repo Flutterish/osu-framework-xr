@@ -97,9 +97,9 @@ namespace osu.Framework.XR.Components {
 			base.Update();
 			if ( children.Any() ) {
 				ChildSize = new Vector3(
-					AutoSizeAxes.HasFlagFast( Axes3D.X ) ? children.Max( c => c.BypassAutoSizeAxes.HasFlagFast( Axes3D.X ) ? 0 : c.RequiredParentSizeToFit.X ) : 0,
-					AutoSizeAxes.HasFlagFast( Axes3D.Y ) ? children.Max( c => c.BypassAutoSizeAxes.HasFlagFast( Axes3D.Y ) ? 0 : c.RequiredParentSizeToFit.Y ) : 0,
-					AutoSizeAxes.HasFlagFast( Axes3D.Z ) ? children.Max( c => c.BypassAutoSizeAxes.HasFlagFast( Axes3D.Z ) ? 0 : c.RequiredParentSizeToFit.Z ) : 0
+					AutoSizeAxes.HasFlagFast( Axes3D.X ) ? children.Max( c => c.BypassAutoSizeAxes.HasFlagFast( Axes3D.X ) ? 0 : c.RequiredParentSizeToFit.X ) : Size.X,
+					AutoSizeAxes.HasFlagFast( Axes3D.Y ) ? children.Max( c => c.BypassAutoSizeAxes.HasFlagFast( Axes3D.Y ) ? 0 : c.RequiredParentSizeToFit.Y ) : Size.Y,
+					AutoSizeAxes.HasFlagFast( Axes3D.Z ) ? children.Max( c => c.BypassAutoSizeAxes.HasFlagFast( Axes3D.Z ) ? 0 : c.RequiredParentSizeToFit.Z ) : Size.Z
 				);
 			}
 			else {

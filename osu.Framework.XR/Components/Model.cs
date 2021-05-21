@@ -1,6 +1,7 @@
 ﻿using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.XR.Graphics;
 using osuTK;
+using osuTK.Graphics;
 using osuTK.Graphics.OpenGL4;
 using System;
 using System.Collections.Generic;
@@ -35,6 +36,8 @@ namespace osu.Framework.XR.Components {
 
 		public override Vector3 Size { get => Mesh.BoundingBox.Size; set => throw new InvalidOperationException( $"Cannot set size of a {nameof(Model)}." ); }
 		public override Vector3 Centre => Mesh.BoundingBox.Min + Mesh.BoundingBox.Size / 2;
+
+		public Color4 Tint = Color4.White;
 	}
 	public class ModelDrawNode : ModelDrawNode<Model> {
 		public ModelDrawNode ( Model source ) : base( source ) { }
@@ -84,6 +87,7 @@ namespace osu.Framework.XR.Components {
 			GL.UniformMatrix4( cameraToClip ??= GL.GetUniformLocation( Shaders.Shader3D, Shaders.VERTEX_3D.CameraToClipMatrix ), true, ref b );
 			GL.UniformMatrix4( localToWorld ??= GL.GetUniformLocation( Shaders.Shader3D, Shaders.VERTEX_3D.LocalToWorldMatrix ), true, ref c );
 			GL.Uniform1( useGamma ??= GL.GetUniformLocation( Shaders.Shader3D, Shaders.FRAGMENT_3D.UseGammaCorrection ), Source.UseGammaCorrection ? 1 : 0 );
+			GL.Uniform4( tint ??= GL.GetUniformLocation( Shaders.Shader3D, Shaders.FRAGMENT_3D.Tint ), Source.Tint );
 			GL.DrawElements( PrimitiveType.Triangles, indiceCount, DrawElementsType.UnsignedInt, 0 );
 			GL.BindVertexArray( 0 );
 			Shaders.Shader3D.Unbind();
@@ -93,6 +97,7 @@ namespace osu.Framework.XR.Components {
 		private static int? cameraToClip;
 		private static int? localToWorld;
 		private static int? useGamma;
+		private static int? tint;
 
 		private int VAO;
 		private int buffer;

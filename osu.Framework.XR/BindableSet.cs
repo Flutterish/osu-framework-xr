@@ -15,7 +15,16 @@ namespace osu.Framework.XR {
 
 		public void BindCollectionChanged ( Action action, bool runOnceImmediately = false ) {
 			CollectionChanged += action;
-			if ( runOnceImmediately ) action?.Invoke();
+			if ( runOnceImmediately ) action();
+		}
+
+		public void BindItemAdded ( Action<T> action, bool runOnceImmediately = false ) {
+			ItemAdded += action;
+			if ( runOnceImmediately ) {
+				foreach ( var i in set ) {
+					action( i );
+				}
+			}
 		}
 
 		public void Add ( T value ) {
