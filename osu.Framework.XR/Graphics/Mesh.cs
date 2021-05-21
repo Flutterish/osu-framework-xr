@@ -206,6 +206,19 @@ namespace osu.Framework.XR.Graphics {
 			f 8 3 4
 			"
 		);
+
+		public static Mesh XZPlane ( float sizeX, float sizeZ ) {
+			Mesh mesh = new();
+			mesh.AddQuad(
+				new Quad(
+					new Vector3( -sizeX / 2, 0, sizeZ / 2 ),
+					new Vector3( sizeX / 2, 0, sizeZ / 2 ),
+					new Vector3( -sizeX / 2, 0, -sizeZ / 2 ),
+					new Vector3( sizeX / 2, 0, -sizeZ / 2 )
+				)
+			);
+			return mesh;
+		}
 	}
 
 	public struct IndexedFace {
