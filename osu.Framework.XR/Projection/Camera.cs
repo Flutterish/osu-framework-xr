@@ -36,7 +36,7 @@ namespace osu.Framework.XR.Projection {
 		private void addRenderTarget ( Drawable3D parent, Drawable3D child ) {
 			if ( shouldBeDepthSorted( child ) )
 				lock ( depthSortedRenderTargets ) { depthSortedRenderTargets.Add( child ); }
-			if ( shoudBeDepthTested( child ) )
+			else if ( shoudBeDepthTested( child ) )
 				lock ( depthTestedRenderTargets ) { depthTestedRenderTargets.Add( child ); }
 			else
 				lock ( renderTargets ) { renderTargets.Add( child ); }
@@ -44,7 +44,7 @@ namespace osu.Framework.XR.Projection {
 		private void removeRenderTarget ( Drawable3D parent, Drawable3D child ) {
 			if ( shouldBeDepthSorted( child ) )
 				lock ( depthSortedRenderTargets ) { depthSortedRenderTargets.Remove( child ); }
-			if ( shoudBeDepthTested( child ) )
+			else if ( shoudBeDepthTested( child ) )
 				lock ( depthTestedRenderTargets ) { depthTestedRenderTargets.Remove( child ); }
 			else
 				lock ( renderTargets ) { renderTargets.Remove( child ); }

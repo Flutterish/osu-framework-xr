@@ -30,9 +30,9 @@ namespace osu.Framework.XR.Physics {
 				var B = Raycast.ClosestPoint( face.B, face.C, rh.Point );
 				var C = Raycast.ClosestPoint( face.C, face.A, rh.Point );
 
-				var al = A.Length;
-				var bl = B.Length;
-				var cl = C.Length;
+				var al = ( A - origin ).Length;
+				var bl = ( B - origin ).Length;
+				var cl = ( C - origin ).Length;
 
 				if ( al > radius && bl > radius && cl > radius ) {
 					hit = default;

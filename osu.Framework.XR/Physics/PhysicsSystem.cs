@@ -85,7 +85,7 @@ namespace osu.Framework.XR.Physics {
 		}
 
 		/// <summary>
-		/// Intersect a shpere and a the closest collider.
+		/// Intersect a sphere and the closest collider.
 		/// </summary>
 		public bool TryHit ( Vector3 origin, double radius, out SphereHit hit ) {
 			SphereHit? closest = null;

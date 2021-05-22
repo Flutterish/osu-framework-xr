@@ -60,13 +60,26 @@ namespace osu.Framework.XR.Physics {
 			var v1d = Vector3.Dot( directionA, d );
 			var v2d = Vector3.Dot( directionB, d );
 			var v1v2 = Vector3.Dot( directionA, directionB );
-			var v1v1 = Vector3.Dot( directionA, directionA );
-			var v2v2 = Vector3.Dot( directionB, directionB );
+			var v1v1 = directionA.LengthSquared;
+			var v2v2 = directionB.LengthSquared;
 
 			var b = ( v2d - v1v2 * v1d / v1v1 ) / ( v1v2 * v1v2 / v1v1 - v2v2 );
 			var a = ( v1d + v1v2 * b ) / v1v1;
 
-			return ( pointOnLineA + a * directionA, pointOnLineB + b * directionB );
+			return (pointOnLineA + a * directionA, pointOnLineB + b * directionB);
+		}
+
+		public static (Vector3 pointOnA, Vector3 pointOnB) FindClosestPointsBetween2LinesPrenormalized ( Vector3 pointOnLineA, Vector3 directionA, Vector3 pointOnLineB, Vector3 directionB ) {
+			// https://www.gamedev.net/forums/topic/520233-closest-point-on-a-line-to-another-line-in-3d/
+			var d = pointOnLineB - pointOnLineA;
+			var v1d = Vector3.Dot( directionA, d );
+			var v2d = Vector3.Dot( directionB, d );
+			var v1v2 = Vector3.Dot( directionA, directionB );
+
+			var b = ( v2d - v1v2 * v1d ) / ( v1v2 * v1v2 - 1 );
+			var a = v1d + v1v2 * b;
+
+			return (pointOnLineA + a * directionA, pointOnLineB + b * directionB);
 		}
 
 		/// <summary>
@@ -74,8 +87,17 @@ namespace osu.Framework.XR.Physics {
 		/// </summary>
 		public static bool TryHitLine ( Vector3 pointOnLineA, Vector3 directionA, Vector3 pointOnLineB, Vector3 directionB, out Vector3 hit ) {
 			Vector3 b;
-			(hit, b) = FindClosestPointsBetween2Lines( pointOnLineA, directionA.Normalized(), pointOnLineB, directionB.Normalized() );
-			return (hit - b).LengthSquared < 0.01f;
+			(hit, b) = FindClosestPointsBetween2LinesPrenormalized( pointOnLineA, directionA.Normalized(), pointOnLineB, directionB.Normalized() );
+			return ( hit - b ).LengthSquared < 0.01f;
+		}
+
+		/// <summary>
+		/// Intersect 2 3D lines.
+		/// </summary>
+		public static bool TryHitLinePrenormalized ( Vector3 pointOnLineA, Vector3 directionA, Vector3 pointOnLineB, Vector3 directionB, out Vector3 hit ) {
+			Vector3 b;
+			(hit, b) = FindClosestPointsBetween2LinesPrenormalized( pointOnLineA, directionA, pointOnLineB, directionB );
+			return ( hit - b ).LengthSquared < 0.01f;
 		}
 
 		/// <summary>
@@ -147,7 +169,7 @@ namespace osu.Framework.XR.Physics {
 
 			if ( TryHit( origin, direction, face.A, normal, out hit, includeBehind ) ) {
 				var directionFromC = ( face.C - hit.Point ).Normalized();
-				if ( TryHitLine( hit.Point, directionFromC, face.A, face.B - face.A, out var pointOnAB ) ) {
+				if ( TryHitLinePrenormalized( hit.Point, directionFromC, face.A, (face.B - face.A).Normalized(), out var pointOnAB ) ) {
 					var distanceFromAToB = SignedDistance( face.A, pointOnAB, face.B );
 					if ( distanceFromAToB >= -0.01f && distanceFromAToB <= ( face.B - face.A ).Length + 0.01f ) {
 						var distanceToC = SignedDistance( face.C, hit.Point, pointOnAB );
