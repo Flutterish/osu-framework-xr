@@ -53,14 +53,14 @@ namespace osu.Framework.XR.Physics {
 		/// <summary>
 		/// Intersect a ray and a the closest collider.
 		/// </summary>
-		public bool TryHit ( Vector3 origin, Vector3 direction, out RaycastHit hit, bool includeBehind = false ) {
+		public bool TryHit ( Vector3 origin, Vector3 direction, out RaycastHit hit, bool includeBehind = false, PhysicsLayer layer = PhysicsLayer.All ) {
 			RaycastHit? closest = null;
 			IHasCollider? closestCollider = null;
 			direction.Normalize();
 
 			for ( int i = 0; i < modelColliders.Count; i++ ) {
 				var (collider, model) = modelColliders[ i ];
-				if ( collider.IsColliderEnabled && Raycast.TryHitPrenormalized( origin, direction, model, out hit, includeBehind ) ) {
+				if ( (collider.PhysicsLayer & layer) != PhysicsLayer.None && collider.IsColliderEnabled && Raycast.TryHitPrenormalized( origin, direction, model, out hit, includeBehind ) ) {
 					if ( closest is null || Math.Abs( closest.Value.Distance ) > Math.Abs( hit.Distance ) ) {
 						closest = hit;
 						closestCollider = collider;
@@ -70,7 +70,7 @@ namespace osu.Framework.XR.Physics {
 
 			for ( int i = 0; i < drawableColliders.Count; i++ ) {
 				var (collider, drawable) = drawableColliders[ i ];
-				if ( collider.IsColliderEnabled && Raycast.TryHitPrenormalized( origin, direction, collider.Mesh, drawable.Transform, out hit, includeBehind ) ) {
+				if ( ( collider.PhysicsLayer & layer ) != PhysicsLayer.None && collider.IsColliderEnabled && Raycast.TryHitPrenormalized( origin, direction, collider.Mesh, drawable.Transform, out hit, includeBehind ) ) {
 					if ( closest is null || Math.Abs( closest.Value.Distance ) > Math.Abs( hit.Distance ) ) {
 						closest = hit;
 						closestCollider = collider;
@@ -100,13 +100,13 @@ namespace osu.Framework.XR.Physics {
 		/// <summary>
 		/// Intersect a sphere and the closest collider.
 		/// </summary>
-		public bool TryHit ( Vector3 origin, double radius, out SphereHit hit ) {
+		public bool TryHit ( Vector3 origin, double radius, out SphereHit hit, PhysicsLayer layer = PhysicsLayer.All ) {
 			SphereHit? closest = null;
 			IHasCollider? closestCollider = null;
 
 			for ( int i = 0; i < modelColliders.Count; i++ ) {
 				var (collider, model) = modelColliders[ i ];
-				if ( collider.IsColliderEnabled && Sphere.TryHit( origin, radius, model, out hit ) ) {
+				if ( ( collider.PhysicsLayer & layer ) != PhysicsLayer.None && collider.IsColliderEnabled && Sphere.TryHit( origin, radius, model, out hit ) ) {
 					if ( closest is null || Math.Abs( closest.Value.Distance ) > Math.Abs( hit.Distance ) ) {
 						closest = hit;
 						closestCollider = collider;
@@ -116,7 +116,7 @@ namespace osu.Framework.XR.Physics {
 
 			for ( int i = 0; i < drawableColliders.Count; i++ ) {
 				var (collider, drawable) = drawableColliders[ i ];
-				if ( collider.IsColliderEnabled && Sphere.TryHit( origin, radius, collider.Mesh, drawable.Transform, out hit ) ) {
+				if ( ( collider.PhysicsLayer & layer ) != PhysicsLayer.None && collider.IsColliderEnabled && Sphere.TryHit( origin, radius, collider.Mesh, drawable.Transform, out hit ) ) {
 					if ( closest is null || Math.Abs( closest.Value.Distance ) > Math.Abs( hit.Distance ) ) {
 						closest = hit;
 						closestCollider = collider;
