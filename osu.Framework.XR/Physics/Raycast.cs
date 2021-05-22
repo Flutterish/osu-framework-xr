@@ -6,12 +6,12 @@ using System;
 using static osu.Framework.XR.Maths.Extensions;
 
 namespace osu.Framework.XR.Physics {
-	// TODO all of the physics methods should include both a regular and a prenormalized version for preformance
 	public static class Raycast {
 		/// <summary>
-		/// Intersect a 3D line and a place.
+		/// Intersect a ray and a plane.
+		/// <paramref name="direction"/> and <paramref name="planeNormal"/> must be normal vectors.
 		/// </summary>
-		public static bool TryHit ( Vector3 origin, Vector3 direction, Vector3 pointOnPlane, Vector3 planeNormal, out RaycastHit hit, bool includeBehind = false ) { // BUG something is wrong with some collisions ( flat Y normals )
+		public static bool TryHitPrenormalized ( Vector3 origin, Vector3 direction, Vector3 pointOnPlane, Vector3 planeNormal, out RaycastHit hit, bool includeBehind = false ) {
 			// plane := all points where ( point - pointOnPlane ) dot planeNormal = 0
 			// line := all points where ( point - pointOnLine ) - d * direction = 0
 			// in other words, point = pointOnLine + d * direction
@@ -19,8 +19,6 @@ namespace osu.Framework.XR.Physics {
 			// direction dot planeNormal * d + ( pointOnLine - pointOnPlane ) dot planeNormal = 0
 			// d = (( pointOnPlane - pointOnLine ) dot planeNormal) / (direction dot planeNormal)
 			// therefore if direction dot planeNormal is 0, there is no intersection or they are on top of each other
-			direction.Normalize();
-			planeNormal.Normalize();
 
 			var dot = Vector3.Dot( direction, planeNormal );
 			if ( dot == 0 ) {
@@ -52,22 +50,16 @@ namespace osu.Framework.XR.Physics {
 				return distance >= 0 || includeBehind;
 			}
 		}
+		/// <summary>
+		/// Intersect a ray and a plane.
+		/// </summary>
+		public static bool TryHit ( Vector3 origin, Vector3 direction, Vector3 pointOnPlane, Vector3 planeNormal, out RaycastHit hit, bool includeBehind = false )
+			=> TryHitPrenormalized( origin, direction.Normalized(), pointOnPlane, planeNormal.Normalized(), out hit, includeBehind );
 
-		public static (Vector3 pointOnA, Vector3 pointOnB) FindClosestPointsBetween2Lines ( Vector3 pointOnLineA, Vector3 directionA, Vector3 pointOnLineB, Vector3 directionB ) {
-			// https://www.gamedev.net/forums/topic/520233-closest-point-on-a-line-to-another-line-in-3d/
-			var d = pointOnLineB - pointOnLineA;
-			var v1d = Vector3.Dot( directionA, d );
-			var v2d = Vector3.Dot( directionB, d );
-			var v1v2 = Vector3.Dot( directionA, directionB );
-			var v1v1 = directionA.LengthSquared;
-			var v2v2 = directionB.LengthSquared;
-
-			var b = ( v2d - v1v2 * v1d / v1v1 ) / ( v1v2 * v1v2 / v1v1 - v2v2 );
-			var a = ( v1d + v1v2 * b ) / v1v1;
-
-			return (pointOnLineA + a * directionA, pointOnLineB + b * directionB);
-		}
-
+		/// <summary>
+		/// Finds points on both lines that are closest to the other line.
+		/// <paramref name="directionA"/> and <paramref name="directionB"/> must be normal vectors.
+		/// </summary>
 		public static (Vector3 pointOnA, Vector3 pointOnB) FindClosestPointsBetween2LinesPrenormalized ( Vector3 pointOnLineA, Vector3 directionA, Vector3 pointOnLineB, Vector3 directionB ) {
 			// https://www.gamedev.net/forums/topic/520233-closest-point-on-a-line-to-another-line-in-3d/
 			var d = pointOnLineB - pointOnLineA;
@@ -80,93 +72,39 @@ namespace osu.Framework.XR.Physics {
 
 			return (pointOnLineA + a * directionA, pointOnLineB + b * directionB);
 		}
-
 		/// <summary>
-		/// Intersect 2 3D lines.
+		/// Finds points on both lines that are closest to the other line.
 		/// </summary>
-		public static bool TryHitLine ( Vector3 pointOnLineA, Vector3 directionA, Vector3 pointOnLineB, Vector3 directionB, out Vector3 hit ) {
-			Vector3 b;
-			(hit, b) = FindClosestPointsBetween2LinesPrenormalized( pointOnLineA, directionA.Normalized(), pointOnLineB, directionB.Normalized() );
-			return ( hit - b ).LengthSquared < 0.01f;
-		}
+		public static (Vector3 pointOnA, Vector3 pointOnB) FindClosestPointsBetween2Lines ( Vector3 pointOnLineA, Vector3 directionA, Vector3 pointOnLineB, Vector3 directionB )
+			=> FindClosestPointsBetween2LinesPrenormalized( pointOnLineA, directionA.Normalized(), pointOnLineB, directionB.Normalized() );
 
 		/// <summary>
 		/// Intersect 2 3D lines.
+		/// <paramref name="directionA"/> and <paramref name="directionB"/> must be normal vectors.
 		/// </summary>
 		public static bool TryHitLinePrenormalized ( Vector3 pointOnLineA, Vector3 directionA, Vector3 pointOnLineB, Vector3 directionB, out Vector3 hit ) {
 			Vector3 b;
 			(hit, b) = FindClosestPointsBetween2LinesPrenormalized( pointOnLineA, directionA, pointOnLineB, directionB );
 			return ( hit - b ).LengthSquared < 0.01f;
 		}
+		/// <summary>
+		/// Intersect 2 3D lines.
+		/// </summary>
+		public static bool TryHitLine ( Vector3 pointOnLineA, Vector3 directionA, Vector3 pointOnLineB, Vector3 directionB, out Vector3 hit )
+			=> TryHitLinePrenormalized( pointOnLineA, directionA.Normalized(), pointOnLineB, directionB.Normalized(), out hit );
 
 		/// <summary>
-		/// Intersect 2 2D lines.
+		/// Intersect a ray and a triangle.
+		/// <paramref name="direction"/> must be a normal vector.
 		/// </summary>
-		public static bool TryHitLine ( Vector2 pointOnLineA, Vector2 directionA, Vector2 pointOnLineB, Vector2 directionB, out Vector2 hit ) {
-			// y = m1 x + b1
-			// y = m2 x + b2
-			// m1 x + b1 = m2 x + b2
-			// (b1-b2) = x(m2-m1)
-			// x = (m2-m1)/(b1-b2)
-			// y - m1 x = b1
-
-			if ( directionA.X == 0 ) {
-				var m1 = directionA.X / directionA.Y;
-				var b1 = pointOnLineA.X - m1 * pointOnLineA.Y;
-				var m2 = directionB.X / directionB.Y;
-				var b2 = pointOnLineB.X - m2 * pointOnLineB.Y;
-
-				if ( m1 == m2 ) {
-					if ( b1 == b2 ) {
-						hit = pointOnLineA;
-						return true;
-					}
-					else {
-						hit = default;
-						return false;
-					}
-				}
-				else {
-					var y = ( b1 - b2 ) / ( m2 - m1 );
-					hit = new Vector2( m1 * y + b1, y );
-					return true;
-				}
-			}
-			else {
-				var m1 = directionA.Y / directionA.X;
-				var b1 = pointOnLineA.Y - m1 * pointOnLineA.X;
-				var m2 = directionB.Y / directionB.X;
-				var b2 = pointOnLineB.Y - m2 * pointOnLineB.X;
-
-				if ( m1 == m2 ) {
-					if ( b1 == b2 ) {
-						hit = pointOnLineA;
-						return true;
-					}
-					else {
-						hit = default;
-						return false;
-					}
-				}
-				else {
-					var x = ( b1 - b2 ) / ( m2 - m1 );
-					hit = new Vector2( x, m1 * x + b1 );
-					return true;
-				}
-			}
-		}
-
-		/// <summary>
-		/// Intersect a 3D line and a triangle.
-		/// </summary>
-		public static bool TryHit ( Vector3 origin, Vector3 direction, Face face, out RaycastHit hit, bool includeBehind = false ) {
+		public static bool TryHitPrenormalized ( Vector3 origin, Vector3 direction, Face face, out RaycastHit hit, bool includeBehind = false ) {
 			var normal = Vector3.Cross( face.B - face.A, face.C - face.A );
 			// we want the normal to be pointing towards the hit origin
 			if ( Vector3.Dot( normal, direction ) > 0 ) {
 				normal *= -1;
 			}
 
-			if ( TryHit( origin, direction, face.A, normal, out hit, includeBehind ) ) {
+			if ( TryHitPrenormalized( origin, direction, face.A, normal.Normalized(), out hit, includeBehind ) ) {
 				var directionFromC = ( face.C - hit.Point ).Normalized();
 				if ( TryHitLinePrenormalized( hit.Point, directionFromC, face.A, (face.B - face.A).Normalized(), out var pointOnAB ) ) {
 					var distanceFromAToB = SignedDistance( face.A, pointOnAB, face.B );
@@ -182,7 +120,15 @@ namespace osu.Framework.XR.Physics {
 			hit = default;
 			return false;
 		}
+		/// <summary>
+		/// Intersect a ray and a triangle.
+		/// </summary>
+		public static bool TryHit ( Vector3 origin, Vector3 direction, Face face, out RaycastHit hit, bool includeBehind = false )
+			=> TryHitPrenormalized( origin, direction.Normalized(), face, out hit, includeBehind );
 
+		/// <summary>
+		/// Checks if a ray intersects an axis aligned box.
+		/// </summary>
 		public static bool Intersects ( Vector3 origin, Vector3 direction, AABox box, bool includeBehind = false ) {
 			if ( direction.X == 0 ) {
 				if ( origin.X < box.Min.X || origin.X > box.Max.X ) return false;
@@ -228,9 +174,10 @@ namespace osu.Framework.XR.Physics {
 		}
 
 		/// <summary>
-		/// Intersect a 3D line and a Mesh.
+		/// Intersect a ray and a Mesh.
+		/// <paramref name="direction"/> must be a normal vector.
 		/// </summary>
-		public static bool TryHit ( Vector3 origin, Vector3 direction, Mesh mesh, Transform transform, out RaycastHit hit, bool includeBehind = false ) {
+		public static bool TryHitPrenormalized ( Vector3 origin, Vector3 direction, Mesh mesh, Transform transform, out RaycastHit hit, bool includeBehind = false ) {
 			if ( mesh.Tris.Count > 6 ) {
 				if ( !Intersects( origin, direction, transform.Matrix * mesh.BoundingBox, includeBehind ) ) {
 					hit = default;
@@ -244,7 +191,7 @@ namespace osu.Framework.XR.Physics {
 				face.A = ( transform.Matrix * new Vector4( face.A, 1 ) ).Xyz;
 				face.B = ( transform.Matrix * new Vector4( face.B, 1 ) ).Xyz;
 				face.C = ( transform.Matrix * new Vector4( face.C, 1 ) ).Xyz;
-				if ( TryHit( origin, direction, face, out hit, includeBehind ) && ( closest is null || Math.Abs( closest.Value.Distance ) > Math.Abs( hit.Distance ) ) ) {
+				if ( TryHitPrenormalized( origin, direction, face, out hit, includeBehind ) && ( closest is null || Math.Abs( closest.Value.Distance ) > Math.Abs( hit.Distance ) ) ) {
 					closest = new RaycastHit(
 						hit.Point,
 						hit.Origin,
@@ -265,11 +212,17 @@ namespace osu.Framework.XR.Physics {
 				return true;
 			}
 		}
+		/// <summary>
+		/// Intersect a ray and a Mesh.
+		/// </summary>
+		public static bool TryHit ( Vector3 origin, Vector3 direction, Mesh mesh, Transform transform, out RaycastHit hit, bool includeBehind = false )
+			=> TryHitPrenormalized( origin, direction.Normalized(), mesh, transform, out hit, includeBehind );
 
 		/// <summary>
-		/// Intersect a 3D line and a Mesh.
+		/// Intersect a ray and a Mesh.
+		/// <paramref name="direction"/> must be a normal vector.
 		/// </summary>
-		public static bool TryHit ( Vector3 origin, Vector3 direction, Mesh mesh, Transform transform, ReadonlyIndexer<int, Face> indexer, out RaycastHit hit, bool includeBehind = false ) {
+		public static bool TryHitPrenormalized ( Vector3 origin, Vector3 direction, Mesh mesh, Transform transform, ReadonlyIndexer<int, Face> indexer, out RaycastHit hit, bool includeBehind = false ) {
 			if ( mesh.Tris.Count > 6 ) {
 				if ( !Intersects( origin, direction, transform.Matrix * mesh.BoundingBox, includeBehind ) ) {
 					hit = default;
@@ -280,7 +233,7 @@ namespace osu.Framework.XR.Physics {
 
 			for ( int i = 0; i < mesh.Tris.Count; i++ ) {
 				var face = indexer[ i ];
-				if ( TryHit( origin, direction, face, out hit, includeBehind ) && ( closest is null || Math.Abs( closest.Value.Distance ) > Math.Abs( hit.Distance ) ) ) {
+				if ( TryHitPrenormalized( origin, direction, face, out hit, includeBehind ) && ( closest is null || Math.Abs( closest.Value.Distance ) > Math.Abs( hit.Distance ) ) ) {
 					closest = new RaycastHit(
 						hit.Point,
 						hit.Origin,
@@ -301,12 +254,18 @@ namespace osu.Framework.XR.Physics {
 				return true;
 			}
 		}
+		/// <summary>
+		/// Intersect a ray and a Mesh.
+		/// </summary>
+		public static bool TryHit ( Vector3 origin, Vector3 direction, Mesh mesh, Transform transform, ReadonlyIndexer<int, Face> indexer, out RaycastHit hit, bool includeBehind = false )
+			=> TryHitPrenormalized( origin, direction.Normalized(), mesh, transform, indexer, out hit, includeBehind );
 
 		/// <summary>
-		/// Intersect a 3D line and a Mesh.
+		/// Intersect a ray and a Mesh.
+		/// <paramref name="direction"/> must be a normal vector.
 		/// </summary>
-		public static bool TryHit ( Vector3 origin, Vector3 direction, Model target, out RaycastHit hit, bool includeBehind = false ) {
-			var ok = TryHit( origin, direction, target.Mesh, target.Transform, target.Faces, out hit, includeBehind );
+		public static bool TryHitPrenormalized ( Vector3 origin, Vector3 direction, Model target, out RaycastHit hit, bool includeBehind = false ) {
+			var ok = TryHitPrenormalized( origin, direction, target.Mesh, target.Transform, target.Faces, out hit, includeBehind );
 			if ( ok ) {
 				hit = new RaycastHit(
 					hit.Point,
@@ -320,13 +279,18 @@ namespace osu.Framework.XR.Physics {
 			}
 			return ok;
 		}
+		// <summary>
+		/// Intersect a ray and a Mesh.
+		/// </summary>
+		public static bool TryHit ( Vector3 origin, Vector3 direction, Model target, out RaycastHit hit, bool includeBehind = false )
+			=> TryHitPrenormalized( origin, direction.Normalized(), target, out hit, includeBehind );
 
 		/// <summary>
 		/// The closest point to a line [from;to]
 		/// </summary>
 		public static Vector3 ClosestPoint ( Vector3 from, Vector3 to, Vector3 other ) {
-			var dir = to - from;
-			TryHit( from, dir, other, dir, out var hit, true );
+			var dir = (to - from).Normalized();
+			TryHitPrenormalized( from, dir, other, dir, out var hit, true );
 
 			// P = from + (to-from) * T -> T = (P - from)/(to-from);
 			float t;

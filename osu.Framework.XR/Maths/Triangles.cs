@@ -7,7 +7,7 @@ namespace osu.Framework.XR.Maths {
 	public static class Triangles {
 		/// <summary>
 		/// Calculates the barycentric coordinates of a point that lies on a face.
-		/// If the point does not lie on the face, it will return the barycentric coordinates with respect to the last distorted cardinal plane.
+		/// If the point does not lie on the face, it will return the barycentric coordinates with respect to the least distorted cardinal plane.
 		/// </summary>
 		public static Vector3 Barycentric ( Face face, Vector3 point ) {
 			var normal = Vector3.Cross( face.A - face.B, face.C - face.B );
@@ -39,7 +39,7 @@ namespace osu.Framework.XR.Maths {
 
 		public static bool IsPointInside ( Vector3 p, Face face ) {
 			var directionFromC = ( face.C - p ).Normalized();
-			if ( Raycast.TryHitLine( p, directionFromC, face.A, face.B - face.A, out var pointOnAB ) ) {
+			if ( Raycast.TryHitLinePrenormalized( p, directionFromC, face.A, (face.B - face.A).Normalized(), out var pointOnAB ) ) {
 				var distanceFromAToB = Extensions.SignedDistance( face.A, pointOnAB, face.B );
 				if ( distanceFromAToB >= -0.01f && distanceFromAToB <= ( face.B - face.A ).Length + 0.01f ) {
 					var distanceToC = Extensions.SignedDistance( face.C, p, pointOnAB );
