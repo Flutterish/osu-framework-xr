@@ -1,10 +1,9 @@
 ﻿using osu.Framework.XR.Components;
 using osu.Framework.XR.Graphics;
 using osu.Framework.XR.Maths;
-using static osu.Framework.XR.Maths.Extensions;
 using osuTK;
 using System;
-using OpenVR.NET;
+using static osu.Framework.XR.Maths.Extensions;
 
 namespace osu.Framework.XR.Physics {
 	// TODO all of the physics methods should include both a regular and a prenormalized version for preformance

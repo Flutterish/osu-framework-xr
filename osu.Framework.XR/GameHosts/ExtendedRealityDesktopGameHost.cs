@@ -1,6 +1,5 @@
 ﻿using osu.Framework.Input.Handlers;
 using osu.Framework.Platform;
-using osuTK;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

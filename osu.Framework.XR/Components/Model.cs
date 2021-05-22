@@ -5,7 +5,6 @@ using osuTK.Graphics;
 using osuTK.Graphics.OpenGL4;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace osu.Framework.XR.Components {
 	/// <summary>
