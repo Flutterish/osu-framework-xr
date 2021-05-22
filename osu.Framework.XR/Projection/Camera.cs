@@ -23,28 +23,36 @@ namespace osu.Framework.XR.Projection {
 			}, true );
 		}
 
+		List<Drawable3D> finalRenderTargets = new();
 		List<Drawable3D> depthSortedRenderTargets = new();
 		List<Drawable3D> depthTestedRenderTargets = new();
 		List<Drawable3D> renderTargets = new();
-		private bool shoudBeDepthTested ( Drawable3D target ) {
+		private bool shouldBeDepthTested ( Drawable3D target ) {
 			return target is not IBehindEverything;
+		}
+		private bool shouldBeRenderedLast ( Drawable3D target ) {
+			return target is IRenderedLast;
 		}
 		private bool shouldBeDepthSorted ( Drawable3D target ) {
 			return target.ShouldBeDepthSorted;
 		}
 
 		private void addRenderTarget ( Drawable3D parent, Drawable3D child ) {
-			if ( shouldBeDepthSorted( child ) )
+			if ( shouldBeRenderedLast( child ) )
+				lock ( finalRenderTargets ) { finalRenderTargets.Add( child ); }
+			else if ( shouldBeDepthSorted( child ) )
 				lock ( depthSortedRenderTargets ) { depthSortedRenderTargets.Add( child ); }
-			else if ( shoudBeDepthTested( child ) )
+			else if ( shouldBeDepthTested( child ) )
 				lock ( depthTestedRenderTargets ) { depthTestedRenderTargets.Add( child ); }
 			else
 				lock ( renderTargets ) { renderTargets.Add( child ); }
 		}
 		private void removeRenderTarget ( Drawable3D parent, Drawable3D child ) {
-			if ( shouldBeDepthSorted( child ) )
+			if ( shouldBeRenderedLast( child ) )
+				lock ( finalRenderTargets ) { finalRenderTargets.Remove( child ); }
+			else if ( shouldBeDepthSorted( child ) )
 				lock ( depthSortedRenderTargets ) { depthSortedRenderTargets.Remove( child ); }
-			else if ( shoudBeDepthTested( child ) )
+			else if ( shouldBeDepthTested( child ) )
 				lock ( depthTestedRenderTargets ) { depthTestedRenderTargets.Remove( child ); }
 			else
 				lock ( renderTargets ) { renderTargets.Remove( child ); }
@@ -130,6 +138,12 @@ namespace osu.Framework.XR.Projection {
 					var p = settings.WorldToCamera * d.Transform.Matrix * new Vector4( d.Centre, 1 );
 					return p.Z / p.W;
 				} ) ) {
+					i.BeforeDraw( settings );
+					i.DrawNode?.Draw( settings );
+				}
+			}
+			lock ( finalRenderTargets ) {
+				foreach ( var i in finalRenderTargets ) {
 					i.BeforeDraw( settings );
 					i.DrawNode?.Draw( settings );
 				}
