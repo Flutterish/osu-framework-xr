@@ -10,7 +10,7 @@ namespace osu.Framework.XR.Physics {
 
 	[Flags]
 	public enum PhysicsLayer : ulong {
-		All     = ( 1uL << 63 ) + ( 1uL << 63 - 1 ),
+		All     = ( 1uL << 63 ) + ( (1uL << 63) - 1 ),
 		None    = 0,
 		Layer0  = 1uL << 0 ,
 		Layer1  = 1uL << 1 ,
