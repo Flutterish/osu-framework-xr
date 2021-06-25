@@ -41,9 +41,8 @@ namespace osu.Framework.XR.Components {
 		public static implicit operator CompositeDrawable3D ( Scene scene )
 			=> scene.Root;
 
-#nullable disable // NULLABLE LOAD
+		[MaybeNull, NotNull]
 		private IShader TextureShader;
-#nullable restore
 		private DepthFrameBuffer depthBuffer = new();
 		[BackgroundDependencyLoader]
 		private void load ( ShaderManager shaders ) {
@@ -60,6 +59,7 @@ namespace osu.Framework.XR.Components {
 			public Scene Scene;
 
 			public SceneDrawer ( Scene scene ) {
+				RelativeSizeAxes = Axes.Both;
 				Scene = scene;
 			}
 
@@ -94,7 +94,7 @@ namespace osu.Framework.XR.Components {
 
 				base.Draw( vertexAction );
 				if ( Source.depthBuffer.Texture.Bind() ) {
-					textureShader!.Bind();
+					textureShader.Bind();
 					DrawQuad( Source.depthBuffer.Texture, quad, DrawColourInfo.Colour );
 					textureShader.Unbind();
 				}

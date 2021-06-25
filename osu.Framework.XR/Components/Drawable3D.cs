@@ -279,7 +279,3 @@ namespace osu.Framework.XR.Components {
 		All = X | Y | Z
 	}
 }
-
-namespace System.Runtime.CompilerServices {
-	public class IsExternalInit { }
-}
