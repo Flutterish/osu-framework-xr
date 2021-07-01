@@ -6,7 +6,7 @@ namespace osu.Framework.XR.Maths {
 	/// <summary>
 	/// Position, rotation and scale of an object with child-parent hiererchy.
 	/// </summary>
-	public class Transform {
+	public sealed class Transform {
 		private readonly object? key;
 		/// <param name="key">An optional key to lock modifying relationships by non-authorized sources.</param>
 		public Transform ( object? key = null ) {
