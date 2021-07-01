@@ -17,6 +17,7 @@ namespace osu.Framework.XR.Components {
 		public Drawable3D () {
 			Transform = new Transform( transformKey );
 			RelativeSizeAxes = Axes.Both;
+			AlwaysPresent = true;
 		}
 
 		internal CompositeDrawable3D? parent;

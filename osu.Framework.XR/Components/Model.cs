@@ -1,4 +1,5 @@
-﻿using osu.Framework.Graphics.OpenGL.Textures;
+﻿using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.XR.Graphics;
 using osuTK;
 using osuTK.Graphics;
@@ -86,7 +87,7 @@ namespace osu.Framework.XR.Components {
 			GL.UniformMatrix4( cameraToClip ??= GL.GetUniformLocation( Shaders.Shader3D, Shaders.VERTEX_3D.CameraToClipMatrix ), true, ref b );
 			GL.UniformMatrix4( localToWorld ??= GL.GetUniformLocation( Shaders.Shader3D, Shaders.VERTEX_3D.LocalToWorldMatrix ), true, ref c );
 			GL.Uniform1( useGamma ??= GL.GetUniformLocation( Shaders.Shader3D, Shaders.FRAGMENT_3D.UseGammaCorrection ), Source.UseGammaCorrection ? 1 : 0 );
-			GL.Uniform4( tint ??= GL.GetUniformLocation( Shaders.Shader3D, Shaders.FRAGMENT_3D.Tint ), Source.Tint );
+			GL.Uniform4( tint ??= GL.GetUniformLocation( Shaders.Shader3D, Shaders.FRAGMENT_3D.Tint ), new Color4( Source.Tint.R, Source.Tint.G, Source.Tint.B, Source.Tint.A * Source.Alpha ) );
 			GL.DrawElements( PrimitiveType.Triangles, indiceCount, DrawElementsType.UnsignedInt, 0 );
 			GL.BindVertexArray( 0 );
 			Shaders.Shader3D.Unbind();
