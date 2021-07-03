@@ -93,7 +93,7 @@ namespace osu.Framework.XR.Components {
 				Source.Camera?.Render( Source.depthBuffer );
 
 				base.Draw( vertexAction );
-				if ( Source.depthBuffer.Texture.Bind() ) {
+				if ( Source.depthBuffer.Texture?.Bind() == true ) {
 					textureShader.Bind();
 					DrawQuad( Source.depthBuffer.Texture, quad, DrawColourInfo.Colour );
 					textureShader.Unbind();

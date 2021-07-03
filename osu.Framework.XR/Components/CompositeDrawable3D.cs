@@ -76,6 +76,17 @@ namespace osu.Framework.XR.Components {
 				}
 			}
 		}
+		public void BindLocalHierarchyChange ( ChildChangedHandler added, ChildChangedHandler removed, bool runOnAllChildrenImmediately = false ) {
+			if ( removed is not null ) ChildRemoved += removed;
+			if ( added is not null ) {
+				ChildAdded += added;
+				if ( runOnAllChildrenImmediately ) {
+					foreach ( var i in Children ) {
+						added( this, i );
+					}
+				}
+			}
+		}
 
 		private Vector3 childSize;
 		/// <summary>
