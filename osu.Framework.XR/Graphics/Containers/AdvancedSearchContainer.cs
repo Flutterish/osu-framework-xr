@@ -67,7 +67,7 @@ namespace osu.Framework.XR.Graphics.Containers {
 		protected override void Update () {
 			base.Update();
 			if ( !isFilterValid.IsValid ) {
-				performFilter();
+				PerformFilter();
 			}
 		}
 
@@ -84,7 +84,7 @@ namespace osu.Framework.XR.Graphics.Containers {
 			return ( stringTerms, terms, searchActive );
 		}
 
-		void performFilter () {
+		public void PerformFilter () {
 			var (stringTerms, terms, searchActive) = getTerms();
 
 			foreach ( var i in Children.OfType<IFilterable>() ) {
