@@ -16,11 +16,6 @@ namespace osu.Framework.XR.Input {
 		public readonly BindableInt DeadzoneBindable = new( 20 );
 		//double holdDuration = 500;
 
-		//[BackgroundDependencyLoader]
-		//private void load ( XrConfigManager config ) {
-		//	config.BindWith( XrConfigSetting.Deadzone, DeadzoneBindable );
-		//}
-
 		private void enqueueInput ( IInput input ) {
 			PendingInputs.Enqueue( input );
 		}
