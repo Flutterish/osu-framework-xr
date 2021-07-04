@@ -1,5 +1,4 @@
 ﻿using osu.Framework.Input.Handlers;
-using osu.Framework.Input.Handlers.Mouse;
 using osu.Framework.Input.StateChanges;
 using osu.Framework.Platform;
 using osuTK;

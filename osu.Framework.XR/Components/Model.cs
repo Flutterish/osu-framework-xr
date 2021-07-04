@@ -1,5 +1,4 @@
-﻿using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Graphics.OpenGL.Textures;
+﻿using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.XR.Graphics;
 using osuTK;
 using osuTK.Graphics;

@@ -5,8 +5,6 @@ using osu.Framework.Graphics.Containers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace osu.Framework.XR.Graphics.Containers {
 	public class AdvancedSearchContainer<Tterm> : AdvancedSearchContainer<Drawable,Tterm> { }

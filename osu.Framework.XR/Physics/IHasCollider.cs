@@ -8,6 +8,9 @@ namespace osu.Framework.XR.Physics {
 		PhysicsLayer PhysicsLayer { get; }
 	}
 
+	/// <summary>
+	/// Shorthand for all 64-bit 1 bit bitmasks. You should create a static class which names these layers instead of using them directly.
+	/// </summary>
 	[Flags]
 	public enum PhysicsLayer : ulong {
 		All     = ( 1uL << 63 ) + ( (1uL << 63) - 1 ),

@@ -1,5 +1,4 @@
 ﻿using osu.Framework.Input.Handlers;
-using osu.Framework.Input.Handlers.Keyboard;
 using osu.Framework.Input.StateChanges;
 using osu.Framework.Platform;
 using TKKey = osuTK.Input.Key;
