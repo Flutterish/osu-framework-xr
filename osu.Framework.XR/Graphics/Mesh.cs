@@ -219,6 +219,12 @@ namespace osu.Framework.XR.Graphics {
 			);
 			return mesh;
 		}
+
+		public void Clear () {
+			Vertices.Clear();
+			TextureCoordinates.Clear();
+			Tris.Clear();
+		}
 	}
 
 	public struct IndexedFace {
