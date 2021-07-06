@@ -31,6 +31,9 @@ namespace osu.Framework.XR.Graphics {
 		public static Texture VerticalGradient ( Color4 top, Color4 bottom, int height )
 			=> GeneratePercentile( 10, height, ( x, y ) => ColorMixing.MixAdditive( top, bottom, (float)y ).ToRbga32() );
 
+		public static Texture VerticalGradient ( Color4 top, Color4 bottom, int height, Func<float, float> amoutTransform )
+			=> GeneratePercentile( 10, height, ( x, y ) => ColorMixing.MixAdditive( top, bottom, amoutTransform(( float)y) ).ToRbga32() );
+
 		public static Texture Vertical2SidedGradient ( Color4 edge, Color4 center, int height )
 			=> GenerateMirroredPercentile( 10, height, ( x, y ) => ColorMixing.MixAdditive( edge, center, (float)y ).ToRbga32() );
 	}

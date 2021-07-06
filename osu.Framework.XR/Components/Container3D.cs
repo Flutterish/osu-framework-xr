@@ -25,5 +25,11 @@ namespace osu.Framework.XR.Components {
 			if ( child.parent != this ) throw new InvalidOperationException( "Tried to remove child which does not belong to this parent." );
 			child.Parent = null;
 		}
+		new public void Clear ( bool disposeChildren = true ) {
+			foreach ( var i in Children ) {
+				Remove( i );
+				if ( disposeChildren ) i.Destroy();
+			}
+		}
 	}
 }

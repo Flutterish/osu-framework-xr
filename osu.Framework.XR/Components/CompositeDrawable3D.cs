@@ -29,6 +29,12 @@ namespace osu.Framework.XR.Components {
 			if ( child.parent != this ) throw new InvalidOperationException( "Tried to remove child which does not belong to this parent." );
 			child.Parent = null;
 		}
+		protected void Clear ( bool disposeChildren = true ) {
+			foreach ( var i in Children ) {
+				Remove( i );
+				if ( disposeChildren ) i.Destroy();
+			}
+		}
 
 		// These events are used for efficient hiererchy change scans used in for example the physics system.
 		public delegate void ChildChangedHandler ( Drawable3D parent, Drawable3D child );
