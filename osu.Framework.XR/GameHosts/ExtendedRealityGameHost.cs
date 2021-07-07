@@ -91,7 +91,8 @@ namespace osu.Framework.XR.GameHosts {
 					rMatrix.m12, rMatrix.m13, -rMatrix.m14, rMatrix.m15
 				);
 
-			runningGame.Scene.Camera.Position = new Vector3( VR.Current.Headset.Position.X, VR.Current.Headset.Position.Y + playerHeightOffset, VR.Current.Headset.Position.Z );
+			runningGame.PlayerPosition.Value = runningGame.PlayerOrigin.Value + new Vector3( VR.Current.Headset.Position.X, VR.Current.Headset.Position.Y + playerHeightOffset, VR.Current.Headset.Position.Z );
+			runningGame.Scene.Camera.Position = runningGame.PlayerPosition.Value;
 			runningGame.Scene.Camera.Rotation = new Quaternion( VR.Current.Headset.Rotation.X, VR.Current.Headset.Rotation.Y, VR.Current.Headset.Rotation.Z, VR.Current.Headset.Rotation.W );
 
 			var el = VR.CVRSystem.GetEyeToHeadTransform( EVREye.Eye_Left );

@@ -166,16 +166,25 @@ namespace osu.Framework.XR.Graphics {
 			TextureCoordinates.Add( BR );
 		}
 
-		public void AddCircle ( Vector3 origin, Vector3 normal, Vector3 direction, int segments ) {
+		public void AddQuad ( Vector3 origin, Vector3 direction, Vector3 up, float length, float width ) {
+			AddQuad( new Quad(
+				origin + width / 2 * up,
+				origin - width / 2 * up,
+				origin + width / 2 * up + direction * length,
+				origin - width / 2 * up + direction * length
+			) );
+		}
+
+		public void AddCircle ( Vector3 origin, Vector3 normal, Vector3 up, int segments ) {
 			FillTextureCoordinates();
 			uint offset = (uint)Vertices.Count;
 
 			normal.Normalize();
 			Vertices.Add( origin );
-			Vertices.Add( origin + direction );
+			Vertices.Add( origin + up );
 			for ( int i = 1; i < segments; i++ ) {
 				var angle = (float)i / segments * MathF.PI * 2;
-				Vertices.Add( origin + ( Quaternion.FromAxisAngle( normal, angle ) * new Vector4( direction, 1 ) ).Xyz );
+				Vertices.Add( origin + ( Quaternion.FromAxisAngle( normal, angle ) * new Vector4( up, 1 ) ).Xyz );
 				Tris.Add( new IndexedFace( offset, offset + (uint)i, offset + (uint)i + 1 ) );
 			}
 			Tris.Add( new IndexedFace( offset, (uint)( segments + offset ), offset + 1 ) );
