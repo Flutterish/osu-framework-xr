@@ -67,5 +67,26 @@ namespace osu.Framework.XR.Maths {
 				a.Average( x => selector( x ).Y ),
 				a.Average( x => selector( x ).Z )
 			);
+
+		/// <summary>
+		/// Decomposes a quaternion into into its rotation around an axis.
+		/// To calculate the remaining rotation use `totalRotation * result.Inverted()`.
+		/// </summary>
+		public static Quaternion DecomposeAroundAxis ( this Quaternion quaternion, Vector3 axis ) {
+			var rotationAxis = new Vector3( quaternion.X, quaternion.Y, quaternion.Z );
+			var dot = Vector3.Dot( axis, rotationAxis );
+			var projected = axis * dot;
+
+			var twist = new Quaternion( projected.X, projected.Y, projected.Z, quaternion.W ).Normalized();
+
+			if ( twist.LengthSquared == 0 ) {
+				twist = Quaternion.Identity;
+			}
+			else if ( dot < 0 ) {
+				return twist * -1;
+			}
+
+			return twist;
+		}
 	}
 }

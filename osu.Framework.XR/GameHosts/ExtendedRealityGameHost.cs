@@ -1,4 +1,5 @@
 ﻿using OpenVR.NET;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Input;
 using osu.Framework.Platform;
@@ -10,7 +11,7 @@ using System;
 using Valve.VR;
 
 namespace osu.Framework.XR.GameHosts {
-	public abstract class ExtendedRealityGameHost : GameHost {
+	public abstract class ExtendedRealityGameHost : GameHost { // TODO scale is not included in autosizing
 		protected ExtendedRealityGameHost ( string gameName = "" ) : base( gameName ) {
 			IsActive.BindValueChanged( v => {
 				if ( v.NewValue == false ) { // this makes it so osu never caps our FPS
@@ -19,7 +20,7 @@ namespace osu.Framework.XR.GameHosts {
 				}
 			} );
 
-			PlayerHeightOffset.ValueChanged += v => {
+			PlayerHeightOffsetBindable.ValueChanged += v => {
 				playerHeightOffsetApplyTime = SceneGraphClock.CurrentTime;
 			};
 		}
@@ -53,15 +54,15 @@ namespace osu.Framework.XR.GameHosts {
 			VR.Exit();
 		}
 
-		public readonly BindableFloat PlayerHeightOffset = new( 0 ) { MinValue = -0.5f, MaxValue = 0.5f };
-		private float playerHeightOffset = 0;
+		public readonly BindableFloat PlayerHeightOffsetBindable = new( 0 ) { MinValue = -0.5f, MaxValue = 0.5f };
+		public float PlayerHeightOffset { get; private set; } = 0;
 		private double playerHeightOffsetApplyTime;
 		protected override void DrawFrame () {
 			base.DrawFrame();
 
 			if ( runningGame?.IsLoaded != true ) return;
 			if ( playerHeightOffsetApplyTime + 1000 < SceneGraphClock.CurrentTime ) {
-				playerHeightOffset = PlayerHeightOffset.Value;
+				PlayerHeightOffset = PlayerHeightOffsetBindable.Value;
 			}
 
 			VR.UpdateDraw( SceneGraphClock.CurrentTime );
@@ -91,10 +92,6 @@ namespace osu.Framework.XR.GameHosts {
 					rMatrix.m12, rMatrix.m13, -rMatrix.m14, rMatrix.m15
 				);
 
-			runningGame.PlayerPosition.Value = runningGame.PlayerOrigin.Value + new Vector3( VR.Current.Headset.Position.X, VR.Current.Headset.Position.Y + playerHeightOffset, VR.Current.Headset.Position.Z );
-			runningGame.Scene.Camera.Position = runningGame.PlayerPosition.Value;
-			runningGame.Scene.Camera.Rotation = new Quaternion( VR.Current.Headset.Rotation.X, VR.Current.Headset.Rotation.Y, VR.Current.Headset.Rotation.Z, VR.Current.Headset.Rotation.W );
-
 			var el = VR.CVRSystem.GetEyeToHeadTransform( EVREye.Eye_Left );
 			var er = VR.CVRSystem.GetEyeToHeadTransform( EVREye.Eye_Right );
 
@@ -112,8 +109,14 @@ namespace osu.Framework.XR.GameHosts {
 				0, 0, 0, 1
 			);
 
-			runningGame.Scene.Camera.Render( leftEye, new Drawable3D.DrawNode3D.DrawSettings { WorldToCamera = headToLeftEye * runningGame.Scene.Camera.WorldCameraMatrix, CameraToClip = leftEyeMatrix } );
-			runningGame.Scene.Camera.Render( rightEye, new Drawable3D.DrawNode3D.DrawSettings { WorldToCamera = headToRightEye * runningGame.Scene.Camera.WorldCameraMatrix, CameraToClip = rightEyeMatrix } );
+			runningGame.Player.Position = runningGame.Player.PositionOffset + new Vector3( VR.Current.Headset.Position.X, VR.Current.Headset.Position.Y + PlayerHeightOffset, VR.Current.Headset.Position.Z );
+
+			var rot = new Quaternion( VR.Current.Headset.Rotation.X, VR.Current.Headset.Rotation.Y, VR.Current.Headset.Rotation.Z, VR.Current.Headset.Rotation.W );
+			runningGame.Player.Rotation = rot.DecomposeAroundAxis( Vector3.UnitY );
+			runningGame.Player.Camera.Rotation = runningGame.Player.Rotation.Inverted() * rot;
+
+			runningGame.Player.Camera.Render( leftEye, new Drawable3D.DrawNode3D.DrawSettings { WorldToCamera = headToLeftEye * runningGame.Scene.Camera.WorldCameraMatrix, CameraToClip = leftEyeMatrix } );
+			runningGame.Player.Camera.Render( rightEye, new Drawable3D.DrawNode3D.DrawSettings { WorldToCamera = headToRightEye * runningGame.Scene.Camera.WorldCameraMatrix, CameraToClip = rightEyeMatrix } );
 
 			Texture_t left = new Texture_t { eColorSpace = EColorSpace.Linear, eType = ETextureType.OpenGL, handle = (IntPtr)leftEye.Texture.TextureId };
 			Texture_t right = new Texture_t { eColorSpace = EColorSpace.Linear, eType = ETextureType.OpenGL, handle = (IntPtr)rightEye.Texture.TextureId };

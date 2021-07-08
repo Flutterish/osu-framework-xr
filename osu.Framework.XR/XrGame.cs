@@ -9,8 +9,8 @@ namespace osu.Framework.XR {
 	public abstract class XrGame : Game {
 		[MaybeNull, NotNull]
 		public Scene Scene { get; protected set; }
-		public readonly Bindable<Vector3> PlayerOrigin = new(); // TODO just move this to a player object
-		public readonly Bindable<Vector3> PlayerPosition = new();
+		[MaybeNull, NotNull]
+		public XrPlayer Player { get; protected set; }
 		public abstract Manifest XrManifest { get; }
 	}
 }
