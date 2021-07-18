@@ -88,5 +88,13 @@ namespace osu.Framework.XR.Maths {
 
 			return twist;
 		}
+
+		public static Quaternion LookRotation ( this Vector3 direction ) {
+			return direction.Y == 1
+				? Quaternion.FromEulerAngles( MathF.PI / 2, 0, 0 )
+				: direction.Y == -1
+				? Quaternion.FromEulerAngles( -MathF.PI / 2, 0, 0 )
+				: Matrix4.LookAt( Vector3.Zero, direction, Vector3.UnitY ).ExtractRotation().Inverted();
+		}
 	}
 }

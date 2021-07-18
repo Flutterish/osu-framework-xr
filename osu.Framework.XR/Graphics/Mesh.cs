@@ -169,8 +169,8 @@ namespace osu.Framework.XR.Graphics {
 		public void AddQuad ( Vector3 origin, Vector3 direction, Vector3 up, float length, float width ) {
 			AddQuad( new Quad(
 				origin + width / 2 * up,
-				origin - width / 2 * up,
 				origin + width / 2 * up + direction * length,
+				origin - width / 2 * up,
 				origin - width / 2 * up + direction * length
 			) );
 		}

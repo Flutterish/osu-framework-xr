@@ -7,9 +7,11 @@ using System.Linq;
 namespace osu.Framework.XR.Components {
 	public class Path3D : Model {
 		private Cached isPathValid = new();
+		public readonly BindableFloat PathWidth = new( 0.05f );
 
 		public Path3D () {
 			Nodes.CollectionChanged += ( _, _ ) => isPathValid.Invalidate();
+			PathWidth.ValueChanged += _ => isPathValid.Invalidate();
 		}
 
 		protected readonly BindableList<Vector3> Nodes = new();
@@ -43,14 +45,19 @@ namespace osu.Framework.XR.Components {
 				Mesh.AddCircle( Nodes[ 0 ], Nodes[ 0 ].Normalized(), Nodes[ 0 ].Normalized(), 32 );
 			}
 			else {
-				foreach ( var (a,b) in Nodes.SkipLast( 1 ).Zip( Nodes.Skip( 1 ) ) ) {
-					var fwd = b - a;
+				Vector3 prev = Nodes[ 0 ];
+				for ( int i = 1; i < Nodes.Count; i++ ) {
+					Vector3 next = Nodes[ i ];
+
+					var fwd = next - prev;
 					var up = Vector3.Cross( fwd, Vector3.Cross( fwd, Vector3.UnitY ) ).Normalized();
 
 					if ( !float.IsNormal( fwd.Length ) ) continue;
 					if ( !float.IsNormal( up.X ) || !float.IsNormal( up.Y ) || !float.IsNormal( up.Z ) ) up = Vector3.UnitY;
 
-					Mesh.AddQuad( origin: a, direction: fwd.Normalized(), up, fwd.Length, 0.05f );
+					Mesh.AddQuad( origin: prev, direction: fwd.Normalized(), up, fwd.Length, PathWidth.Value );
+
+					prev = next;
 				}
 			}
 		}

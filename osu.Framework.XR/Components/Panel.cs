@@ -1,6 +1,7 @@
 ﻿using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
 using osu.Framework.XR.Input;
 using osu.Framework.XR.Maths;
@@ -16,14 +17,14 @@ namespace osu.Framework.XR.Components {
 	/// </summary>
 	public abstract partial class Panel : Model, IHasCollider {
 		public PhysicsLayer PhysicsLayer { get; set; } = PhysicsLayer.All;
-		public readonly VirtualInputManager EmulatedInput = new VirtualInputManager { RelativeSizeAxes = Axes.Both };
-		private PlatformActionContainer platformActions = new() { RelativeSizeAxes = Axes.Both };
-		public Container Source => platformActions;
+		public readonly VirtualInputManager EmulatedInput = new();
+		private PlatformActionContainer platformActions = new();
+		public Container<Drawable> Source => tooltips;
 		/// <summary>
 		/// Non-stretching scaling applied to the content
 		/// </summary>
 		public Bindable<Vector2> ContentScale = new( Vector2.One );
-		public BufferedCapture SourceCapture { get; } = new BufferedCapture { RelativeSizeAxes = Axes.Both };
+		public BufferedCapture SourceCapture { get; } = new();
 		protected bool IsMeshInvalidated = true;
 
 		/// <summary>
@@ -33,10 +34,12 @@ namespace osu.Framework.XR.Components {
 			EmulatedInput.RelativeSizeAxes = Axes.Y;
 			SourceCapture.RelativeSizeAxes = Axes.Y;
 			platformActions.RelativeSizeAxes = Axes.Y;
+			tooltips.RelativeSizeAxes = Axes.Y;
 
 			EmulatedInput.AutoSizeAxes = Axes.X;
 			SourceCapture.AutoSizeAxes = Axes.X;
 			platformActions.AutoSizeAxes = Axes.X;
+			tooltips.AutoSizeAxes = Axes.X;
 
 			return this;
 		}
@@ -47,10 +50,12 @@ namespace osu.Framework.XR.Components {
 			EmulatedInput.RelativeSizeAxes = Axes.X;
 			SourceCapture.RelativeSizeAxes = Axes.X;
 			platformActions.RelativeSizeAxes = Axes.X;
+			tooltips.RelativeSizeAxes = Axes.X;
 
 			EmulatedInput.AutoSizeAxes = Axes.Y;
 			SourceCapture.AutoSizeAxes = Axes.Y;
 			platformActions.AutoSizeAxes = Axes.Y;
+			tooltips.AutoSizeAxes = Axes.Y;
 
 			return this;
 		}
@@ -61,10 +66,28 @@ namespace osu.Framework.XR.Components {
 			EmulatedInput.RelativeSizeAxes = Axes.None;
 			SourceCapture.RelativeSizeAxes = Axes.None;
 			platformActions.RelativeSizeAxes = Axes.None;
+			tooltips.RelativeSizeAxes = Axes.None;
 
 			EmulatedInput.AutoSizeAxes = Axes.Both;
 			SourceCapture.AutoSizeAxes = Axes.Both;
 			platformActions.AutoSizeAxes = Axes.Both;
+			tooltips.AutoSizeAxes = Axes.Both;
+
+			return this;
+		}
+		/// <summary>
+		/// Makes the content use the 2D width and height of this panel.
+		/// </summary>
+		public Panel AutosizeNone () {
+			EmulatedInput.RelativeSizeAxes = Axes.Both;
+			SourceCapture.RelativeSizeAxes = Axes.Both;
+			platformActions.RelativeSizeAxes = Axes.Both;
+			tooltips.RelativeSizeAxes = Axes.Both;
+
+			EmulatedInput.AutoSizeAxes = Axes.None;
+			SourceCapture.AutoSizeAxes = Axes.None;
+			platformActions.AutoSizeAxes = Axes.None;
+			tooltips.AutoSizeAxes = Axes.None;
 
 			return this;
 		}
@@ -79,11 +102,16 @@ namespace osu.Framework.XR.Components {
 
 			SourceCapture.Add( EmulatedInput );
 			EmulatedInput.Add( platformActions );
+			platformActions.Add( tooltips = CreateTooltipContainer() ?? new Container() );
 			AddDrawable( SourceCapture );
 
 			ShouldBeDepthSorted = true;
+
+			AutosizeNone();
 		}
 
+		Container<Drawable> tooltips;
+		protected virtual TooltipContainer? CreateTooltipContainer () => null;
 		protected abstract void RecalculateMesh ();
 
 		/// <summary>

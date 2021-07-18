@@ -60,6 +60,9 @@ namespace osu.Framework.XR.Maths {
 		public float X { get => position.X; set { position.X = value; invalidateLocal(); } }
 		public float Y { get => position.Y; set { position.Y = value; invalidateLocal(); } }
 		public float Z { get => position.Z; set { position.Z = value; invalidateLocal(); } }
+		public Vector3 GlobalPosition {
+			get => ( Matrix * new Vector4( 0, 0, 0, 1 ) ).Xyz;
+		}
 
 		private Vector3 scale = Vector3.One;
 		public Vector3 Scale { get => scale; set { scale = value; invalidateLocal(); } }
@@ -79,6 +82,9 @@ namespace osu.Framework.XR.Maths {
 		public float EulerRotX { get => EulerRotation.X; set { EulerRotation = EulerRotation.With( x: value ); invalidateLocal(); } }
 		public float EulerRotY { get => EulerRotation.Y; set { EulerRotation = EulerRotation.With( y: value ); invalidateLocal(); } }
 		public float EulerRotZ { get => EulerRotation.Z; set { EulerRotation = EulerRotation.With( z: value ); invalidateLocal(); } }
+		public Quaternion GlobalRotation {
+			get => parent is null ? rotation : parent.rotation * rotation;
+		}
 
 		public Vector3 Forward => ( Rotation * new Vector4( 0, 0, 1, 1 ) ).Xyz;
 		public Vector3 Backward => ( Rotation * new Vector4( 0, 0, -1, 1 ) ).Xyz;
@@ -87,7 +93,12 @@ namespace osu.Framework.XR.Maths {
 		public Vector3 Up => ( Rotation * new Vector4( 0, 1, 0, 1 ) ).Xyz;
 		public Vector3 Down => ( Rotation * new Vector4( 0, -1, 0, 1 ) ).Xyz;
 
-		public Vector3 GlobalPosition => ( Matrix * new Vector4( position, 1 ) ).Xyz;
+		public Vector3 GlobalForward => ( GlobalRotation * new Vector4( 0, 0, 1, 1 ) ).Xyz;
+		public Vector3 GlobalBackward => ( GlobalRotation * new Vector4( 0, 0, -1, 1 ) ).Xyz;
+		public Vector3 GlobalLeft => ( GlobalRotation * new Vector4( -1, 0, 0, 1 ) ).Xyz;
+		public Vector3 GlobalRight => ( GlobalRotation * new Vector4( 1, 0, 0, 1 ) ).Xyz;
+		public Vector3 GlobalUp => ( GlobalRotation * new Vector4( 0, 1, 0, 1 ) ).Xyz;
+		public Vector3 GlobalDown => ( GlobalRotation * new Vector4( 0, -1, 0, 1 ) ).Xyz;
 
 		private Matrix4x4 localMatrix;
 		private Matrix4x4 finalMatrix;

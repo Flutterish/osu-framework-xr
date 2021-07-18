@@ -79,6 +79,7 @@ namespace osu.Framework.XR.Components {
 		protected readonly object transformKey = new { };
 		public readonly Transform Transform;
 		new public Vector3 Position { get => Transform.Position; set => Transform.Position = value; }
+		public Vector3 GlobalPosition { get => Transform.GlobalPosition; }
 		new public float X { get => Transform.X; set => Transform.X = value; }
 		new public float Y { get => Transform.Y; set => Transform.Y = value; }
 		public float Z { get => Transform.Z; set => Transform.Z = value; }
@@ -122,6 +123,7 @@ namespace osu.Framework.XR.Components {
 		public float EulerRotX { get => Transform.EulerRotX; set => Transform.EulerRotX = value; }
 		public float EulerRotY { get => Transform.EulerRotY; set => Transform.EulerRotY = value; }
 		public float EulerRotZ { get => Transform.EulerRotZ; set => Transform.EulerRotZ = value; }
+		public Quaternion GlobalRotation { get => Transform.GlobalRotation; }
 
 		public Vector3 Forward => Transform.Forward;
 		public Vector3 Backward => Transform.Backward;
@@ -129,6 +131,13 @@ namespace osu.Framework.XR.Components {
 		public Vector3 Right => Transform.Right;
 		public Vector3 Up => Transform.Up;
 		public Vector3 Down => Transform.Down;
+
+		public Vector3 GlobalForward => Transform.GlobalForward;
+		public Vector3 GlobalBackward => Transform.GlobalBackward;
+		public Vector3 GlobalLeft => Transform.GlobalLeft;
+		public Vector3 GlobalRight => Transform.GlobalRight;
+		public Vector3 GlobalUp => Transform.GlobalUp;
+		public Vector3 GlobalDown => Transform.GlobalDown;
 
 		new public virtual Vector3 Size { get; set; }
 		public virtual Vector3 RequiredParentSizeToFit => Size;
