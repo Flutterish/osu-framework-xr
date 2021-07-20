@@ -90,6 +90,8 @@ namespace osu.Framework.XR.Maths {
 		}
 
 		public static Quaternion LookRotation ( this Vector3 direction ) {
+			direction.Normalize();
+
 			return direction.Y == 1
 				? Quaternion.FromEulerAngles( MathF.PI / 2, 0, 0 )
 				: direction.Y == -1

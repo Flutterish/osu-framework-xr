@@ -13,14 +13,14 @@ using Valve.VR;
 namespace osu.Framework.XR.GameHosts {
 	public abstract class ExtendedRealityGameHost : GameHost { // TODO scale is not included in autosizing
 		protected ExtendedRealityGameHost ( string gameName = "" ) : base( gameName ) {
-			IsActive.BindValueChanged( v => {
-				if ( v.NewValue == false ) { // this makes it so osu never caps our FPS
-					IsActive.UnbindFrom( Window.IsActive );
-					( (Bindable<bool>)IsActive ).Value = true; // NOTE check if this might cause the load fails
-				}
-			} );
+			//IsActive.BindValueChanged( v => {
+			//	if ( v.NewValue == false ) { // this makes it so osu never caps our FPS
+			//		IsActive.UnbindFrom( Window.IsActive );
+			//		( (Bindable<bool>)IsActive ).Value = true; // NOTE check if this might cause the load fails
+			//	}
+			//} );
 
-			PlayerHeightOffsetBindable.ValueChanged += v => {
+			PlayerHeightOffsetBindable.ValueChanged += v => { // TODO a better way to apply a bindable change with a delay
 				playerHeightOffsetApplyTime = SceneGraphClock.CurrentTime;
 			};
 		}
