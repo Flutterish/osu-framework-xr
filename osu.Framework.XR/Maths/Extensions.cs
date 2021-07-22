@@ -89,6 +89,9 @@ namespace osu.Framework.XR.Maths {
 			return twist;
 		}
 
+		/// <summary>
+		/// A quaternion such that Z+ would align with the given direction
+		/// </summary>
 		public static Quaternion LookRotation ( this Vector3 direction ) {
 			direction.Normalize();
 

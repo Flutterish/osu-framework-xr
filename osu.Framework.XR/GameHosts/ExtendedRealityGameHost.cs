@@ -115,8 +115,18 @@ namespace osu.Framework.XR.GameHosts {
 			runningGame.Player.Rotation = rot.DecomposeAroundAxis( Vector3.UnitY );
 			runningGame.Player.Camera.Rotation = runningGame.Player.Rotation.Inverted() * rot;
 
-			runningGame.Player.Camera.Render( leftEye, new Drawable3D.DrawNode3D.DrawSettings { WorldToCamera = headToLeftEye * runningGame.Scene.Camera.WorldCameraMatrix, CameraToClip = leftEyeMatrix } );
-			runningGame.Player.Camera.Render( rightEye, new Drawable3D.DrawNode3D.DrawSettings { WorldToCamera = headToRightEye * runningGame.Scene.Camera.WorldCameraMatrix, CameraToClip = rightEyeMatrix } );
+			runningGame.Player.Camera.Render( leftEye, new Drawable3D.DrawNode3D.DrawSettings { 
+				WorldToCamera = headToLeftEye * runningGame.Scene.Camera.WorldCameraMatrix,
+				CameraToClip = leftEyeMatrix,
+				GlobalCameraPos = runningGame.Player.Camera.GlobalPosition,
+				GlobalCameraRot = runningGame.Player.Camera.GlobalRotation
+			} );
+			runningGame.Player.Camera.Render( rightEye, new Drawable3D.DrawNode3D.DrawSettings { 
+				WorldToCamera = headToRightEye * runningGame.Scene.Camera.WorldCameraMatrix, 
+				CameraToClip = rightEyeMatrix,
+				GlobalCameraPos = runningGame.Player.Camera.GlobalPosition,
+				GlobalCameraRot = runningGame.Player.Camera.GlobalRotation
+			} );
 
 			Texture_t left = new Texture_t { eColorSpace = EColorSpace.Linear, eType = ETextureType.OpenGL, handle = (IntPtr)leftEye.Texture.TextureId };
 			Texture_t right = new Texture_t { eColorSpace = EColorSpace.Linear, eType = ETextureType.OpenGL, handle = (IntPtr)rightEye.Texture.TextureId };

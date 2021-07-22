@@ -103,7 +103,9 @@ namespace osu.Framework.XR.Projection {
 			var settings = new DrawNode3D.DrawSettings {
 				Camera = this,
 				CameraToClip = CameraClipMatrix,
-				WorldToCamera = Matrix4x4.CreateScale( scale.X, scale.Y ) * WorldCameraMatrix
+				WorldToCamera = Matrix4x4.CreateScale( scale.X, scale.Y ) * WorldCameraMatrix,
+				GlobalCameraPos = GlobalPosition,
+				GlobalCameraRot = GlobalRotation
 			};
 
 			Render( depthBuffer, settings );

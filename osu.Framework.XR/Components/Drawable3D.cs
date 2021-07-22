@@ -262,6 +262,8 @@ namespace osu.Framework.XR.Components {
 			public record DrawSettings { // TODO most of these should be in a global uniform block
 				public Matrix4 WorldToCamera { get; init; }
 				public Matrix4 CameraToClip { get; init; }
+				public Vector3 GlobalCameraPos { get; init; }
+				public Quaternion GlobalCameraRot { get; init; }
 				[MaybeNull, NotNull]
 				public Camera Camera { get; init; }
 			}

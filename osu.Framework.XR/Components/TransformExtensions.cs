@@ -8,6 +8,15 @@ namespace osu.Framework.XR.Components {
 		public static TransformSequence<T> MoveTo<T> ( this T drawable, Vector3 position, double duration = 0, Easing easing = Easing.None )
 			where T : Drawable3D
 			=> drawable.TransformTo( drawable.PopulateTransform( new PositionTransform( position ), default, duration, new DefaultEasingFunction( easing ) ) );
+		public static TransformSequence<T> MoveTo<T> ( this TransformSequence<T> seq, Vector3 position, double duration = 0, Easing easing = Easing.None )
+			where T : Drawable3D
+			=> seq.Append( o => o.MoveTo( position, duration, easing ) );
+		public static TransformSequence<T> MoveToOffset<T> ( this T drawable, Vector3 offset, double duration = 0, Easing easing = Easing.None )
+			where T : Drawable3D
+			=> drawable.TransformTo( drawable.PopulateTransform( new PositionOffsetTransform( offset ), default, duration, new DefaultEasingFunction( easing ) ) );
+		public static TransformSequence<T> MoveToOffset<T> ( this TransformSequence<T> seq, Vector3 offset, double duration = 0, Easing easing = Easing.None )
+			where T : Drawable3D
+			=> seq.Append( o => o.MoveToOffset( offset, duration, easing ) );
 
 		public static TransformSequence<T> ScaleTo<T> ( this T drawable, Vector3 scale, double duration = 0, Easing easing = Easing.None )
 			where T : Drawable3D
@@ -19,6 +28,9 @@ namespace osu.Framework.XR.Components {
 		public static TransformSequence<T> RotateTo<T> ( this T drawable, Quaternion rotation, double duration = 0, Easing easing = Easing.None )
 			where T : Drawable3D
 			=> drawable.TransformTo( drawable.PopulateTransform( new RotationTransform( rotation ), default, duration, new DefaultEasingFunction( easing ) ) );
+		public static TransformSequence<T> RotateTo<T> ( this TransformSequence<T> seq, Quaternion rotation, double duration = 0, Easing easing = Easing.None )
+			where T : Drawable3D
+			=> seq.Append( o => o.RotateTo( rotation, duration, easing ) );
 
 		private class PositionTransform : Transform<Vector3, Drawable3D> {
 			private readonly Vector3 target;
@@ -41,6 +53,16 @@ namespace osu.Framework.XR.Components {
 			protected override void ReadIntoStartValue ( Drawable3D d ) {
 				StartValue = d.Position;
 				EndValue = target;
+			}
+		}
+
+		private class PositionOffsetTransform : PositionTransform {
+			public PositionOffsetTransform ( Vector3 offset ) : base( offset ) {
+			}
+
+			protected override void ReadIntoStartValue ( Drawable3D d ) {
+				base.ReadIntoStartValue( d );
+				EndValue += StartValue;
 			}
 		}
 
