@@ -1,4 +1,5 @@
-﻿using osuTK;
+﻿using osu.Framework.Utils;
+using osuTK;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,6 +33,10 @@ namespace osu.Framework.XR.Maths {
 
 		public static Vector3 ExtractPosition ( this HmdMatrix34_t mat ) {
 			return new Vector3( mat.m3, mat.m7, -mat.m11 );
+		}
+
+		public static Vector3 ExtractPosition ( this Matrix4x4 mat ) {
+			return new Vector3( mat.M30, mat.M31, mat.M32 );
 		}
 
 		public static Quaternion ExtractRotation ( this HmdMatrix34_t mat ) {
@@ -100,6 +105,45 @@ namespace osu.Framework.XR.Maths {
 				: direction.Y == -1
 				? Quaternion.FromEulerAngles( -MathF.PI / 2, 0, 0 )
 				: Matrix4.LookAt( Vector3.Zero, direction, Vector3.UnitY ).ExtractRotation().Inverted();
+		}
+
+		public static Quaternion ShortestRotationTo ( this Vector3 from, Vector3 to ) { // TODO with an up vector
+			var dot = from.Dot( to );
+			if ( dot < -0.999999 ) {
+				return Quaternion.FromAxisAngle( from.AnyOrthogonal(), MathF.PI );
+			}
+			else if ( dot > 0.999999 ) {
+				return Quaternion.Identity;
+			}
+			else {
+				return new Quaternion( from.Cross( to ), 1 + dot ).Normalized();
+			}
+		}
+
+		public static float Dot ( this Vector3 a, Vector3 b )
+			=> Vector3.Dot( a, b );
+
+		public static Vector3 Cross ( this Vector3 a, Vector3 b )
+			=> Vector3.Cross( a, b );
+
+		/// <summary>
+		/// Returns some normal orthogonal vector
+		/// </summary>
+		public static Vector3 AnyOrthogonal ( this Vector3 vector ) {
+			var cross = vector.Cross( Vector3.UnitX );
+			if ( ( cross - vector ).LengthSquared < 0.0000001 )
+				cross = vector.Cross( Vector3.UnitZ );
+
+			return cross.Normalized();
+		}
+
+		/// <summary>
+		/// A quaternion such that Z+ and Y+ would align with the given direction
+		/// </summary>
+		public static Quaternion LookRotation ( this Vector3 direction, Vector3 up ) {
+			direction.Normalize();
+
+			return Matrix4.LookAt( Vector3.Zero, direction, Vector3.UnitY ).ExtractRotation().Inverted();
 		}
 	}
 }

@@ -79,7 +79,10 @@ namespace osu.Framework.XR.Components {
 		protected readonly object transformKey = new { };
 		public readonly Transform Transform;
 		new public Vector3 Position { get => Transform.Position; set => Transform.Position = value; }
-		public Vector3 GlobalPosition { get => Transform.GlobalPosition; }
+		public Vector3 GlobalPosition {
+			get => Transform.GlobalPosition;
+			set => Transform.GlobalPosition = value;
+		}
 		new public float X { get => Transform.X; set => Transform.X = value; }
 		new public float Y { get => Transform.Y; set => Transform.Y = value; }
 		public float Z { get => Transform.Z; set => Transform.Z = value; }
@@ -123,7 +126,10 @@ namespace osu.Framework.XR.Components {
 		public float EulerRotX { get => Transform.EulerRotX; set => Transform.EulerRotX = value; }
 		public float EulerRotY { get => Transform.EulerRotY; set => Transform.EulerRotY = value; }
 		public float EulerRotZ { get => Transform.EulerRotZ; set => Transform.EulerRotZ = value; }
-		public Quaternion GlobalRotation { get => Transform.GlobalRotation; }
+		public Quaternion GlobalRotation {
+			get => Transform.GlobalRotation;
+			set => Transform.GlobalRotation = value;
+		}
 
 		public Vector3 Forward => Transform.Forward;
 		public Vector3 Backward => Transform.Backward;

@@ -61,7 +61,28 @@ namespace osu.Framework.XR.Maths {
 		public float Y { get => position.Y; set { position.Y = value; invalidateLocal(); } }
 		public float Z { get => position.Z; set { position.Z = value; invalidateLocal(); } }
 		public Vector3 GlobalPosition {
-			get => ( Matrix * new Vector4( 0, 0, 0, 1 ) ).Xyz;
+			get {
+				if ( parent is null ) {
+					return position;
+				}
+				return ( parent.Matrix * new Vector4( position, 1 ) ).Xyz;
+			}
+			set {
+				if ( parent is null ) {
+					Position = value;
+					return;
+				}
+
+				var zero = ( parent.Matrix * new Vector4( Vector3.Zero, 1 ) ).Xyz;
+				var unitX = ( parent.Matrix * new Vector4( Vector3.UnitX, 1 ) ).Xyz - zero;
+				var unitY = ( parent.Matrix * new Vector4( Vector3.UnitY, 1 ) ).Xyz - zero;
+				var unitZ = ( parent.Matrix * new Vector4( Vector3.UnitZ, 1 ) ).Xyz - zero;
+
+				var coeffs = new Matrix3( unitX, unitY, unitZ );
+				coeffs.Transpose();
+				coeffs.Invert();
+				Position = coeffs * ( value - zero );
+			}
 		}
 
 		private Vector3 scale = Vector3.One;
@@ -83,7 +104,15 @@ namespace osu.Framework.XR.Maths {
 		public float EulerRotY { get => EulerRotation.Y; set { EulerRotation = EulerRotation.With( y: value ); invalidateLocal(); } }
 		public float EulerRotZ { get => EulerRotation.Z; set { EulerRotation = EulerRotation.With( z: value ); invalidateLocal(); } }
 		public Quaternion GlobalRotation {
-			get => parent is null ? rotation : parent.rotation * rotation;
+			get => parent is null ? rotation : parent.GlobalRotation * rotation;
+			set {
+				if ( parent is null ) {
+					Rotation = value;
+					return;
+				}
+
+				Rotation = parent.GlobalRotation.Inverted() * value;
+			}
 		}
 
 		public Vector3 Forward => ( Rotation * new Vector4( 0, 0, 1, 1 ) ).Xyz;
