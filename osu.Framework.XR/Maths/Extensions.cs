@@ -3,6 +3,7 @@ using osuTK;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Valve.VR;
 
 namespace osu.Framework.XR.Maths {
@@ -146,6 +147,7 @@ namespace osu.Framework.XR.Maths {
 			return Matrix4.LookAt( Vector3.Zero, direction, Vector3.UnitY ).ExtractRotation().Inverted();
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static Vector3 Apply ( this Quaternion quaternion, Vector3 vector )
 			=> ( quaternion * new Vector4( vector, 1 ) ).Xyz;
 	}
