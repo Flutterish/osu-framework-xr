@@ -80,7 +80,7 @@ namespace osu.Framework.XR.Components {
 
 			var a = settings.WorldToCamera;
 			var b = settings.CameraToClip;
-			var c = (Matrix4)Source.Transform.Matrix;
+			var c = (Matrix4)Transform.Matrix;
 
 			GL.UniformMatrix4( worldToCamera ??= GL.GetUniformLocation( Shaders.Shader3D, Shaders.VERTEX_3D.WorldToCameraMatrix ), true, ref a );
 			GL.UniformMatrix4( cameraToClip ??= GL.GetUniformLocation( Shaders.Shader3D, Shaders.VERTEX_3D.CameraToClipMatrix ), true, ref b );
@@ -92,7 +92,7 @@ namespace osu.Framework.XR.Components {
 			Shaders.Shader3D.Unbind();
 		}
 
-		private static int? worldToCamera;
+		private static int? worldToCamera; // TODO would be nice to get rid of the nullcheck
 		private static int? cameraToClip;
 		private static int? localToWorld;
 		private static int? useGamma;
@@ -109,7 +109,7 @@ namespace osu.Framework.XR.Components {
 		}
 		protected void UpdateMesh ( Mesh mesh ) {
 			GL.BindVertexArray( VAO );
-			indiceCount = mesh.UploadToGPU( AttribLocation( "vertex" ), AttribLocation( "UV" ), buffer, EBO );
+			indiceCount = mesh.UploadToGPU( attribLocation( "vertex" ), attribLocation( "UV" ), buffer, EBO );
 			GL.BindVertexArray( 0 );
 		}
 
@@ -120,8 +120,8 @@ namespace osu.Framework.XR.Components {
 			GL.DeleteBuffer( EBO );
 		}
 
-		private Dictionary<string, int> attribs = new();
-		protected int AttribLocation ( string name ) {
+		private static Dictionary<string, int> attribs = new();
+		private int attribLocation ( string name ) {
 			if ( attribs.TryGetValue( name, out var handle ) ) return handle;
 			handle = GL.GetAttribLocation( Shaders.Shader3D, name );
 			attribs.Add( name, handle );

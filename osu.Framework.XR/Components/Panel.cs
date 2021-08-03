@@ -129,15 +129,6 @@ namespace osu.Framework.XR.Components {
 		}
 
 		private Vector2 lastTextureSize;
-		public override void BeforeDraw ( DrawSettings settings ) {
-			if ( SourceCapture is null ) return;
-			if ( SourceCapture.Capture is null ) return;
-			MainTexture = SourceCapture.Capture;
-			if ( MainTexture.Size != lastTextureSize ) {
-				IsMeshInvalidated = true;
-				lastTextureSize = MainTexture.Size;
-			}
-		}
 
 		protected override void Update () {
 			base.Update();
@@ -162,6 +153,25 @@ namespace osu.Framework.XR.Components {
 					i.Hide();
 				}
 			} );
+		}
+
+		protected override DrawNode3D CreateDrawNode ()
+			=> new PanelDrawNode( this );
+
+		class PanelDrawNode : ModelDrawNode<Panel> {
+			public PanelDrawNode ( Panel source ) : base( source ) {
+			}
+
+			public override void Draw ( DrawSettings settings ) {
+				if ( Source.SourceCapture?.Capture is not null ) {
+					Source.MainTexture = Source.SourceCapture.Capture;
+					if ( Source.MainTexture.Size != Source.lastTextureSize ) {
+						Source.IsMeshInvalidated = true;
+						Source.lastTextureSize = Source.MainTexture.Size;
+					}
+				}
+				base.Draw( settings );
+			}
 		}
 	}
 }

@@ -80,10 +80,20 @@ namespace osu.Framework.XR.Components {
 			}
 			protected virtual void OnReleased () { }
 
-			public override void BeforeDraw ( DrawNode3D.DrawSettings settings ) {
-				base.BeforeDraw( settings );
+			protected override DrawNode3D CreateDrawNode ()
+				=> new ParticleDrawNode( this );
 
-				Rotation = ( settings.GlobalCameraPos - GlobalPosition ).LookRotation();
+			class ParticleDrawNode : ModelDrawNode<Particle> {
+				public ParticleDrawNode ( Particle source ) : base( source ) {
+					cameraFacingTransform.Parent = source;
+				}
+
+				private Transform cameraFacingTransform = new();
+				protected override Transform Transform => cameraFacingTransform;
+				public override void Draw ( DrawSettings settings ) {
+					cameraFacingTransform.GlobalRotation = ( settings.GlobalCameraPos - cameraFacingTransform.GlobalPosition ).LookRotation();
+					base.Draw( settings );
+				}
 			}
 		}
 	}

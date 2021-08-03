@@ -74,8 +74,6 @@ namespace osu.Framework.XR.Components {
 			return find( Root );
 		}
 
-		public virtual void BeforeDraw ( DrawNode3D.DrawSettings settings ) { }
-
 		protected readonly object transformKey = new { };
 		public readonly Transform Transform;
 		new public Vector3 Position { get => Transform.Position; set => Transform.Position = value; }
@@ -255,8 +253,8 @@ namespace osu.Framework.XR.Components {
 			drawNode?.Dispose();
 		}
 		public abstract class DrawNode3D : IDisposable {
-			protected Drawable3D Source;
-			protected Transform Transform => Source.Transform;
+			protected readonly Drawable3D Source;
+			protected virtual Transform Transform => Source.Transform;
 			public DrawNode3D ( Drawable3D source ) {
 				Source = source;
 			}

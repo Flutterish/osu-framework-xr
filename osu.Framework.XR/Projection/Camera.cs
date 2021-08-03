@@ -122,7 +122,6 @@ namespace osu.Framework.XR.Projection {
 			GL.Clear( ClearBufferMask.ColorBufferBit );
 			lock ( renderTargets ) {
 				foreach ( var i in renderTargets ) {
-					i.BeforeDraw( settings );
 					i.DrawNode?.Draw( settings );
 				}
 			}
@@ -131,7 +130,6 @@ namespace osu.Framework.XR.Projection {
 			GL.Clear( ClearBufferMask.DepthBufferBit );
 			lock ( depthTestedRenderTargets ) {
 				foreach ( var i in depthTestedRenderTargets ) {
-					i.BeforeDraw( settings );
 					i.DrawNode?.Draw( settings );
 				}
 			}
@@ -140,13 +138,11 @@ namespace osu.Framework.XR.Projection {
 					var p = settings.WorldToCamera * d.Transform.Matrix * new Vector4( d.Centre, 1 );
 					return p.Z / p.W;
 				} ) ) {
-					i.BeforeDraw( settings );
 					i.DrawNode?.Draw( settings );
 				}
 			}
 			lock ( finalRenderTargets ) {
 				foreach ( var i in finalRenderTargets ) {
-					i.BeforeDraw( settings );
 					i.DrawNode?.Draw( settings );
 				}
 			}
