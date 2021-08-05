@@ -19,15 +19,17 @@ namespace osu.Framework.XR.GameHosts {
 			}
 		}
 
-		public void Deactivate ( object sender ) {
+		public void Deactivate () {
 			pending = "";
 			IsActiveBindable.Value = false;
 		}
 
-		public void Activate ( object sender ) {
+		public void Activate () {
 			pending = "";
 			IsActiveBindable.Value = true;
 		}
+
+		public void EnsureActivated () { }
 
 		public readonly BindableBool IsActiveBindable = new( false );
 
