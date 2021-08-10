@@ -24,7 +24,7 @@ namespace osu.Framework.XR.Components {
 		public Camera Camera { get; } = new();
 
 		public XrPlayer () {
-			Add( Camera );
+			AddInternal( Camera );
 		}
 	}
 }

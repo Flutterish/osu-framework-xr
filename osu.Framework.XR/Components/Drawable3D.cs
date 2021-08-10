@@ -12,7 +12,7 @@ namespace osu.Framework.XR.Components {
 	/// <summary>
 	/// An <see cref="Drawable3D"/> is the 3D counterpart of a <see cref="Drawable"/>.
 	/// </summary>
-	public class Drawable3D : CompositeDrawable { // has to be a "Drawable" because it gives us cool stuff. It should eventually become a `(Composite)Component` when that is implemented
+	public class Drawable3D : CompositeDrawable { // NOTE has to be a "Drawable" because it gives us cool stuff. It should eventually become a `(Composite)Component` when that is implemented
 		public override bool RemoveCompletedTransforms => true;
 		public Drawable3D () {
 			Transform = new Transform( transformKey );
@@ -36,7 +36,7 @@ namespace osu.Framework.XR.Components {
 				parent = value;
 				if ( parent is not null ) {
 					parent.children.Add( this );
-					parent.AddDrawable( this ); // this is here so they actually exist in the framework heirerchy
+					parent.AddDrawable( this ); // NOTE this is here so they actually exist in the framework heirerchy. maybe we can somehow merge the 2 lists used to keep track of children
 
 					parent.onChildAdded( this );
 					foreach ( var i in GetAllChildrenInHiererchy() ) parent.onChildAddedToHierarchy( i.parent!, i );

@@ -12,6 +12,9 @@ namespace osu.Framework.XR.Components {
 		new protected T Emit () => (T)base.Emit();
 	}
 
+	/// <summary>
+	/// A primitive particle emmiter that uses sprite particles.
+	/// </summary>
 	public abstract class ParticleEmiter : CompositeDrawable3D {
 		private readonly List<Particle> particlePool = new();
 
@@ -26,13 +29,13 @@ namespace osu.Framework.XR.Components {
 		}
 
 		private void release ( Particle particle ) {
-			Remove( particle );
+			RemoveInternal( particle );
 			ActiveParticles--;
 		}
 		protected Particle Emit () {
 			var particle = getParticle();
 
-			Add( particle );
+			AddInternal( particle );
 			ActiveParticles++;
 			particle.Apply( this );
 

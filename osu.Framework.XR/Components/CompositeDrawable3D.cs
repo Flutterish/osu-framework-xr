@@ -1,4 +1,5 @@
 ﻿using osu.Framework.Extensions.EnumExtensions;
+using osu.Framework.Graphics;
 using osu.Framework.XR.Maths;
 using osuTK;
 using System;
@@ -8,35 +9,41 @@ using System.Linq;
 namespace osu.Framework.XR.Components {
 	public class CompositeDrawable3D : Drawable3D {
 		internal List<Drawable3D> children = new();
-		public Drawable3D Child {
+		new public Drawable3D InternalChild {
 			get => children.Single();
 			protected set {
 				foreach ( var i in children.ToArray() ) i.Parent = null;
 				value.Parent = this;
 			}
 		}
-		public IReadOnlyList<Drawable3D> Children {
+		new public IReadOnlyList<Drawable3D> InternalChildren {
 			get => children.AsReadOnly();
 			protected set {
 				foreach ( var i in children.ToArray() ) i.Parent = null;
 				foreach ( var i in value ) i.Parent = this;
 			}
 		}
-		protected void Add ( Drawable3D child ) {
+		protected void AddInternal ( Drawable3D child ) {
 			child.Parent = this;
 		}
-		protected void Remove ( Drawable3D child ) {
+		protected override void AddInternal ( Drawable drawable ) {
+			if ( drawable is Drawable3D d3 ) AddInternal( d3 );
+			else AddDrawable( drawable );
+		}
+		protected void RemoveInternal ( Drawable3D child ) {
 			if ( child.parent != this ) throw new InvalidOperationException( "Tried to remove child which does not belong to this parent." );
 			child.Parent = null;
 		}
-		protected void Clear ( bool disposeChildren = true ) {
-			foreach ( var i in Children ) {
-				Remove( i );
+		new protected void ClearInternal ( bool disposeChildren = true ) {
+			foreach ( var i in InternalChildren ) {
+				RemoveInternal( i );
 				if ( disposeChildren ) i.Destroy();
 			}
 		}
 
-		// These events are used for efficient hiererchy change scans used in for example the physics system.
+		// NOTE These events are used for dependency inversion and observing the hierarchy.
+		// NOTE we possibly might want to remove the parent parameter as every interested subscriber can keep track of the current parent in case of removal and in case of addition just check the .Parent property
+		// NOTE additionally, the "added to/removed from this one specifically" events should get a name change as anyone subscribing to a Container3D with custom content wants to subscribe to the content and not the internal children.
 		public delegate void ChildChangedHandler ( Drawable3D parent, Drawable3D child );
 		/// <summary>
 		/// Occurs whenever a child is added to this <see cref="CompositeDrawable3D"/>
@@ -47,11 +54,11 @@ namespace osu.Framework.XR.Components {
 		/// </summary>
 		public event ChildChangedHandler? ChildRemoved;
 		/// <summary>
-		/// Occurs whenever an <see cref="Drawable3D"/> is added under this <see cref="CompositeDrawable3D"/>
+		/// Occurs whenever a <see cref="Drawable3D"/> is added under this <see cref="CompositeDrawable3D"/>
 		/// </summary>
 		public event ChildChangedHandler? ChildAddedToHierarchy;
 		/// <summary>
-		/// Occurs whenever an <see cref="Drawable3D"/> is removed from under this <see cref="CompositeDrawable3D"/>
+		/// Occurs whenever a <see cref="Drawable3D"/> is removed from under this <see cref="CompositeDrawable3D"/>
 		/// </summary>
 		public event ChildChangedHandler? ChildRemovedFromHierarchy;
 
@@ -87,7 +94,7 @@ namespace osu.Framework.XR.Components {
 			if ( added is not null ) {
 				ChildAdded += added;
 				if ( runOnAllChildrenImmediately ) {
-					foreach ( var i in Children ) {
+					foreach ( var i in InternalChildren ) {
 						added( this, i );
 					}
 				}
@@ -98,7 +105,7 @@ namespace osu.Framework.XR.Components {
 		/// <summary>
 		/// The size nescessary to fit all children
 		/// </summary>
-		new public Vector3 ChildSize { get => childSize; private set => childSize = value; }
+		new public Vector3 ChildSize { get => childSize; private set => childSize = value; } // TODO this is not what ChildSize actually is in o!f. The current use is what BoundingBox does.
 		public override Vector3 RequiredParentSizeToFit => ChildSize;
 		public override Vector3 Size { 
 			get => ChildSize; 
