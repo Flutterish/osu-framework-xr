@@ -6,6 +6,7 @@ using osu.Framework.XR.Components;
 using osu.Framework.XR.Graphics;
 using osu.Framework.XR.Maths;
 using osuTK;
+using osuTK.Graphics;
 using osuTK.Graphics.OpenGL4;
 using System;
 using System.Collections.Generic;
@@ -14,10 +15,10 @@ using System.Linq;
 namespace osu.Framework.XR.Projection {
 	public class Camera : Drawable3D {
 		public Camera () {
-			Fov = new Vector2( MathF.PI * 2 - 4 * MathF.Atan( 16f / 9 ), MathF.PI );
+			Fov = new Vector2( MathF.Atan( 16f / 9 ) * 2, MathF.Atan( 1 ) * 2 );
 			FovBindable.BindValueChanged( v => {
-				XSlope = 1 / MathF.Tan( ( MathF.PI - v.NewValue.X / 2 ) / 2 );
-				YSlope = 1 / MathF.Tan( ( MathF.PI - v.NewValue.Y / 2 ) / 2 );
+				XSlope = MathF.Tan( v.NewValue.X / 2 );
+				YSlope = MathF.Tan( v.NewValue.Y / 2 );
 				AspectRatio = XSlope / YSlope;
 				CameraClipMatrix = Matrix4x4.CreatePerspectiveProjection( XSlope, YSlope, 0.01f, 1000 );
 			}, true );
@@ -93,11 +94,18 @@ namespace osu.Framework.XR.Projection {
 
 		public void Render ( DepthFrameBuffer depthBuffer ) {
 			Vector2 scale;
-			if ( depthBuffer.Size.X / depthBuffer.Size.Y > AspectRatio ) {
-				scale = new( AspectRatio * AspectRatio, 1 ); // TODO why square?
+			var ratio = depthBuffer.Size.X / depthBuffer.Size.Y;
+			if ( ratio > AspectRatio ) {
+				scale = new Vector2(
+					1 / ( ratio / AspectRatio ),
+					1
+				);
 			}
 			else {
-				scale = new( 1, 1 / AspectRatio / AspectRatio );
+				scale = new Vector2(
+					1,
+					1 * ( ratio / AspectRatio )
+				);
 			}
 
 			var settings = new DrawNode3D.DrawSettings {
@@ -119,6 +127,7 @@ namespace osu.Framework.XR.Projection {
 			GLWrapper.PushScissorOffset( Vector2I.Zero );
 			depthBuffer.Bind();
 			GLWrapper.PushDepthInfo( new DepthInfo( false, false, osuTK.Graphics.ES30.DepthFunction.Less ) );
+			GL.ClearColor( Color4.Transparent );
 			GL.Clear( ClearBufferMask.ColorBufferBit );
 			lock ( renderTargets ) {
 				foreach ( var i in renderTargets ) {

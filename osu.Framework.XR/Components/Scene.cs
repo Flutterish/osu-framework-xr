@@ -75,12 +75,13 @@ namespace osu.Framework.XR.Components {
 
 			Vector2 size;
 			Quad quad;
+			RectangleF textureCoords;
 			[MaybeNull, NotNull]
 			IShader textureShader;
 			public override void ApplyState () {
 				base.ApplyState();
-				size = Source.DrawSize;
 				quad = Source.ScreenSpaceDrawQuad;
+				size = quad.Size;
 				quad = new Quad( quad.BottomLeft, quad.BottomRight, quad.TopLeft, quad.TopRight );
 				textureShader = Source.TextureShader;
 			}
@@ -90,13 +91,15 @@ namespace osu.Framework.XR.Components {
 
 				if ( Source.depthBuffer.Size != size ) Source.depthBuffer.Size = size;
 
-				Source.Camera?.Render( Source.depthBuffer );
+				if ( Source.Camera is not null ) {
+					Source.Camera.Render( Source.depthBuffer );
 
-				base.Draw( vertexAction );
-				if ( Source.depthBuffer.Texture?.Bind() == true ) {
-					textureShader.Bind();
-					DrawQuad( Source.depthBuffer.Texture, quad, DrawColourInfo.Colour );
-					textureShader.Unbind();
+					base.Draw( vertexAction );
+					if ( Source.depthBuffer.Texture?.Bind() == true ) {
+						textureShader.Bind();
+						DrawQuad( Source.depthBuffer.Texture, quad, DrawColourInfo.Colour );
+						textureShader.Unbind();
+					}
 				}
 			}
 		}

@@ -175,19 +175,82 @@ namespace osu.Framework.XR.Graphics {
 			) );
 		}
 
-		public void AddCircle ( Vector3 origin, Vector3 normal, Vector3 up, int segments ) {
+		public void AddCircle ( Vector3 origin, Vector3 normal, Vector3 forward, int segments ) {
 			FillTextureCoordinates();
 			uint offset = (uint)Vertices.Count;
 
 			normal.Normalize();
 			Vertices.Add( origin );
-			Vertices.Add( origin + up );
+			Vertices.Add( origin + forward );
 			for ( int i = 1; i < segments; i++ ) {
 				var angle = (float)i / segments * MathF.PI * 2;
-				Vertices.Add( origin + ( Quaternion.FromAxisAngle( normal, angle ) * new Vector4( up, 1 ) ).Xyz );
+				Vertices.Add( origin + ( Quaternion.FromAxisAngle( normal, angle ) * new Vector4( forward, 1 ) ).Xyz );
 				Tris.Add( new IndexedFace( offset, offset + (uint)i, offset + (uint)i + 1 ) );
 			}
 			Tris.Add( new IndexedFace( offset, (uint)( segments + offset ), offset + 1 ) );
+		}
+
+		public void AddCircularArc ( Vector3 normal, Vector3 forward, float angle, float innerRadius, float outerRadius, int? steps = null, Vector3? origin = null ) {
+			FillTextureCoordinates();
+
+			forward.Normalize();
+			normal.Normalize();
+
+			origin ??= Vector3.Zero;
+			steps ??= (int)( angle / MathF.PI * 128 );
+			if ( steps < 1 ) steps = 1;
+			var deltaAngle = angle / steps.Value;
+
+			(uint a, uint b) addVertices ( float angle ) {
+				var direction = Quaternion.FromAxisAngle( normal, angle ).Apply( forward );
+				var inner = innerRadius * direction + origin.Value;
+				var outer = outerRadius * direction + origin.Value;
+
+				Vertices.Add( inner );
+				Vertices.Add( outer );
+
+				return ( (uint)Vertices.Count - 2, (uint)Vertices.Count - 1 );
+			}
+
+			var (lastVerticeA, lastVerticeB) = addVertices( 0 );
+			for ( int i = 1; i < steps; i++ ) {
+				var (a, b) = addVertices( deltaAngle * i );
+
+				Tris.Add(new IndexedFace(lastVerticeA, lastVerticeB, b));
+				Tris.Add(new IndexedFace(a, b, lastVerticeA));
+
+				(lastVerticeA, lastVerticeB) = (a, b);
+			}
+		}
+
+		public void AddArcedPlane ( Vector3 up, Vector3 forward, float height, float radius, float angle, int? steps = null, Vector3? origin = null ) {
+			FillTextureCoordinates();
+
+			forward.Normalize();
+			up.Normalize();
+
+			origin ??= Vector3.Zero;
+			steps ??= (int)( angle / MathF.PI * 128 );
+			if ( steps < 1 ) steps = 1;
+			var deltaAngle = angle / steps.Value;
+
+			(uint a, uint b) addVertices ( float angle ) {
+				var middle = Quaternion.FromAxisAngle( up, angle ).Apply( forward ) * radius + origin.Value;
+				Vertices.Add( middle - up * height / 2 );
+				Vertices.Add( middle + up * height / 2 );
+
+				return ( (uint)Vertices.Count - 2, (uint)Vertices.Count - 1 );
+			}
+
+			var (lastVerticeA, lastVerticeB) = addVertices( 0 );
+			for ( int i = 1; i < steps; i++ ) {
+				var (a, b) = addVertices( deltaAngle * i );
+
+				Tris.Add(new IndexedFace(lastVerticeA, lastVerticeB, b));
+				Tris.Add(new IndexedFace(a, b, lastVerticeA));
+
+				(lastVerticeA, lastVerticeB) = (a, b);
+			}
 		}
 
 		public static Mesh UnitCube => FromOBJ(
@@ -224,6 +287,19 @@ namespace osu.Framework.XR.Graphics {
 					new Vector3( sizeX / 2, 0, sizeZ / 2 ),
 					new Vector3( -sizeX / 2, 0, -sizeZ / 2 ),
 					new Vector3( sizeX / 2, 0, -sizeZ / 2 )
+				)
+			);
+			return mesh;
+		}
+
+		public static Mesh XYPlane ( float sizeX, float sizeY ) {
+			Mesh mesh = new();
+			mesh.AddQuad(
+				new Quad(
+					new Vector3( -sizeX / 2, sizeY / 2, 0 ),
+					new Vector3( sizeX / 2, sizeY / 2, 0 ),
+					new Vector3( -sizeX / 2, -sizeY / 2, 0 ),
+					new Vector3( sizeX / 2, -sizeY / 2, 0 )
 				)
 			);
 			return mesh;

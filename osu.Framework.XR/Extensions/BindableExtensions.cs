@@ -1,7 +1,7 @@
 ﻿using osu.Framework.Bindables;
 using System;
 
-namespace osu.Framework.XR {
+namespace osu.Framework.XR.Extensions {
 	public static class BindableExtensions {
 		public delegate void UnbindAction ();
 
