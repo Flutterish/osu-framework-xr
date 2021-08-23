@@ -24,6 +24,8 @@ namespace osu.Framework.XR.Projection {
 			}, true );
 		}
 
+		HashSet<Drawable3D> allDrawables = new();
+
 		List<Drawable3D> finalRenderTargets = new();
 		List<Drawable3D> depthSortedRenderTargets = new();
 		List<Drawable3D> depthTestedRenderTargets = new();
@@ -39,6 +41,11 @@ namespace osu.Framework.XR.Projection {
 		}
 
 		private void addRenderTarget ( Drawable3D parent, Drawable3D child ) {
+			if ( allDrawables.Contains( child ) ) {
+				throw new InvalidOperationException( "Tried to add a render target that was already registered" );
+			}
+			allDrawables.Add( child );
+
 			if ( shouldBeRenderedLast( child ) )
 				lock ( finalRenderTargets ) { finalRenderTargets.Add( child ); }
 			else if ( shouldBeDepthSorted( child ) )
@@ -49,6 +56,11 @@ namespace osu.Framework.XR.Projection {
 				lock ( renderTargets ) { renderTargets.Add( child ); }
 		}
 		private void removeRenderTarget ( Drawable3D parent, Drawable3D child ) {
+			if ( !allDrawables.Contains( child ) ) {
+				throw new InvalidOperationException( "Tried to remove a render target that was not registered" );
+			}
+			allDrawables.Remove( child );
+
 			if ( shouldBeRenderedLast( child ) )
 				lock ( finalRenderTargets ) { finalRenderTargets.Remove( child ); }
 			else if ( shouldBeDepthSorted( child ) )
@@ -59,8 +71,8 @@ namespace osu.Framework.XR.Projection {
 				lock ( renderTargets ) { renderTargets.Remove( child ); }
 		}
 
-		[BackgroundDependencyLoader]
-		private void load () {
+		protected override void LoadComplete () {
+			base.LoadComplete();
 			Root.BindHierarchyChange( addRenderTarget, removeRenderTarget, true );
 		}
 

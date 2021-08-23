@@ -23,23 +23,23 @@ namespace osu.Framework.XR.Components {
 		internal CompositeDrawable3D? parent;
 		new public CompositeDrawable3D? Parent {
 			get => parent;
-			set {
+			internal set {
 				if ( parent == value ) return;
 
 				if ( parent is not null ) {
 					parent.children.Remove( this );
-					parent.RemoveDrawable( this );
 
 					parent.onChildRemoved( this );
 					foreach ( var i in GetAllChildrenInHiererchy() ) parent.onChildRemovedFromHierarchy( i.parent!, i );
+					parent.RemoveDrawable( this );
 				}
 				parent = value;
 				if ( parent is not null ) {
 					parent.children.Add( this );
-					parent.AddDrawable( this ); // NOTE this is here so they actually exist in the framework heirerchy. maybe we can somehow merge the 2 lists used to keep track of children
 
 					parent.onChildAdded( this );
 					foreach ( var i in GetAllChildrenInHiererchy() ) parent.onChildAddedToHierarchy( i.parent!, i );
+					parent.AddDrawable( this ); // NOTE this is here so they actually exist in the framework heirerchy. maybe we can somehow merge the 2 lists used to keep track of children
 				}
 				Transform.SetParent( parent?.Transform, transformKey );
 			}
