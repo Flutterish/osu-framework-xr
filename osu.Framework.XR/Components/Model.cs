@@ -47,7 +47,10 @@ namespace osu.Framework.XR.Components {
 		public override Vector3 Size { get => Mesh.BoundingBox.Size; set => throw new InvalidOperationException( $"Cannot set size of a {nameof(Model)}." ); }
 		public override Vector3 Centre => Mesh.BoundingBox.Min + Mesh.BoundingBox.Size / 2;
 
-		public Color4 Tint = Color4.White;
+		public Color4 Tint {
+			get => base.Colour;
+			set => base.Colour = value;
+		}
 	}
 	public class ModelDrawNode : ModelDrawNode<Model> {
 		public ModelDrawNode ( Model source ) : base( source ) { }

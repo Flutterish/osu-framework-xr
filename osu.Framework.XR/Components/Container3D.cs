@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace osu.Framework.XR.Components {
-	public class Container3D : CompositeDrawable3D {
+	public class Container3D : CompositeDrawable3D, IEnumerable<Drawable3D> {
 		/// <summary>
 		/// What <see cref="Container3D"/> the children actually get added to/removed from. 
 		/// This is used if you want to separate content from internal children. 
@@ -36,6 +37,14 @@ namespace osu.Framework.XR.Components {
 		public void Clear ( bool disposeChildren = true ) {
 			if ( Content == this ) ClearInternal( disposeChildren );
 			else Content.Clear( disposeChildren );
+		}
+
+		public IEnumerator<Drawable3D> GetEnumerator () {
+			return Children.GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator () {
+			return ( (IEnumerable)Children ).GetEnumerator();
 		}
 	}
 }
