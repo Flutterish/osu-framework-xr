@@ -127,7 +127,6 @@ namespace osu.Framework.XR.Projection {
 			GLWrapper.PushScissorOffset( Vector2I.Zero );
 			depthBuffer.Bind();
 			GLWrapper.PushDepthInfo( new DepthInfo( false, false, osuTK.Graphics.ES30.DepthFunction.Less ) );
-			GL.ClearColor( Color4.Transparent );
 			GL.Clear( ClearBufferMask.ColorBufferBit );
 			lock ( renderTargets ) {
 				foreach ( var i in renderTargets ) {
