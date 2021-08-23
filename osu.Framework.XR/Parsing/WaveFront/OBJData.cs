@@ -1,12 +1,7 @@
-﻿using NUnit.Framework.Constraints;
-using osu.Framework.Graphics;
-using osu.Framework.XR.Graphics;
+﻿using osu.Framework.Graphics;
+using osu.Framework.XR.Parsing.Materials;
 using osuTK;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace osu.Framework.XR.Parsing.WaveFront {
 	// NOTE not everything is implmented yet and some structures are in OBJData rather than their respective classes

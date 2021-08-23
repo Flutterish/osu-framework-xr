@@ -2,11 +2,8 @@
 using osuTK;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace osu.Framework.XR.Parsing.WaveFront {
 	public class OBJFile {
@@ -14,8 +11,8 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 			ParsingErrors = errors.AsReadOnly();
 		}
 
-		private List<OBJParsingError> errors = new();
-		public readonly IEnumerable<OBJParsingError> ParsingErrors;
+		private List<ParsingError> errors = new();
+		public readonly IEnumerable<ParsingError> ParsingErrors;
 
 		public readonly List<OBJObject> Objects = new();
 		public readonly List<OBJGroup> Groups = new();
@@ -116,7 +113,7 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 				return !source.Any( x => x == 0 );
 			}
 
-			CurveParameterData[]? parseCurveData ( ref string rest, string name, uint L, List<OBJParsingError> errors ) {
+			CurveParameterData[]? parseCurveData ( ref string rest, string name, uint L, List<ParsingError> errors ) {
 				List<CurveParameterData> data = new();
 				while ( rest != "" ) {
 					var a = takeNext( ref rest );
@@ -124,7 +121,7 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 					var c = takeNext( ref rest );
 
 					if ( a == null || b == null || c == null ) {
-						errors.Add( new( $"Expected {name} at L{L} to have a multiple of 3 parameters but it had some dangling values.", OBJParsingErrorSeverity.Issue ) );
+						errors.Add( new( $"Expected {name} at L{L} to have a multiple of 3 parameters but it had some dangling values.", ParsingErrorSeverity.Issue ) );
 						break;
 					}
 
@@ -136,7 +133,7 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 				}
 
 				if ( data.Count < 1 ) {
-					errors.Add( new( $"Expected {name} at L{L} to have at least 3 values but it had 0.", OBJParsingErrorSeverity.Issue ) );
+					errors.Add( new( $"Expected {name} at L{L} to have at least 3 values but it had 0.", ParsingErrorSeverity.Issue ) );
 				}
 				else {
 					return data.ToArray();
@@ -151,7 +148,7 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 
 				try {
 					var type = takeNext( ref rest );
-					if ( type is null ) {
+					if ( type is null or "" ) {
 						continue;
 					}
 					// Comments
@@ -162,7 +159,7 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 					else if ( type == "v" ) {
 						var coords = parseFloats( rest );
 						if ( coords.Length is < 3 or > 4 and not 7 ) {
-							errors.Add( new( $"Expected vertice at L{L} to have between 3 and 4 coordinates or exactly 7, but it had {coords.Length}.", OBJParsingErrorSeverity.Error ) );
+							errors.Add( new( $"Expected vertice at L{L} to have between 3 and 4 coordinates or exactly 7, but it had {coords.Length}.", ParsingErrorSeverity.Error ) );
 						}
 
 						source.Vertices.Add( new Vector4( -coords.ElementAtOrDefault( 0 ), coords.ElementAtOrDefault( 1 ), coords.ElementAtOrDefault( 2 ), coords.Length > 3 ? coords[ 3 ] : 1 ) );
@@ -177,7 +174,7 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 					else if ( type == "vt" ) {
 						var coords = parseFloats( rest );
 						if ( coords.Length is < 1 or > 3 ) {
-							errors.Add( new( $"Expected texture coordinate at L{L} to have between 1 and 3 coordinates, but it had {coords.Length}.", OBJParsingErrorSeverity.Issue ) );
+							errors.Add( new( $"Expected texture coordinate at L{L} to have between 1 and 3 coordinates, but it had {coords.Length}.", ParsingErrorSeverity.Issue ) );
 						}
 
 						source.TextureCoordinates.Add( new Vector3( coords.ElementAtOrDefault( 0 ), coords.ElementAtOrDefault( 1 ), coords.ElementAtOrDefault( 2 ) ) );
@@ -185,7 +182,7 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 					else if ( type == "vn" ) {
 						var coords = parseFloats( rest );
 						if ( coords.Length is not 3 ) {
-							errors.Add( new( $"Expected vertex normal at L{L} to have 3 coordinates, but it had {coords.Length}.", OBJParsingErrorSeverity.Issue ) );
+							errors.Add( new( $"Expected vertex normal at L{L} to have 3 coordinates, but it had {coords.Length}.", ParsingErrorSeverity.Issue ) );
 						}
 
 						source.VerticeNormals.Add( new Vector3( -coords.ElementAtOrDefault( 0 ), coords.ElementAtOrDefault( 1 ), coords.ElementAtOrDefault( 2 ) ).Normalized() );
@@ -193,7 +190,7 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 					else if ( type == "vp" ) {
 						var coords = parseFloats( rest );
 						if ( coords.Length is < 1 or > 3 ) {
-							errors.Add( new( $"Expected parameter-space vertice at L{L} to have between 1 and 3 coordinates, but it had {coords.Length}.", OBJParsingErrorSeverity.Error ) );
+							errors.Add( new( $"Expected parameter-space vertice at L{L} to have between 1 and 3 coordinates, but it had {coords.Length}.", ParsingErrorSeverity.Error ) );
 						}
 
 						source.ParameterSpaceVertices.Add( new Vector3( coords.ElementAtOrDefault( 0 ), coords.ElementAtOrDefault( 1 ), coords.Length > 2 ? coords[ 2 ] : 1 ) );
@@ -213,7 +210,7 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 						};
 
 						if ( curveType is null ) {
-							errors.Add( new( $"Invalid curve type at L{L}. Expected one of: bmatrix, bezier, bspline, cardinal or taylor but got {next}.", OBJParsingErrorSeverity.Issue ) );
+							errors.Add( new( $"Invalid curve type at L{L}. Expected one of: bmatrix, bezier, bspline, cardinal or taylor but got {next}.", ParsingErrorSeverity.Issue ) );
 							continue;
 						}
 
@@ -223,7 +220,7 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 					else if ( type == "deg" ) {
 						var degrees = parseUints( rest );
 						if ( degrees.Length is < 1 or > 2 ) {
-							errors.Add( new( $"Expected degree at L{L} to have between 1 and 2 parameters, but it had {degrees.Length}.", OBJParsingErrorSeverity.Error ) );
+							errors.Add( new( $"Expected degree at L{L} to have between 1 and 2 parameters, but it had {degrees.Length}.", ParsingErrorSeverity.Error ) );
 						}
 
 						source.DegreesU.Add( degrees[ 0 ] );
@@ -241,7 +238,7 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 						};
 
 						if ( direction is null ) {
-							errors.Add( new( $"Invalid matrix direction at L{L}. Expected one of u or v, but got {d}.", OBJParsingErrorSeverity.Issue ) );
+							errors.Add( new( $"Invalid matrix direction at L{L}. Expected one of u or v, but got {d}.", ParsingErrorSeverity.Issue ) );
 							continue;
 						}
 
@@ -254,7 +251,7 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 					else if ( type == "step" ) {
 						var steps = parseUints( rest );
 						if ( steps.Length is < 1 or > 2 ) {
-							errors.Add( new( $"Expected steps at L{L} to have between 1 and 2 parameters, but they had {steps.Length}.", OBJParsingErrorSeverity.Error ) );
+							errors.Add( new( $"Expected steps at L{L} to have between 1 and 2 parameters, but they had {steps.Length}.", ParsingErrorSeverity.Error ) );
 						}
 
 						source.StepsU.Add( steps[ 0 ] );
@@ -267,7 +264,7 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 					else if ( type == "p" ) {
 						foreach ( var n in parseUints( rest ) ) {
 							if ( n == 0 ) {
-								errors.Add( new( $"Point at L{L} is malformed as it has invalid vertice indices declared.", OBJParsingErrorSeverity.Issue ) );
+								errors.Add( new( $"Point at L{L} is malformed as it has invalid vertice indices declared.", ParsingErrorSeverity.Issue ) );
 							}
 							else {
 								source.Points.Add( n < 0 ? (uint)source.Vertices.Count + n : n - 1 );
@@ -279,13 +276,13 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 						var coords = parseMultiReferences( rest );
 
 						if ( coords.Length < 2 ) {
-							errors.Add( new( $"Expected line at L{L} to have at least 2 vertices, but it had {coords.Length}.", OBJParsingErrorSeverity.Issue ) );
+							errors.Add( new( $"Expected line at L{L} to have at least 2 vertices, but it had {coords.Length}.", ParsingErrorSeverity.Issue ) );
 						}
 
 						if ( !transformMultiIndicesNotnull( source.Vertices.Count, coords, 0, out var vertices )
 							|| !transformMultiIndices( source.TextureCoordinates.Count, coords, 1, out var tx )
 						) {
-							errors.Add( new( $"Line at L{L} is malformed as it has invalid vertice indices declared.", OBJParsingErrorSeverity.Issue ) );
+							errors.Add( new( $"Line at L{L} is malformed as it has invalid vertice indices declared.", ParsingErrorSeverity.Issue ) );
 						}
 						else {
 							source.Lines.Add( new LineData(
@@ -299,20 +296,20 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 						var coords = parseMultiReferences( rest );
 
 						if ( coords.Length < 3 ) {
-							errors.Add( new( $"Expected face at L{L} to have at least 3 indices, but it had {coords.Length}.", OBJParsingErrorSeverity.Issue ) );
+							errors.Add( new( $"Expected face at L{L} to have at least 3 indices, but it had {coords.Length}.", ParsingErrorSeverity.Issue ) );
 						}
 						else if ( !transformMultiIndicesNotnull( source.Vertices.Count, coords, 0, out var vertices )
 							|| !transformMultiIndices( source.TextureCoordinates.Count, coords, 1, out var tx )
 							|| !transformMultiIndices( source.VerticeNormals.Count, coords, 2, out var nor )
 						) {
-							errors.Add( new( $"Face at L{L} is malformed as it has invalid vertice indices declared.", OBJParsingErrorSeverity.Issue ) );
+							errors.Add( new( $"Face at L{L} is malformed as it has invalid vertice indices declared.", ParsingErrorSeverity.Issue ) );
 						}
 						else {
 							source.Faces.Add( new FaceData( vertices, tx, nor, materialIndex ) );
 							Current().Faces.Add( (uint)source.Faces.Count - 1 );
 
 							if ( coords.Any( x => x.Length > 3 ) ) {
-								errors.Add( new( $"Face at L{L} declared more than 3 indices per vertex, which is considered malformed input.", OBJParsingErrorSeverity.Issue ) );
+								errors.Add( new( $"Face at L{L} declared more than 3 indices per vertex, which is considered malformed input.", ParsingErrorSeverity.Issue ) );
 							}
 						}
 					}
@@ -320,20 +317,20 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 						var a = takeNext( ref rest );
 						var b = takeNext( ref rest );
 						if ( a is null || b is null ) {
-							errors.Add( new( $"Expected curve at L{L} to have a start and end parameter values.", OBJParsingErrorSeverity.Issue ) );
+							errors.Add( new( $"Expected curve at L{L} to have a start and end parameter values.", ParsingErrorSeverity.Issue ) );
 							continue;
 						}
 						var @params = parseUints( rest );
 
 						if ( @params.Length < 2 ) {
-							errors.Add( new( $"Expected curve at L{L} to have at least 2 vertices, but it had {@params.Length}.", OBJParsingErrorSeverity.Issue ) );
+							errors.Add( new( $"Expected curve at L{L} to have at least 2 vertices, but it had {@params.Length}.", ParsingErrorSeverity.Issue ) );
 						}
 						else {
 							var start = float.Parse( a );
 							var end = float.Parse( b );
 
 							if ( !transformIndices( source.Vertices.Count, @params, out var vertices ) ) {
-								errors.Add( new( $"Curve at L{L} is malformed as it has invalid vertice indices declared.", OBJParsingErrorSeverity.Issue ) );
+								errors.Add( new( $"Curve at L{L} is malformed as it has invalid vertice indices declared.", ParsingErrorSeverity.Issue ) );
 							}
 
 							source.Curves.Add( new CurveData( start, end, vertices ) );
@@ -341,12 +338,12 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 					}
 					else if ( type == "curv2" ) {
 						if ( !transformIndices( source.ParameterSpaceVertices.Count, parseUints( rest ), out var vertices ) ) {
-							errors.Add( new( $"Curve at L{L} is malformed as it has invalid vertice indices declared.", OBJParsingErrorSeverity.Issue ) );
+							errors.Add( new( $"Curve at L{L} is malformed as it has invalid vertice indices declared.", ParsingErrorSeverity.Issue ) );
 							continue;
 						}
 
 						if ( vertices.Length < 2 ) {
-							errors.Add( new( $"Expected curve at L{L} to have at least 2 vertices, but it had {vertices.Length}.", OBJParsingErrorSeverity.Issue ) );
+							errors.Add( new( $"Expected curve at L{L} to have at least 2 vertices, but it had {vertices.Length}.", ParsingErrorSeverity.Issue ) );
 						}
 
 						source.V2Curves.Add( new CurveV2Data( vertices ) );
@@ -358,12 +355,12 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 						var t2 = takeNext( ref rest );
 
 						if ( s1 is null || s2 is null ) {
-							errors.Add( new( $"Expected surface at L{L} to have a start and end parameter values for the U direction.", OBJParsingErrorSeverity.Issue ) );
+							errors.Add( new( $"Expected surface at L{L} to have a start and end parameter values for the U direction.", ParsingErrorSeverity.Issue ) );
 							continue;
 						}
 
 						if ( t1 is null || t2 is null ) {
-							errors.Add( new( $"Expected surface at L{L} to have a start and end parameter values for the V direction.", OBJParsingErrorSeverity.Issue ) );
+							errors.Add( new( $"Expected surface at L{L} to have a start and end parameter values for the V direction.", ParsingErrorSeverity.Issue ) );
 							continue;
 						}
 
@@ -372,7 +369,7 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 							|| !transformMultiIndices( source.TextureCoordinates.Count, indices, 1, out var tx )
 							|| !transformMultiIndices( source.VerticeNormals.Count, indices, 1, out var nor )
 						) {
-							errors.Add( new( $"Surface at L{L} is malformed as it has invalid vertice indices declared.", OBJParsingErrorSeverity.Issue ) );
+							errors.Add( new( $"Surface at L{L} is malformed as it has invalid vertice indices declared.", ParsingErrorSeverity.Issue ) );
 						}
 						else {
 							source.Surfaces.Add( new SurfaceData(
@@ -397,14 +394,14 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 						};
 
 						if( direction is null ) {
-							errors.Add( new( $"Invalid parameter direction at L{L}. Expected one of u or v, but got {d}.", OBJParsingErrorSeverity.Issue ) );
+							errors.Add( new( $"Invalid parameter direction at L{L}. Expected one of u or v, but got {d}.", ParsingErrorSeverity.Issue ) );
 							continue;
 						}
 
 						var elements = parseFloats( rest );
 
 						if ( elements.Length < 2 ) {
-							errors.Add( new( $"Expected parameter at L{L} to have at least 2 values, but it had {elements.Length}.", OBJParsingErrorSeverity.Issue ) );
+							errors.Add( new( $"Expected parameter at L{L} to have at least 2 values, but it had {elements.Length}.", ParsingErrorSeverity.Issue ) );
 						}
 
 						if ( direction == Direction.Horizontal )
@@ -429,12 +426,12 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 					}
 					else if ( type == "sp" ) {
 						if ( !transformIndices( source.Vertices.Count, parseUints( rest ), out var vertices ) ) {
-							errors.Add( new( $"Special point at L{L} is malformed as it has invalid vertice indices declared.", OBJParsingErrorSeverity.Issue ) );
+							errors.Add( new( $"Special point at L{L} is malformed as it has invalid vertice indices declared.", ParsingErrorSeverity.Issue ) );
 							continue;
 						}
 
 						if ( vertices.Length < 1 ) {
-							errors.Add( new( $"Expected special point at L{L} to have at least 1 vertice, but it had {vertices.Length}.", OBJParsingErrorSeverity.Issue ) );
+							errors.Add( new( $"Expected special point at L{L} to have at least 1 vertice, but it had {vertices.Length}.", ParsingErrorSeverity.Issue ) );
 						}
 
 						source.SpecialPoints.Add( vertices );
@@ -454,7 +451,7 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 						var curv2 = takeNext( ref rest );
 
 						if ( surf1 is null || surf2 is null || q01 is null || q11 is null || curv1 is null || curv2 is null || q02 is null || q12 is null ) {
-							errors.Add( new( $"Expected connectivity data at L{L} to have 8 values.", OBJParsingErrorSeverity.Issue ) );
+							errors.Add( new( $"Expected connectivity data at L{L} to have 8 values.", ParsingErrorSeverity.Issue ) );
 							continue;
 						}
 
@@ -517,16 +514,16 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 					}
 					// Display/render attributes
 					else if ( type == "bevel" ) {
-						errors.Add( new( $"{type} was declared at L{L}, but its not implemented yet.", OBJParsingErrorSeverity.NotImplemented ) );
+						errors.Add( new( $"{type} was declared at L{L}, but its not implemented yet.", ParsingErrorSeverity.NotImplemented ) );
 					}
 					else if ( type == "c_interp" ) {
-						errors.Add( new( $"{type} was declared at L{L}, but its not implemented yet.", OBJParsingErrorSeverity.NotImplemented ) );
+						errors.Add( new( $"{type} was declared at L{L}, but its not implemented yet.", ParsingErrorSeverity.NotImplemented ) );
 					}
 					else if ( type == "d_interp" ) {
-						errors.Add( new( $"{type} was declared at L{L}, but its not implemented yet.", OBJParsingErrorSeverity.NotImplemented ) );
+						errors.Add( new( $"{type} was declared at L{L}, but its not implemented yet.", ParsingErrorSeverity.NotImplemented ) );
 					}
 					else if ( type == "lod" ) {
-						errors.Add( new( $"{type} was declared at L{L}, but its not implemented yet.", OBJParsingErrorSeverity.NotImplemented ) );
+						errors.Add( new( $"{type} was declared at L{L}, but its not implemented yet.", ParsingErrorSeverity.NotImplemented ) );
 					}
 					else if ( type == "usemtl" ) {
 						var index = source.Materials.IndexOf( rest );
@@ -542,23 +539,23 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 						source.MTLFiles.AddRange( rest.Split( ' ', StringSplitOptions.RemoveEmptyEntries ).Select( x => new MTLFileReference( x ) ) );
 					}
 					else if ( type == "shadow_obj" ) {
-						errors.Add( new( $"{type} was declared at L{L}, but its not implemented yet.", OBJParsingErrorSeverity.NotImplemented ) );
+						errors.Add( new( $"{type} was declared at L{L}, but its not implemented yet.", ParsingErrorSeverity.NotImplemented ) );
 					}
 					else if ( type == "trace_obj" ) {
-						errors.Add( new( $"{type} was declared at L{L}, but its not implemented yet.", OBJParsingErrorSeverity.NotImplemented ) );
+						errors.Add( new( $"{type} was declared at L{L}, but its not implemented yet.", ParsingErrorSeverity.NotImplemented ) );
 					}
 					else if ( type == "ctech" ) {
-						errors.Add( new( $"{type} was declared at L{L}, but its not implemented yet.", OBJParsingErrorSeverity.NotImplemented ) );
+						errors.Add( new( $"{type} was declared at L{L}, but its not implemented yet.", ParsingErrorSeverity.NotImplemented ) );
 					}
 					else if ( type == "stech" ) {
-						errors.Add( new( $"{type} was declared at L{L}, but its not implemented yet.", OBJParsingErrorSeverity.NotImplemented ) );
+						errors.Add( new( $"{type} was declared at L{L}, but its not implemented yet.", ParsingErrorSeverity.NotImplemented ) );
 					}
 					else {
-						errors.Add( new( $"{type} was declared at L{L}, but its not a recognized identifier.", OBJParsingErrorSeverity.Issue ) );
+						errors.Add( new( $"{type} was declared at L{L}, but its not a recognized identifier.", ParsingErrorSeverity.Issue ) );
 					}
 				}
 				catch ( Exception e ) {
-					errors.Add( new( $"Exception while parsing L{L}: {e.Message}", OBJParsingErrorSeverity.Error ) );
+					errors.Add( new( $"Exception while parsing L{L}: {e.Message}", ParsingErrorSeverity.Error ) );
 				}
 			}
 

@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace osu.Framework.XR.Parsing.WaveFront {
+namespace osu.Framework.XR.Parsing {
 	[Flags]
-	public enum OBJParsingErrorSeverity {
+	public enum ParsingErrorSeverity {
 		Success = 0,
 		Issue = 1,
 		Error = 2,

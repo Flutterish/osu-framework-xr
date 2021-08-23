@@ -1,12 +1,10 @@
-﻿using osu.Framework.Allocation;
-using osu.Framework.Bindables;
+﻿using osu.Framework.Bindables;
 using osu.Framework.Graphics.OpenGL;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.XR.Components;
 using osu.Framework.XR.Graphics;
 using osu.Framework.XR.Maths;
 using osuTK;
-using osuTK.Graphics;
 using osuTK.Graphics.OpenGL4;
 using System;
 using System.Collections.Generic;

@@ -1,7 +1,6 @@
 ﻿using osu.Framework.Bindables;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics.OpenGL;
-using osu.Framework.Logging;
 using osu.Framework.XR.Maths;
 using osuTK;
 using osuTK.Graphics.OpenGL4;

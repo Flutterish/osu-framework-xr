@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace osu.Framework.XR.Components {
 	public class Container3D : CompositeDrawable3D, IEnumerable<Drawable3D> {

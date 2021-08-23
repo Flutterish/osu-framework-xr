@@ -2,7 +2,6 @@
 using osu.Framework.Caching;
 using osuTK;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace osu.Framework.XR.Components {
 	public class Path3D : Model {

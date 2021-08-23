@@ -9,7 +9,6 @@ using osu.Framework.XR.Physics;
 using osu.Framework.XR.Rendering;
 using osuTK;
 using System.Linq;
-using static osu.Framework.XR.Components.Drawable3D.DrawNode3D;
 
 namespace osu.Framework.XR.Components {
 	/// <summary>
