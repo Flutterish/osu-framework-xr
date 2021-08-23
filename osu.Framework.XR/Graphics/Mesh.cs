@@ -174,8 +174,6 @@ namespace osu.Framework.XR.Graphics {
 						else {
 							current.Tris.Add( new( (uint)coords[ 0 ][ 0 ]! - offset, (uint)coords[ 1 ][ 0 ]! - offset, (uint)coords[ 2 ][ 0 ]! - offset ) );
 						}
-
-						current.Tris.Add( new( (uint)coords[ 0 ][ 0 ]! - offset, (uint)coords[ 1 ][ 0 ]! - offset, (uint)coords[ 2 ][ 0 ]! - offset ) );
 					}
 				}
 				else if ( line.StartsWith( "l " ) ) {
