@@ -26,7 +26,7 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 	}
 
 	public class MergingGroup : OBJGroup {
-		public MergingGroup ( string name = "Untitled Group", float resolution ) : base( name, GroupType.Merging ) {
+		public MergingGroup ( string name = "Untitled Group", float resolution = 0 ) : base( name, GroupType.Merging ) {
 			Resolution = resolution;
 		}
 
