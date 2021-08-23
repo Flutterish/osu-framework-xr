@@ -1,5 +1,7 @@
 ﻿using osu.Framework.Bindables;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics.OpenGL;
+using osu.Framework.Logging;
 using osu.Framework.XR.Maths;
 using osuTK;
 using osuTK.Graphics.OpenGL4;
@@ -64,45 +66,174 @@ namespace osu.Framework.XR.Graphics {
 
 		public static Mesh FromOBJFile ( string path )
 			=> FromOBJ( File.ReadAllLines( path ) );
+		public static Mesh FromOBJFile ( string path, List<MeshParsingError> errors )
+			=> FromOBJ( File.ReadAllLines( path ), errors );
 		public static Mesh FromOBJ ( string lines )
 			=> FromOBJ( lines.Split( '\n' ) );
+		public static Mesh FromOBJ ( string lines, List<MeshParsingError> errors )
+			=> FromOBJ( lines.Split( '\n' ), errors );
 		public static Mesh FromOBJ ( IEnumerable<string> lines ) {
 			// TODO Merge( IEnumerable<Mesh> ) so we dont repeat here
 			return MultipleFromOBJ( lines ).FirstOrDefault() ?? new();
 		}
+		public static Mesh FromOBJ ( IEnumerable<string> lines, List<MeshParsingError> errors ) {
+			// TODO Merge( IEnumerable<Mesh> ) so we dont repeat here
+			return MultipleFromOBJ( lines, errors ).FirstOrDefault() ?? new();
+		}
 
 		public static IEnumerable<Mesh> MultipleFromOBJFile ( string path )
 			=> MultipleFromOBJ( File.ReadAllLines( path ) );
+		public static IEnumerable<Mesh> MultipleFromOBJFile ( string path, List<MeshParsingError> errors )
+			=> MultipleFromOBJ( File.ReadAllLines( path ), errors );
 
 		public static IEnumerable<Mesh> MultipleFromOBJ ( string lines )
 			=> MultipleFromOBJ( lines.Split( '\n' ) );
+		public static IEnumerable<Mesh> MultipleFromOBJ ( string lines, List<MeshParsingError> errors )
+			=> MultipleFromOBJ( lines.Split( '\n' ), errors );
 
 		public static IEnumerable<Mesh> MultipleFromOBJ ( IEnumerable<string> lines ) {
+			var errors = new List<MeshParsingError>();
+			var value = MultipleFromOBJ( lines, errors );
+
+			if ( errors.Any( x => x.Severity.HasFlagFast( MeshParsingErrorSeverity.Hard ) ) ) throw new InvalidOperationException( string.Join( '\n', errors ) );
+			return value;
+		}
+
+		public static IEnumerable<Mesh> MultipleFromOBJ ( IEnumerable<string> lines, List<MeshParsingError> errors ) {
 			Mesh current = new();
-			uint indexOffset = 1;
+			uint offset = 1;
+
+			int L = 0;
 			foreach ( var i in lines ) {
 				var line = i.Trim();
-				if ( line.StartsWith( "o " ) ) {
-					if ( !current.IsEmpty ) {
-						yield return current;
-						indexOffset += (uint)current.Vertices.Count;
-						current = new();
+				L++;
+
+				if ( line.StartsWith( "v " ) ) {
+					var coords = line.Substring( 2 ).Split( ' ', options: StringSplitOptions.RemoveEmptyEntries ).Select( x => float.Parse( x ) ).ToArray();
+					if ( coords.Length is < 3 or ( > 4 and not 7 ) ) {
+						errors.Add( new( $"Expected vertice at L{L} to have between 3 and 4 coordinates or exactly 7, but it had {coords.Length}.", MeshParsingErrorSeverity.Hard ) );
+						current.Vertices.Add( new Vector3( coords.ElementAtOrDefault( 0 ), coords.ElementAtOrDefault( 1 ), coords.ElementAtOrDefault( 2 ) ) );
+					}
+					else {
+						current.Vertices.Add( new Vector3( coords[ 0 ], coords[ 1 ], coords[ 2 ] ) );
+					}
+
+					if ( coords.Length == 7 ) {
+						errors.Add( new( $"Vertice at L{L} specified a vertice color, but they are not implemented yet.", MeshParsingErrorSeverity.NotImplemented ) );
 					}
 				}
-				else if ( line.StartsWith( "v " ) ) {
-					var coords = line.Substring( 2 ).Split( " " ).Where( x => x.Length > 0 ).Select( x => float.Parse( x ) ).ToArray();
-					current.Vertices.Add( new Vector3( coords[ 0 ], coords[ 1 ], coords[ 2 ] ) );
+				else if ( line.StartsWith( "vt " ) ) {
+					var coords = line.Substring( 3 ).Split( ' ', options: StringSplitOptions.RemoveEmptyEntries ).Select( x => float.Parse( x ) ).ToArray();
+					if ( coords.Length is < 1 or > 3 ) {
+						errors.Add( new( $"Expected texture coordinate at L{L} to have between 1 and 3 coordinates, but it had {coords.Length}.", MeshParsingErrorSeverity.Soft ) );
+						current.TextureCoordinates.Add( new Vector2( coords.ElementAtOrDefault( 0 ), coords.ElementAtOrDefault( 1 ) ) );
+					}
+					else {
+						current.TextureCoordinates.Add( new Vector2( coords[ 0 ], coords.Length > 1 ? coords[ 1 ] : 0 ) );
+					}
+				}
+				else if ( line.StartsWith( "vn " ) ) {
+					var coords = line.Substring( 3 ).Split( ' ', options: StringSplitOptions.RemoveEmptyEntries ).Select( x => float.Parse( x ) ).ToArray();
+					if ( coords.Length is not 3 ) {
+						errors.Add( new( $"Expected vertex normal at L{L} to have 3 coordinates, but it had {coords.Length}.", MeshParsingErrorSeverity.Soft ) );
+					}
+					
+					errors.Add( new( $"Vertex normal was declared at L{L}, but they are not implemented yet.", MeshParsingErrorSeverity.NotImplemented ) );
+				}
+				else if ( line.StartsWith( "vp " ) ) {
+					var coords = line.Substring( 3 ).Split( ' ', options: StringSplitOptions.RemoveEmptyEntries ).Select( x => float.Parse( x ) ).ToArray();
+					if ( coords.Length is < 1 or > 3 ) {
+						errors.Add( new( $"Expected free-form geometry vertice at L{L} to have between 1 and 3 coordinates, but it had {coords.Length}.", MeshParsingErrorSeverity.Hard ) );
+					}
+					errors.Add( new( $"Free-form geometry vertice was declared at L{L}, but they are not implemented yet.", MeshParsingErrorSeverity.HardNotImplemented ) );
 				}
 				else if ( line.StartsWith( "f " ) ) {
-					var info = line.Substring( 2 ).Split( " " ).Where( x => x.Length > 0 ).Select( x => x.Split( "/" ).Select( x => uint.Parse( x ) ).ToArray() ).ToArray();
-					current.Tris.Add( new IndexedFace( info[ 0 ][ 0 ] - indexOffset, info[ 1 ][ 0 ] - indexOffset, info[ 2 ][ 0 ] - indexOffset ) );
+					var coords = line.Substring( 2 ).Split( ' ', options: StringSplitOptions.RemoveEmptyEntries )
+						.Select( x => x.Split( '/' ).Select( y => y == "" ? null : (uint?)uint.Parse( y ) ).ToArray() ).ToArray();
+
+					if ( coords.Length < 3 ) {
+						errors.Add( new( $"Expected face at L{L} to have at least 3 indices, but it had {coords.Length}.", MeshParsingErrorSeverity.Soft ) );
+					}
+					else if ( coords.Any( x => x[ 0 ] is null ) ) {
+						errors.Add( new( $"Face at L{L} is malformed as it has invalid vertice indices declared.", MeshParsingErrorSeverity.Soft ) );
+					}
+					else {
+						if ( coords.Any( x => x.Length > 1 && x[ 1 ] is not null ) ) {
+							errors.Add( new( $"Face at L{L} declared texture coordinate indices, but per-face texture coordinates are not implemented yet.", MeshParsingErrorSeverity.NotImplemented ) );
+						}
+						if ( coords.Any( x => x.Length > 2 && x[ 2 ] is null ) ) {
+							errors.Add( new( $"Face at L{L} declared normal coordinate indices, but per-face vertice normal coordinates are not implemented yet.", MeshParsingErrorSeverity.NotImplemented ) );
+						}
+						if ( coords.Any( x => x.Length > 3 ) ) {
+							errors.Add( new( $"Face at L{L} declared more than 3 indices per vertex, which is considered malformed input.", MeshParsingErrorSeverity.Soft ) );
+						}
+						
+						if ( coords.Length > 3 ) {
+							errors.Add( new( $"Face at L{L} declared {coords.Length} indices, but parsing this many is not implemented yet.", MeshParsingErrorSeverity.NotImplemented ) );
+						}
+						else {
+							current.Tris.Add( new( (uint)coords[ 0 ][ 0 ]! - offset, (uint)coords[ 1 ][ 0 ]! - offset, (uint)coords[ 2 ][ 0 ]! - offset ) );
+						}
+
+						current.Tris.Add( new( (uint)coords[ 0 ][ 0 ]! - offset, (uint)coords[ 1 ][ 0 ]! - offset, (uint)coords[ 2 ][ 0 ]! - offset ) );
+					}
+				}
+				else if ( line.StartsWith( "l " ) ) {
+					var coords = line.Substring( 2 ).Split( ' ', options: StringSplitOptions.RemoveEmptyEntries ).Select( x => uint.Parse( x ) );
+					
+					errors.Add( new( $"Line segment was declared at L{L}, but they are not implemented yet.", MeshParsingErrorSeverity.NotImplemented ) );
+				}
+				else if ( line.StartsWith( "mtllib " ) ) {
+					var name = line.Substring( 7 );
+					
+					errors.Add( new( $"Material library was declared at L{L}, but they are not implemented yet.", MeshParsingErrorSeverity.NotImplemented ) );
+				}
+				else if ( line.StartsWith( "usemtl " ) ) {
+					var name = line.Substring( 7 );
+					
+					errors.Add( new( $"Material library usage was declared at L{L}, but they are not implemented yet.", MeshParsingErrorSeverity.NotImplemented ) );
+				}
+				else if ( line.StartsWith( "o " ) ) {
+					var name = line.Substring( 2 );
+
+					if ( !current.IsEmpty ) yield return current;
+					offset += (uint)current.Vertices.Count;
+					current = new();
+				}
+				else if ( line.StartsWith( "g " ) ) {
+					var name = line.Substring( 2 );
+					
+					errors.Add( new( $"Object group was declared at L{L}, but they are not implemented yet.", MeshParsingErrorSeverity.NotImplemented ) );
+				}
+				else if ( line.StartsWith( "s " ) ) {
+					var value = line.Substring( 2 );
+					
+					errors.Add( new( $"Shading style was declared at L{L}, but they are not implemented yet.", MeshParsingErrorSeverity.NotImplemented ) );
 				}
 			}
 
-			if ( !current.IsEmpty ) {
-				yield return current;
-				current = new();
-			}
+			if ( !current.IsEmpty ) yield return current;
+		}
+
+		public record MeshParsingError ( string Message, MeshParsingErrorSeverity Severity ) { }
+		[Flags]
+		public enum MeshParsingErrorSeverity {
+			/// <summary>
+			/// Does not break any dependencies.
+			/// </summary>
+			Soft = 0,
+			/// <summary>
+			/// Breaks some dependencies.
+			/// </summary>
+			Hard = 1,
+			/// <summary>
+			/// Does not break any dependencies, but does not work yet.
+			/// </summary>
+			NotImplemented = 2,
+			/// <summary>
+			/// Breaks some dependencies and does not work yet.
+			/// </summary>
+			HardNotImplemented = NotImplemented | Hard,
 		}
 
 		public bool IsEmpty => !Tris.Any();

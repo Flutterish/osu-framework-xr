@@ -1,8 +1,11 @@
 ﻿using osu.Framework.Graphics.OpenGL.Textures;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.XR.Graphics;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Graphics.OpenGL4;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using System;
 using System.Collections.Generic;
 
@@ -19,9 +22,17 @@ namespace osu.Framework.XR.Components {
 			set => AllTextures[ 0 ] = value;
 		}
 		public readonly List<TextureGL> AllTextures = new();
+		private static TextureGL createWhilePixel () { // this exists because the default white pixel is for some reason a gradient from white to transparent
+			var upload = new TextureUpload( new Image<Rgba32>( 1, 1, new Rgba32( 1f, 1f, 1f, 1f ) ) );
+			var txt = new Texture( 1, 1 );
+			txt.SetData( upload );
+
+			return txt.TextureGL;
+		}
+		public static TextureGL WhitePixel { get; } = createWhilePixel();
 		public Model () {
 			Faces = new( i => Transform.Matrix * Mesh.Faces[ i ] );
-			AllTextures.Add( Framework.Graphics.Textures.Texture.WhitePixel.TextureGL );
+			AllTextures.Add( WhitePixel );
 		}
 		protected override DrawNode3D CreateDrawNode ()
 			=> new ModelDrawNode( this );
