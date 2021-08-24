@@ -215,6 +215,9 @@ namespace osu.Framework.XR.Parsing.Materials {
 						var parts = rest.Split( ' ', StringSplitOptions.RemoveEmptyEntries );
 						Material().ReflectionMaps.Add( mapType.Value, new TextureMap( parts.LastOrDefault(), parts.SkipLast( 1 ).ToArray() ) );
 					}
+					else {
+						errors.Add( new( $"{type} was declared at L{L}, but its not a recognized identifier.", ParsingErrorSeverity.Issue ) );
+					}
 				}
 				catch ( Exception e ) {
 					errors.Add( new( $"Exception while parsing L{L}: {e.Message}", ParsingErrorSeverity.Error ) );

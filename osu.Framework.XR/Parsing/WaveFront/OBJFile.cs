@@ -40,6 +40,7 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 			OBJObject Current () {
 				if ( _current is null ) {
 					_current = new OBJObject( source );
+					file.Objects.Add( _current );
 					smoothingGroup?.Add( _current );
 					mergingGroup?.Add( _current );
 					foreach ( var i in activeGroups )
@@ -508,6 +509,7 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 					}
 					else if ( type == "o" ) {
 						_current = new OBJObject( source, rest );
+						file.Objects.Add( _current );
 						smoothingGroup?.Add( _current );
 						mergingGroup?.Add( _current );
 						foreach ( var i in activeGroups ) {
