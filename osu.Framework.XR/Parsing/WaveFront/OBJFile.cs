@@ -8,12 +8,10 @@ using System.Linq;
 
 namespace osu.Framework.XR.Parsing.WaveFront {
 	public class OBJFile {
-		private OBJFile () {
-			ParsingErrors = errors.AsReadOnly();
-		}
+		private OBJFile () { }
 
-		private List<ParsingError> errors = new();
-		public readonly IEnumerable<ParsingError> ParsingErrors;
+		public readonly List<ParsingError> ParsingErrors = new();
+		public readonly List<(uint line, string content)> Comments = new();
 
 		public readonly OBJData Data = new();
 		public readonly List<OBJObject> Objects = new();
@@ -49,7 +47,7 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 
 				return _current;
 			}
-			var errors = file.errors;
+			var errors = file.ParsingErrors;
 
 			string? takeNext ( ref string data ) {
 				string? toParse = null;
@@ -150,14 +148,16 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 				L++;
 
 				try {
+					if ( rest.StartsWith( "#" ) ) {
+						file.Comments.Add( (L, line) );
+						continue;
+					}
+
 					var type = takeNext( ref rest );
 					if ( type is null or "" ) {
 						continue;
 					}
-					// Comments
-					if ( type.StartsWith( "#" ) ) {
-						continue;
-					}
+
 					// Vertex data
 					else if ( type == "v" ) {
 						var coords = parseFloats( rest );

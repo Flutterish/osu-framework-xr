@@ -6,12 +6,10 @@ using System.Linq;
 
 namespace osu.Framework.XR.Parsing.Materials {
 	public class MTLFile {
-		private MTLFile () {
-			ParsingErrors = errors.AsReadOnly();
-		}
+		private MTLFile () { }
 
-		private List<ParsingError> errors = new();
-		public readonly IEnumerable<ParsingError> ParsingErrors;
+		public readonly List<ParsingError> ParsingErrors = new();
+		public readonly List<(uint line, string content)> Comments = new();
 
 		public readonly List<MTLMaterial> Materials = new();
 
@@ -24,7 +22,7 @@ namespace osu.Framework.XR.Parsing.Materials {
 		// https://www.fileformat.info/format/material/
 		public static MTLFile FromText ( IEnumerable<string> lines ) {
 			MTLFile file = new();
-			var errors = file.errors;
+			var errors = file.ParsingErrors;
 			MTLMaterial? _material = null;
 			MTLMaterial Material() {
 				if ( _material is null ) {
@@ -93,6 +91,12 @@ namespace osu.Framework.XR.Parsing.Materials {
 			foreach ( var line in lines ) {
 				L++;
 				var rest = line.Trim();
+
+				if ( rest.StartsWith( "#" ) ) {
+					file.Comments.Add( (L, line) );
+					continue;
+				}
+
 				var type = takeNext( ref rest );
 
 				if ( type is null or "" ) {
