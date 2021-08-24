@@ -11,10 +11,19 @@ namespace osu.Framework.XR.Parsing.Materials {
 		public readonly string Path;
 		[MemberNotNullWhen( true, nameof( Source ) )]
 		public bool IsLoaded { get; private set; }
+		[MemberNotNull(nameof(Source))]
 		public void Load ( Storage baseDirectory ) {
 			if ( IsLoaded ) return;
 
 			using var stream = new StreamReader( baseDirectory.GetStream( Path ) );
+			Source = MTLFile.FromText( stream.ReadToEnd() );
+			IsLoaded = true;
+		}
+		[MemberNotNull( nameof( Source ) )]
+		public void Load ( string baseDirectory ) {
+			if ( IsLoaded ) return;
+
+			using var stream = new StreamReader( System.IO.Path.Combine( System.IO.Path.GetFullPath( baseDirectory ), Path ) );
 			Source = MTLFile.FromText( stream.ReadToEnd() );
 			IsLoaded = true;
 		}

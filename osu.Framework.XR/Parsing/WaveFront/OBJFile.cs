@@ -15,6 +15,7 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 		private List<ParsingError> errors = new();
 		public readonly IEnumerable<ParsingError> ParsingErrors;
 
+		public readonly OBJData Data = new();
 		public readonly List<OBJObject> Objects = new();
 		public readonly List<OBJGroup> Groups = new();
 		public readonly List<OBJGroup> SmoothingGroups = new();
@@ -29,7 +30,7 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 		// http://www.martinreddy.net/gfx/3d/OBJ.spec
 		public static OBJFile FromText ( IEnumerable<string> lines ) {
 			OBJFile file = new();
-			OBJData source = new();
+			OBJData source = file.Data;
 			List<OBJGroup> activeGroups = new();
 			OBJGroup? smoothingGroup = null;
 			OBJGroup? mergingGroup = null;
