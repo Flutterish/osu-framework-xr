@@ -134,7 +134,7 @@ namespace osu.Framework.XR.Components {
 		}
 
 		public override void Destroy () {
-			foreach ( var i in children ) i.Destroy();
+			foreach ( var i in children.ToArray() ) i.Destroy();
 			base.Destroy();
 		}
 	}

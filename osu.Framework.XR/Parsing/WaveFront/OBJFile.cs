@@ -1,4 +1,5 @@
 ﻿using osu.Framework.Graphics;
+using osu.Framework.XR.Graphics;
 using osu.Framework.XR.Parsing.Materials;
 using osuTK;
 using System;
@@ -562,8 +563,58 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 			return file;
 		}
 
-		public ModelGroup CreateModelGroup () {
-			throw new NotImplementedException();
+		public ImportedModelGroup CreateModelGroup () {
+			var scene = new ImportedModelGroup( "Default Group" );
+			Dictionary<MTLMaterial, ImportedMaterial> materials = new();
+
+			foreach ( var i in Objects ) {
+				var model = new ImportedModel( i.Name );
+
+				foreach ( var group in i.Faces.Select( x => Data.Faces[ (int)x ] ).GroupBy( x => x.Material ) ) {
+					var material = Data.FetchMaterial( (int)group.Key );
+
+					ImportedMaterial mat;
+					if ( material is null ) {
+						mat = ImportedMaterial.Default;
+					}
+					else if ( !materials.TryGetValue( material, out mat! ) ) {
+						materials.Add( material, mat = material.CreateMaterial() );
+					}
+
+					var mesh = new Mesh();
+
+					Dictionary<uint, uint> vertexMap = new();
+					
+					uint mapIndices ( uint v, uint? t ) {
+						if ( !vertexMap.TryGetValue( v, out var V ) ) {
+							vertexMap.Add( v, V = (uint)mesh.Vertices.Count );
+							mesh.Vertices.Add( Data.Vertices[ (int)v ].Xyz );
+							mesh.TextureCoordinates.Add( t is null ? Vector2.Zero : Data.TextureCoordinates[ (int)t ].Xy );
+						}
+
+						return V;
+					}
+
+					foreach ( var face in group ) {
+						var v1 = mapIndices( face.Vertices[ 0 ], face.TextureCoordinates[ 0 ] );
+						var v2 = mapIndices( face.Vertices[ 1 ], face.TextureCoordinates[ 1 ] );
+
+						foreach ( var (v,t) in face.Vertices.Zip( face.TextureCoordinates ).Skip( 2 ) ) {
+							var v3 = mapIndices( v, t );
+
+							mesh.Tris.Add( new IndexedFace( v1, v2, v3 ) );
+
+							v2 = v3;
+						}
+					}
+
+					model.Elements.Add( (mesh, mat) );
+				}
+
+				scene.Models.Add( model );
+			}
+
+			return scene;
 		}
 	}
 }

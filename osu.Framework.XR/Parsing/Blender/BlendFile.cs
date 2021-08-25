@@ -176,7 +176,7 @@ namespace osu.Framework.XR.Parsing.Blender {
 			return jo;
 		}
 
-		public ModelGroup CreateModelGroup () {
+		public ImportedModelGroup CreateModelGroup () {
 			throw new NotImplementedException();
 		}
 	}

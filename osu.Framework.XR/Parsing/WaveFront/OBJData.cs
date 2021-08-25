@@ -2,6 +2,7 @@
 using osu.Framework.XR.Parsing.Materials;
 using osuTK;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Framework.XR.Parsing.WaveFront {
 	// NOTE not everything is implmented yet and some structures are in OBJData rather than their respective classes
@@ -33,6 +34,20 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 		public readonly List<uint[]> SpecialPoints = new();
 		public readonly List<ConnectivityData> Connections = new();
 		public readonly List<string> Materials = new List<string>();
+
+		public MTLMaterial? FetchMaterial ( int index )
+			=> index >= 0 && index < Materials.Count ? FetchMaterial( Materials[ index ] ) : null;
+		public MTLMaterial? FetchMaterial ( string name ) {
+			foreach ( var i in MTLFiles ) {
+				if ( !i.IsLoaded ) continue;
+
+				var match = i.Source.Materials.FirstOrDefault( x => x.Name == name );
+				if ( match is not null )
+					return match;
+			}
+
+			return null;
+		}
 	}
 
 	public struct FaceData {

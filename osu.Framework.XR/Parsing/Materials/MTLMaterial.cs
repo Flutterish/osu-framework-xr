@@ -3,7 +3,7 @@ using osuTK.Graphics;
 using System.Collections.Generic;
 
 namespace osu.Framework.XR.Parsing.Materials {
-	public class MTLMaterial {
+	public class MTLMaterial : IImportedMaterial {
 		public MTLMaterial ( string name ) {
 			Name = name;
 		}
@@ -13,7 +13,7 @@ namespace osu.Framework.XR.Parsing.Materials {
 		public Color4? Diffuse;
 		public Color4? Specular;
 		public Color4? EmissiveCoefficient;
-		public Color4? TransmissionFilte;
+		public Color4? TransmissionFilter;
 		public IlluminationMode IlluminationMode = IlluminationMode.Mode1;
 		public float Opacity = 1;
 		public bool UseHaloOpacity = false;
@@ -30,6 +30,10 @@ namespace osu.Framework.XR.Parsing.Materials {
 		public TextureMap? DisplacementMap;
 		public TextureMap? BumpMap;
 		public Dictionary<ReflectionMapType, TextureMap> ReflectionMaps = new();
+
+		public ImportedMaterial CreateMaterial () {
+			return new ImportedMaterial();
+		}
 	}
 
 	public class TextureMap {
