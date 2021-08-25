@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 
 namespace osu.Framework.XR.Parsing.Blender.FileBlocks {
 	public abstract class BlendFileBlock {
@@ -11,5 +7,7 @@ namespace osu.Framework.XR.Parsing.Blender.FileBlocks {
 		protected BlendFileBlock ( BlendFileBlockHeader header ) {
 			Header = header;
 		}
+
+		public abstract void PostProcess ( BlendFile file, SDNABlock sdna, Stream stream );
 	}
 }

@@ -3,10 +3,10 @@ using osu.Framework.XR.Parsing.Blender.FileBlocks;
 using System;
 using System.Buffers;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace osu.Framework.XR.Parsing.Blender {
 	// https://archive.blender.org/development/architecture/blender-file-format/index.html
@@ -15,6 +15,8 @@ namespace osu.Framework.XR.Parsing.Blender {
 
 		public BlendFileHeader Header;
 		public readonly List<BlendFileBlock> Blocks = new();
+		[MaybeNull, NotNull]
+		public SDNABlock SDNA;
 
 		public static BlendFile FromFile ( string path ) {
 			using var stream = File.Open( path, FileMode.Open, FileAccess.Read );
@@ -32,6 +34,13 @@ namespace osu.Framework.XR.Parsing.Blender {
 				var block = file.parseBlock( stream );
 
 				if ( block.Header.Identifier == "ENDB" ) break;
+			}
+
+			if ( file.SDNA is null )
+				throw new InvalidDataException( "File did not contain an SDNA block." );
+
+			foreach ( var i in file.Blocks ) {
+				i.PostProcess( file, file.SDNA, stream );
 			}
 
 			return file;
@@ -74,10 +83,13 @@ namespace osu.Framework.XR.Parsing.Blender {
 			var endpos = stream.Position + header.Size;
 
 			if ( header.Identifier == "DNA1" ) {
-				block = new SDNABlock( header, this, stream );
+				if ( SDNA is not null )
+					throw new InvalidDataException( "More than 1 SDNA block found." );
+
+				block = SDNA = new SDNABlock( header, this, stream );
 			}
 			else {
-				block = new UnidentifiedBlendFileBlock( header, this, stream );
+				block = new DataBlendFileBlock( header, this, stream );
 			}
 
 			if ( stream.Position != endpos )
@@ -90,8 +102,8 @@ namespace osu.Framework.XR.Parsing.Blender {
 		private BlendFileBlockHeader parseBlockHeader ( Stream stream ) {
 			stream.Align( 4 );
 
-			var size = 16 + Header.PointerSize;
-			var sdnaOffset = 8 + Header.PointerSize;
+			var size = 16 + (int)Header.PointerSize;
+			var sdnaOffset = 8 + (int)Header.PointerSize;
 
 			var buffer = ArrayPool<byte>.Shared.Rent( size );
 
@@ -104,7 +116,7 @@ namespace osu.Framework.XR.Parsing.Blender {
 					Identifier = identifier,
 					Size = this.ParseU32( buffer, 4 ),
 					OldPointerAddress = this.ParsePointer( buffer, 8 ),
-					SDNA = this.ParseU32( buffer, sdnaOffset ),
+					SDNAIndex = this.ParseU32( buffer, sdnaOffset ),
 					Count = this.ParseU32( buffer, sdnaOffset + 4 )
 				};
 			}
@@ -157,6 +169,12 @@ namespace osu.Framework.XR.Parsing.Blender {
 		public static string ParseString ( this BlendFile file, byte[] buffer, int offset, int length )
 			=> Encoding.ASCII.GetString( buffer.AsSpan( offset, length ) );
 
+		public static float ParseF32 ( this BlendFile file, byte[] buffer, int offset )
+			=> BitConverter.ToSingle( file.correntEndianess( buffer, offset, 4 ) );
+
+		public static double ParseF64 ( this BlendFile file, byte[] buffer, int offset )
+			=> BitConverter.ToDouble( file.correntEndianess( buffer, offset, 8 ) );
+
 		public static void Align ( this Stream stream, uint multiple ) {
 			var offset = stream.Position;
 			var nextMultiple = ( ( offset + multiple - 1 ) / multiple ) * multiple;
@@ -180,6 +198,7 @@ namespace osu.Framework.XR.Parsing.Blender {
 			}
 			finally {
 				ArrayPool<byte>.Shared.Return( single );
+				sb.Clear();
 				builderPool.Return( sb );
 			}
 		}
