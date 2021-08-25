@@ -24,7 +24,7 @@ namespace osu.Framework.XR.Parsing.Materials {
 			if ( IsLoaded ) return;
 
 			using var stream = new StreamReader( System.IO.Path.Combine( System.IO.Path.GetFullPath( baseDirectory ), Path ) );
-			Source = MTLFile.FromText( stream.ReadToEnd() );
+			Source = MTLFile.FromText( stream.ReadToEnd(), baseDirectory );
 			IsLoaded = true;
 		}
 		public MTLFile? Source;

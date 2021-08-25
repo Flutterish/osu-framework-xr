@@ -1,6 +1,8 @@
-﻿using osuTK;
+﻿using osu.Framework.Graphics.Textures;
+using osuTK;
 using osuTK.Graphics;
 using System.Collections.Generic;
+using System.IO;
 
 namespace osu.Framework.XR.Parsing.Materials {
 	public class MTLMaterial : IImportedMaterial {
@@ -32,7 +34,12 @@ namespace osu.Framework.XR.Parsing.Materials {
 		public Dictionary<ReflectionMapType, TextureMap> ReflectionMaps = new();
 
 		public ImportedMaterial CreateMaterial () {
-			return new ImportedMaterial();
+			var texture = DiffuseMap?.LoadTexture();
+
+			return new ImportedMaterial {
+				Texture = texture,
+				Albedo = texture is not null ? Color4.White : ( Diffuse ?? Color4.White ),
+			};
 		}
 	}
 
@@ -51,6 +58,14 @@ namespace osu.Framework.XR.Parsing.Materials {
 		public Vector3 PatternScale = new Vector3( 1 );
 		public Vector3 Turbulence;
 		public long? TextureResolution;
+
+		public Texture? LoadTexture () {
+			if ( Path is null )
+				return null;
+
+			using var stream = File.OpenRead( Path );
+			return Texture.FromStream( stream );
+		}
 
 		public TextureMap ( string? path, string[] options, bool isDecal = false ) {
 			Path = path;

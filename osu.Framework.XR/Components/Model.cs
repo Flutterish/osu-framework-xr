@@ -29,10 +29,10 @@ namespace osu.Framework.XR.Components {
 
 			return txt.TextureGL;
 		}
-		public static TextureGL WhitePixel { get; } = createWhilePixel();
+		public static TextureGL WhitePixelTexture { get; } = createWhilePixel();
 		public Model () {
 			Faces = new( i => Transform.Matrix * Mesh.Faces[ i ] );
-			AllTextures.Add( WhitePixel );
+			AllTextures.Add( WhitePixelTexture );
 		}
 		protected override DrawNode3D CreateDrawNode ()
 			=> new ModelDrawNode( this );

@@ -14,13 +14,13 @@ namespace osu.Framework.XR.Parsing.Materials {
 		public readonly List<MTLMaterial> Materials = new();
 
 		public static MTLFile FromFile ( string path )
-			=> FromText( File.ReadAllLines( path ) );
+			=> FromText( File.ReadAllLines( path ), Path.Combine( path, ".." ) );
 
-		public static MTLFile FromText ( string text )
-			=> FromText( text.Split( '\n' ) );
+		public static MTLFile FromText ( string text, string basePath = "./" )
+			=> FromText( text.Split( '\n' ), basePath );
 
 		// https://www.fileformat.info/format/material/
-		public static MTLFile FromText ( IEnumerable<string> lines ) {
+		public static MTLFile FromText ( IEnumerable<string> lines, string basePath = "./" ) {
 			MTLFile file = new();
 			var errors = file.ParsingErrors;
 			MTLMaterial? _material = null;
@@ -159,23 +159,28 @@ namespace osu.Framework.XR.Parsing.Materials {
 					}
 					else if ( type == "map_Ka" ) {
 						var parts = rest.Split( ' ', StringSplitOptions.RemoveEmptyEntries );
-						Material().AmbientMap = new( parts.LastOrDefault(), parts.SkipLast( 1 ).ToArray() );
+						var path = parts.LastOrDefault();
+						Material().AmbientMap = new( path is null ? null : Path.Combine( basePath, path ), parts.SkipLast( 1 ).ToArray() );
 					}
 					else if ( type == "map_Kd" ) {
 						var parts = rest.Split( ' ', StringSplitOptions.RemoveEmptyEntries );
-						Material().DiffuseMap = new( parts.LastOrDefault(), parts.SkipLast( 1 ).ToArray() );
+						var path = parts.LastOrDefault();
+						Material().DiffuseMap = new( path is null ? null : Path.Combine( basePath, path ), parts.SkipLast( 1 ).ToArray() );
 					}
 					else if ( type == "map_Ks" ) {
 						var parts = rest.Split( ' ', StringSplitOptions.RemoveEmptyEntries );
-						Material().SpecularMap = new( parts.LastOrDefault(), parts.SkipLast( 1 ).ToArray() );
+						var path = parts.LastOrDefault();
+						Material().SpecularMap = new( path is null ? null : Path.Combine( basePath, path ), parts.SkipLast( 1 ).ToArray() );
 					}
 					else if ( type == "map_Ns" ) {
 						var parts = rest.Split( ' ', StringSplitOptions.RemoveEmptyEntries );
-						Material().TransmissionFilterMap = new( parts.LastOrDefault(), parts.SkipLast( 1 ).ToArray() );
+						var path = parts.LastOrDefault();
+						Material().TransmissionFilterMap = new( path is null ? null : Path.Combine( basePath, path ), parts.SkipLast( 1 ).ToArray() );
 					}
 					else if ( type == "map_d" ) {
 						var parts = rest.Split( ' ', StringSplitOptions.RemoveEmptyEntries );
-						Material().OpacityMap = new( parts.LastOrDefault(), parts.SkipLast( 1 ).ToArray() );
+						var path = parts.LastOrDefault();
+						Material().OpacityMap = new( path is null ? null : Path.Combine( basePath, path ), parts.SkipLast( 1 ).ToArray() );
 					}
 					else if ( type == "map_aat" ) {
 						if ( rest == "on" )
@@ -183,15 +188,18 @@ namespace osu.Framework.XR.Parsing.Materials {
 					}
 					else if ( type == "decal" ) {
 						var parts = rest.Split( ' ', StringSplitOptions.RemoveEmptyEntries );
-						Material().DecalMap = new( parts.LastOrDefault(), parts.SkipLast( 1 ).ToArray(), isDecal: true );
+						var path = parts.LastOrDefault();
+						Material().DecalMap = new( path is null ? null : Path.Combine( basePath, path ), parts.SkipLast( 1 ).ToArray(), isDecal: true );
 					}
 					else if ( type == "disp" ) {
 						var parts = rest.Split( ' ', StringSplitOptions.RemoveEmptyEntries );
-						Material().DisplacementMap = new( parts.LastOrDefault(), parts.SkipLast( 1 ).ToArray() );
+						var path = parts.LastOrDefault();
+						Material().DisplacementMap = new( path is null ? null : Path.Combine( basePath, path ), parts.SkipLast( 1 ).ToArray() );
 					}
 					else if ( type == "bump" ) {
 						var parts = rest.Split( ' ', StringSplitOptions.RemoveEmptyEntries );
-						Material().BumpMap = new( parts.LastOrDefault(), parts.SkipLast( 1 ).ToArray() );
+						var path = parts.LastOrDefault();
+						Material().BumpMap = new( path is null ? null : Path.Combine( basePath, path ), parts.SkipLast( 1 ).ToArray() );
 					}
 					else if ( type == "refl" ) {
 						var next = takeNext( ref rest );
@@ -216,7 +224,8 @@ namespace osu.Framework.XR.Parsing.Materials {
 						}
 
 						var parts = rest.Split( ' ', StringSplitOptions.RemoveEmptyEntries );
-						Material().ReflectionMaps.Add( mapType.Value, new TextureMap( parts.LastOrDefault(), parts.SkipLast( 1 ).ToArray() ) );
+						var path = parts.LastOrDefault();
+						Material().ReflectionMaps.Add( mapType.Value, new TextureMap( path is null ? null : Path.Combine( basePath, path ), parts.SkipLast( 1 ).ToArray() ) );
 					}
 					else {
 						errors.Add( new( $"{type} was declared at L{L}, but its not a recognized identifier.", ParsingErrorSeverity.Issue ) );

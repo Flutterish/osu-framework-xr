@@ -1,4 +1,6 @@
-﻿using osu.Framework.XR.Graphics;
+﻿using osu.Framework.Graphics.Textures;
+using osu.Framework.XR.Graphics;
+using osuTK.Graphics;
 using System.Collections.Generic;
 
 namespace osu.Framework.XR.Parsing {
@@ -24,5 +26,8 @@ namespace osu.Framework.XR.Parsing {
 
 	public class ImportedMaterial {
 		public static readonly ImportedMaterial Default = new();
+
+		public Color4 Albedo = Color4.White;
+		public Texture? Texture;
 	}
 }
