@@ -137,11 +137,11 @@ namespace osu.Framework.XR.Parsing.Blender.FileBlocks {
 
 			if ( name.StartsWith( "*" ) ) {
 				PointerCount = name.TakeWhile( x => x == '*' ).Count();
+				startIndex = PointerCount;
 				if ( !IsPointer ) {
 					ItemPointerCount = PointerCount;
 					PointerCount = 0;
 				}
-				startIndex = PointerCount;
 			}
 			else if ( name.StartsWith( "(" ) ) {
 				IsFunction = true;

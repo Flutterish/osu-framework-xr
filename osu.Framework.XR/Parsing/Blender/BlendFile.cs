@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.ObjectPool;
+using Newtonsoft.Json.Linq;
 using osu.Framework.XR.Parsing.Blender.FileBlocks;
 using System;
 using System.Buffers;
@@ -17,6 +18,8 @@ namespace osu.Framework.XR.Parsing.Blender {
 		public readonly List<BlendFileBlock> Blocks = new();
 		[MaybeNull, NotNull]
 		public SDNABlock SDNA;
+
+		public readonly Dictionary<ulong, LinkedType> MemoryMap = new();
 
 		public static BlendFile FromFile ( string path ) {
 			using var stream = File.Open( path, FileMode.Open, FileAccess.Read );
@@ -42,6 +45,8 @@ namespace osu.Framework.XR.Parsing.Blender {
 			foreach ( var i in file.Blocks ) {
 				i.PostProcess( file, file.SDNA, stream );
 			}
+
+			file.Blocks.Sort( ( a, b ) => a.Header.OldPointerAddress > b.Header.OldPointerAddress ? 1 : -1 );
 
 			return file;
 		}
@@ -123,6 +128,52 @@ namespace osu.Framework.XR.Parsing.Blender {
 			finally {
 				ArrayPool<byte>.Shared.Return( buffer );
 			}
+		}
+
+		public JToken ExportAsJSON () {
+			JObject jo = new JObject();
+			
+			JObject metadata = new JObject();
+			metadata.Add( "PointerSize", Header.PointerSize );
+			metadata.Add( "IsLitteEndian", Header.IsLittleEndian );
+			metadata.Add( "BlenderVersion", Header.Version );
+			jo.Add( "Header", metadata );
+
+			JArray def = new JArray();
+			foreach ( var i in SDNA.Structs ) {
+				def.Add( i.ToString() );
+			}
+			jo.Add( "TypeDefinitios", def );
+
+			JArray blocks = new JArray();
+			foreach ( var i in Blocks ) {
+				JObject block = new();
+
+				JObject header = new JObject();
+				header.Add( "Identifier", i.Header.Identifier );
+				header.Add( "Size", i.Header.Size );
+				header.Add( "Address", i.Header.OldPointerAddress );
+				header.Add( "SDNAIndex", i.Header.SDNAIndex );
+				header.Add( "Count", i.Header.Count );
+				block.Add( "Header", header );
+
+				if ( i is DataBlendFileBlock data ) {
+					header.Add( "Structure", data.Structure.Name );
+
+					JArray structs = new JArray();
+					foreach ( var n in data.Data ) {
+						structs.Add( n );
+					}
+					block.Add( "Elements", structs );
+				}
+				else {
+					block.Add( "Data", "See Type Definitions" );
+				}
+				blocks.Add( block );
+			}
+			jo.Add( "Blocks", blocks );
+
+			return jo;
 		}
 	}
 

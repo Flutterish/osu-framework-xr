@@ -16,15 +16,22 @@ namespace osu.Framework.XR.Parsing.Blender.FileBlocks {
 		public Structure Structure;
 		[MaybeNull, NotNull]
 		public List<JObject> Data;
+		[MaybeNull, NotNull]
+		public List<LinkedStructure> LinkedData;
 
 		public override void PostProcess ( BlendFile file, SDNABlock sdna, Stream stream ) {
 			Structure = sdna.Structs[ (int)Header.SDNAIndex ];
 
 			Data = new List<JObject>( (int)Header.Count );
+			LinkedData = new List<LinkedStructure>( (int)Header.Count );
 			for ( int i = 0; i < Header.Count; i++ ) {
 				stream.Position = position + Structure.Size * i; // sometimes structs have more data than declared, this skips their padding
-				Data.Add( Structure.Parse( file, stream ) );
+				var jo = Structure.Parse( file, stream );
+				Data.Add( jo );
+				LinkedData.Add( new LinkedStructure( file, Structure, jo ) );
 			}
+
+			file.MemoryMap.Add( Header.OldPointerAddress, Header.Count == 1 ? new LinkedStructure( file, Structure, Data[0] ) : new LinkedArray( file, Structure, new JArray( Data ) ) );
 		}
 	}
 
