@@ -10,7 +10,7 @@ namespace osu.Framework.XR.Allocation {
 
 		private ObjectPool<PooledDictionary<K,V>> pool;
 
-		public static PooledDictionary<K, V> Shared { get; } = new();
+		public static DictionaryPool<K, V> Shared { get; } = new();
 
 		public PooledDictionary<K, V> Rent ()
 			=> pool.Get();

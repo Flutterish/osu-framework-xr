@@ -1,6 +1,7 @@
 ﻿using osu.Framework.Bindables;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics.OpenGL;
+using osu.Framework.XR.Allocation;
 using osu.Framework.XR.Maths;
 using osuTK;
 using osuTK.Graphics.OpenGL4;
@@ -91,14 +92,14 @@ namespace osu.Framework.XR.Graphics {
 			=> MultipleFromOBJ( lines.Split( '\n' ), errors );
 
 		public static IEnumerable<Mesh> MultipleFromOBJ ( IEnumerable<string> lines ) {
-			var errors = new List<MeshParsingError>();
+			using var errors = ListPool<MeshParsingError>.Shared.Rent();
 			var value = MultipleFromOBJ( lines, errors );
 
 			if ( errors.Any( x => x.Severity.HasFlagFast( MeshParsingErrorSeverity.Hard ) ) ) throw new InvalidOperationException( string.Join( '\n', errors ) );
 			return value;
 		}
 
-		public static IEnumerable<Mesh> MultipleFromOBJ ( IEnumerable<string> lines, List<MeshParsingError> errors ) {
+		public static IEnumerable<Mesh> MultipleFromOBJ ( IEnumerable<string> lines, List<MeshParsingError> errors ) { // TODO from .obj parsing. problem is that it corrects for RHS coords
 			Mesh current = new();
 			uint offset = 1;
 

@@ -1,5 +1,6 @@
 ﻿using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.XR.Allocation;
 using osu.Framework.XR.Maths;
 using osu.Framework.XR.Projection;
 using osuTK;
@@ -46,7 +47,7 @@ namespace osu.Framework.XR.Components {
 		}
 
 		public IEnumerable<Drawable3D> GetAllChildrenInHiererchy () {
-			List<Drawable3D> all = new() { this };
+			using var all = ListPool<Drawable3D>.Shared.Rent( this );
 			for ( int i = 0; i < all.Count; i++ ) {
 				if ( all[ i ] is CompositeDrawable3D current ) {
 					for ( int k = 0; k < current.children.Count; k++ ) {

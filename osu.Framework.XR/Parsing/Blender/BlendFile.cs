@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.ObjectPool;
 using Newtonsoft.Json.Linq;
+using osu.Framework.XR.Allocation;
 using osu.Framework.XR.Graphics;
 using osu.Framework.XR.Parsing.Blender.FileBlocks;
 using osuTK;
@@ -192,7 +193,6 @@ namespace osu.Framework.XR.Parsing.Blender {
 
 				var totVert = rawMesh[ "totvert" ]!.GetValue<int>()!; // Vertices
 				var totEdge = rawMesh[ "totedge" ]!.GetValue<int>()!; // Edges ( 2 vertices )
-				var totFace = rawMesh[ "totface" ]!.GetValue<int>()!; // Tris ( and quads? )
 				var totPoly = rawMesh[ "totpoly" ]!.GetValue<int>()!; // N-gons defined as spans of edge loops
 				var totLoop = rawMesh[ "totloop" ]!.GetValue<int>()!; // Edge loops ( vertice + edge )
 																	  // MLoopTri defines a triangle in an N-gon
@@ -213,7 +213,7 @@ namespace osu.Framework.XR.Parsing.Blender {
 					}
 				}
 
-				List<(int a, int b)> edges = new();
+				using var edges = ListPool<(int a, int b)>.Shared.Rent();
 				if ( totEdge > 0 ) {
 					var medge = rawMesh[ "medge" ] as LinkedArray;
 					for ( int i = 0; i < totEdge; i++ ) {
@@ -225,7 +225,7 @@ namespace osu.Framework.XR.Parsing.Blender {
 					}
 				}
 
-				List<(int v, int e)> edgeLoops = new();
+				using var edgeLoops = ListPool<(int v, int e)>.Shared.Rent();
 				if ( totLoop > 0 ) {
 					var mloop = rawMesh[ "mloop" ] as LinkedArray;
 					for ( int i = 0; i < totLoop; i++ ) {
@@ -237,7 +237,7 @@ namespace osu.Framework.XR.Parsing.Blender {
 					}
 				}
 
-				List<(int start, int count)> polys = new();
+				using var polys = ListPool<(int start, int count)>.Shared.Rent();
 				if ( totPoly > 0 ) {
 					var mpoly = rawMesh[ "mpoly" ] as LinkedArray;
 					for ( int i = 0; i < totPoly; i++ ) {
@@ -250,7 +250,7 @@ namespace osu.Framework.XR.Parsing.Blender {
 				}
 
 				foreach ( var poly in polys ) {
-					List<int> vertices = new();
+					using var vertices = ListPool<int>.Shared.Rent();
 
 					for ( int i = poly.start; i < poly.start + poly.count; i++ ) {
 						vertices.Add( edgeLoops[ i ].v );

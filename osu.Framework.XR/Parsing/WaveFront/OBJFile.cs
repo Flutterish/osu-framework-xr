@@ -1,4 +1,5 @@
 ﻿using osu.Framework.Graphics;
+using osu.Framework.XR.Allocation;
 using osu.Framework.XR.Graphics;
 using osu.Framework.XR.Parsing.Materials;
 using osuTK;
@@ -30,7 +31,7 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 		public static OBJFile FromText ( IEnumerable<string> lines ) {
 			OBJFile file = new();
 			OBJData source = file.Data;
-			List<OBJGroup> activeGroups = new();
+			using var activeGroups = ListPool<OBJGroup>.Shared.Rent();
 			OBJGroup? smoothingGroup = null;
 			OBJGroup? mergingGroup = null;
 			uint materialIndex = 0;
@@ -116,7 +117,7 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 			}
 
 			CurveParameterData[]? parseCurveData ( ref string rest, string name, uint L, List<ParsingError> errors ) {
-				List<CurveParameterData> data = new();
+				using var data = ListPool<CurveParameterData>.Shared.Rent();
 				while ( rest != "" ) {
 					var a = takeNext( ref rest );
 					var b = takeNext( ref rest );
@@ -565,7 +566,7 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 
 		public ImportedModelGroup CreateModelGroup () {
 			var scene = new ImportedModelGroup( "Default Group" );
-			Dictionary<MTLMaterial, ImportedMaterial> materials = new();
+			using var materials = DictionaryPool<MTLMaterial, ImportedMaterial>.Shared.Rent();
 
 			foreach ( var i in Objects ) {
 				var model = new ImportedModel( i.Name );
@@ -583,7 +584,7 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 
 					var mesh = new Mesh();
 
-					Dictionary<uint, uint> vertexMap = new();
+					using var vertexMap = DictionaryPool<uint, uint>.Shared.Rent();
 					
 					uint mapIndices ( uint v, uint? t ) {
 						if ( !vertexMap.TryGetValue( v, out var V ) ) {

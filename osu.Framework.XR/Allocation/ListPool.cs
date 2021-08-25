@@ -15,6 +15,18 @@ namespace osu.Framework.XR.Allocation {
 		public PooledList<T> Rent ()
 			=> pool.Get();
 
+		public PooledList<T> Rent ( T content ) {
+			var list = pool.Get();
+			list.Add( content );
+			return list;
+		}
+
+		public PooledList<T> Rent ( IEnumerable<T> content ) {
+			var list = pool.Get();
+			list.AddRange( content );
+			return list;
+		}
+
 		public void Return ( PooledList<T> list )
 			=> pool.Return( list );
 

@@ -1,4 +1,5 @@
-﻿using System.Buffers;
+﻿using osu.Framework.XR.Allocation;
+using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace osu.Framework.XR.Parsing.Blender.FileBlocks {
 
 		private struct StructDNA {
 			public ushort Type;
-			public (ushort Type, ushort Name)[] Fields;
+			public PooledList<(ushort Type, ushort Name)> Fields;
 		}
 
 		public SDNABlock ( BlendFileBlockHeader header, BlendFile file, Stream stream ) : base( header ) {
@@ -29,9 +30,9 @@ namespace osu.Framework.XR.Parsing.Blender.FileBlocks {
 
 				stream.EnsureRead( buffer, 0, 4 );
 				var count = file.ParseU32( buffer, 0 );
-				var Names = new string[ count ];
+				using var Names = ListPool<string>.Shared.Rent();
 				for ( int i = 0; i < count; i++ ) {
-					Names[ i ] = file.ParseCString( stream );
+					Names.Add( file.ParseCString( stream ) );
 				}
 
 				stream.Align( 4 );
@@ -42,9 +43,9 @@ namespace osu.Framework.XR.Parsing.Blender.FileBlocks {
 
 				stream.EnsureRead( buffer, 0, 4 );
 				count = file.ParseU32( buffer, 0 );
-				var Types = new string[ count ];
+				using var Types = ListPool<string>.Shared.Rent();
 				for ( int i = 0; i < count; i++ ) {
-					Types[ i ] = file.ParseCString( stream );
+					Types.Add( file.ParseCString( stream ) );
 				}
 
 				stream.Align( 4 );
@@ -53,10 +54,10 @@ namespace osu.Framework.XR.Parsing.Blender.FileBlocks {
 				if ( identifier != "TLEN" )
 					throw new InvalidDataException( $"Expected 4th identifier in DNA1 block to be 'TLEN' but it was '{identifier}'" );
 
-				var Lengths = new ushort[ count ];
+				using var Lengths = ListPool<ushort>.Shared.Rent();
 				for ( int i = 0; i < count; i++ ) {
 					stream.EnsureRead( buffer, 0, 2 );
-					Lengths[ i ] = file.ParseU16( buffer, 0 );
+					Lengths.Add( file.ParseU16( buffer, 0 ) );
 				}
 
 				stream.Align( 4 );
@@ -67,39 +68,43 @@ namespace osu.Framework.XR.Parsing.Blender.FileBlocks {
 
 				stream.EnsureRead( buffer, 0, 4 );
 				count = file.ParseU32( buffer, 0 );
-				var Structures = new StructDNA[count];
+				using var Structures = ListPool<StructDNA>.Shared.Rent();
 				for ( int i = 0; i < count; i++ ) {
 					StructDNA s = new();
 					stream.EnsureRead( buffer, 0, 4 );
 					s.Type = file.ParseU16( buffer, 0 );
 					var fieldCount = file.ParseU16( buffer, 2 );
-					s.Fields = new (ushort Type, ushort Name)[fieldCount];
+					s.Fields = ListPool<(ushort Type, ushort Name)>.Shared.Rent();
 					for ( int k = 0; k < fieldCount; k++ ) {
 						stream.EnsureRead( buffer, 0, 4 );
-						s.Fields[ k ] = ( file.ParseU16( buffer, 0 ), file.ParseU16( buffer, 2 ) );
+						s.Fields.Add( ( file.ParseU16( buffer, 0 ), file.ParseU16( buffer, 2 ) ) );
 					}
-					Structures[ i ] = s;
+					Structures.Add( s );
 				}
 
-				for ( int i = 0; i < Structures.Length; i++ ) {
+				for ( int i = 0; i < Structures.Count; i++ ) {
 					var s = Structures[ i ];
 					var st = new Structure( Types[ s.Type ], Lengths[ s.Type ] );
 					this.Structs.Add( st );
 					this.Types.Add( Types[ s.Type ], st );
 				}
 
-				for ( int i = 0; i < Types.Length; i++ ) {
+				for ( int i = 0; i < Types.Count; i++ ) {
 					if ( this.Types.ContainsKey( Types[ i ] ) ) continue;
 					this.Types.Add( Types[ i ], new Type( Types[ i ], Lengths[ i ] ) );
 				}
 
-				for ( int i = 0; i < Structures.Length; i++ ) {
+				for ( int i = 0; i < Structures.Count; i++ ) {
 					var s = Structures[ i ];
 					var st = (Structure)this.Types[ Types[ s.Type ] ];
 					foreach ( var f in s.Fields ) {
 						var field = new Field( file, Names[ f.Name ], this.Types[ Types[ f.Type ] ] );
 						st.Fields.Add( field.Name, field );
 					}
+				}
+
+				for ( int i = 0; i < Structures.Count; i++ ) {
+					Structures[ i ].Fields.Dispose();
 				}
 			}
 			finally {

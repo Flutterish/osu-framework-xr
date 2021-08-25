@@ -13,7 +13,7 @@ namespace osu.Framework.XR.Input {
 		public override bool Initialize ( GameHost host ) => true;
 		public override bool IsActive => true;
 
-		public readonly BindableInt DeadzoneBindable = new( 20 );
+		public readonly BindableInt DeadzoneBindable = new( 20 ); // TODO deadzone should be based on actual distance, not pixel distance
 		//double holdDuration = 500;
 
 		private void enqueueInput ( IInput input ) {

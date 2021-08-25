@@ -9,7 +9,7 @@ namespace osu.Framework.XR.Parsing.Materials {
 		private MTLFile () { }
 
 		public readonly List<ParsingError> ParsingErrors = new();
-		public readonly List<(uint line, string content)> Comments = new();
+		public readonly List<(uint line, string content)> Comments = new(); // TODO not implemented
 
 		public readonly List<MTLMaterial> Materials = new();
 

@@ -2,6 +2,7 @@
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.XR.Allocation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -71,7 +72,7 @@ namespace osu.Framework.XR.Graphics.Containers {
 
 		(IEnumerable<string> stringTerms, IEnumerable<Tterm> terms, bool searchActive) getTerms () {
 			var term = searchTerm.Value ?? string.Empty;
-			List<Tterm> terms = new();
+			using var terms = ListPool<Tterm>.Shared.Rent();
 			foreach ( var filter in filterFunctions ) {
 				terms.AddRange( filter( term, out var nextTerm ) );
 				term = nextTerm ?? string.Empty;
@@ -79,7 +80,7 @@ namespace osu.Framework.XR.Graphics.Containers {
 			var stringTerms = term.Split( new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries );
 			var searchActive = stringTerms.Any() || terms.Any();
 
-			return ( stringTerms, terms, searchActive );
+			return ( stringTerms, terms.ToArray(), searchActive );
 		}
 
 		public void PerformFilter () {
