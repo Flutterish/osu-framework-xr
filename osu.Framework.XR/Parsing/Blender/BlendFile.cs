@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.ObjectPool;
 using Newtonsoft.Json.Linq;
+using osu.Framework.XR.Graphics;
 using osu.Framework.XR.Parsing.Blender.FileBlocks;
+using osuTK;
 using System;
 using System.Buffers;
 using System.Collections.Generic;
@@ -20,6 +22,12 @@ namespace osu.Framework.XR.Parsing.Blender {
 		public SDNABlock SDNA;
 
 		public readonly Dictionary<ulong, LinkedType> MemoryMap = new();
+
+		public IEnumerable<LinkedType> GetAllWithCode ( string code )
+			=> Blocks.Where( x => x.Header.Identifier.StartsWith( code ) ).OfType<DataBlendFileBlock>().SelectMany( x => x.LinkedData );
+
+		public IEnumerable<LinkedType> GetAllOfType ( string type )
+			=> Blocks.OfType<DataBlendFileBlock>().Where( x => x.Structure.Name == type ).SelectMany( x => x.LinkedData );
 
 		public static BlendFile FromFile ( string path ) {
 			using var stream = File.Open( path, FileMode.Open, FileAccess.Read );
@@ -177,7 +185,93 @@ namespace osu.Framework.XR.Parsing.Blender {
 		}
 
 		public ImportedModelGroup CreateModelGroup () {
-			throw new NotImplementedException();
+			var scene = new ImportedModelGroup( "Scene" );
+
+			foreach ( LinkedStructure rawMesh in GetAllOfType( "Mesh" ) ) {
+				LinkedStructure id = (rawMesh[ "id" ] as LinkedStructure)!;
+
+				var totVert = rawMesh[ "totvert" ]!.GetValue<int>()!; // Vertices
+				var totEdge = rawMesh[ "totedge" ]!.GetValue<int>()!; // Edges ( 2 vertices )
+				var totFace = rawMesh[ "totface" ]!.GetValue<int>()!; // Tris ( and quads? )
+				var totPoly = rawMesh[ "totpoly" ]!.GetValue<int>()!; // N-gons defined as spans of edge loops
+				var totLoop = rawMesh[ "totloop" ]!.GetValue<int>()!; // Edge loops ( vertice + edge )
+																	  // MLoopTri defines a triangle in an N-gon
+
+				var model = new ImportedModel( ((string)id[ "name" ]!.Value!).FromCString() );
+				var mat = ImportedMaterial.Default;
+				var mesh = new Mesh();
+
+				if ( totVert > 0 ) {
+					var mvert = rawMesh[ "mvert" ] as LinkedArray;
+					for ( int i = 0; i < totVert; i++ ) {
+						var coords = ( mvert![ i ] as LinkedStructure )![ "co" ] as LinkedArray;
+						mesh.Vertices.Add( new Vector3(
+							coords![ 0 ]!.GetValue<float>(),
+							coords![ 1 ]!.GetValue<float>(),
+							coords![ 2 ]!.GetValue<float>()
+						) );
+					}
+				}
+
+				List<(int a, int b)> edges = new();
+				if ( totEdge > 0 ) {
+					var medge = rawMesh[ "medge" ] as LinkedArray;
+					for ( int i = 0; i < totEdge; i++ ) {
+						var edge = ( medge![ i ] as LinkedStructure )!;
+						edges.Add( (
+							edge[ "v1" ]!.GetValue<int>(),
+							edge[ "v2" ]!.GetValue<int>()
+						) );
+					}
+				}
+
+				List<(int v, int e)> edgeLoops = new();
+				if ( totLoop > 0 ) {
+					var mloop = rawMesh[ "mloop" ] as LinkedArray;
+					for ( int i = 0; i < totLoop; i++ ) {
+						var loop = ( mloop![ i ] as LinkedStructure )!;
+						edgeLoops.Add( (
+							loop[ "v" ]!.GetValue<int>(),
+							loop[ "e" ]!.GetValue<int>()
+						) );
+					}
+				}
+
+				List<(int start, int count)> polys = new();
+				if ( totPoly > 0 ) {
+					var mpoly = rawMesh[ "mpoly" ] as LinkedArray;
+					for ( int i = 0; i < totPoly; i++ ) {
+						var poly = ( mpoly![ i ] as LinkedStructure )!;
+						polys.Add( (
+							poly[ "loopstart" ]!.GetValue<int>(),
+							poly[ "totloop" ]!.GetValue<int>()
+						) );
+					}
+				}
+
+				foreach ( var poly in polys ) {
+					List<int> vertices = new();
+
+					for ( int i = poly.start; i < poly.start + poly.count; i++ ) {
+						vertices.Add( edgeLoops[ i ].v );
+					}
+
+					var v1 = vertices[ 0 ];
+					var v2 = vertices[ 1 ];
+					for ( int i = 2; i < vertices.Count; i++ ) {
+						var v3 = vertices[ i ];
+
+						mesh.Tris.Add( new IndexedFace( (uint)v1, (uint)v2, (uint)v3 ) );
+
+						v2 = v3;
+					}
+				}
+
+				model.Elements.Add( (mesh, mat) );
+				scene.Models.Add( model );
+			}
+
+			return scene;
 		}
 	}
 
@@ -256,6 +350,14 @@ namespace osu.Framework.XR.Parsing.Blender {
 				sb.Clear();
 				builderPool.Return( sb );
 			}
+		}
+
+		public static string FromCString ( this string cString ) {
+			var index = cString.IndexOf( '\0' );
+			if ( index == -1 )
+				return cString;
+			else
+				return cString.Substring( 0, index );
 		}
 	}
 }

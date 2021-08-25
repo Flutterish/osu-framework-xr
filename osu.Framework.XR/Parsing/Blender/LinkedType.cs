@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using osu.Framework.XR.Parsing.Blender.FileBlocks;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Type = osu.Framework.XR.Parsing.Blender.FileBlocks.Type;
@@ -17,6 +18,7 @@ namespace osu.Framework.XR.Parsing.Blender {
 		}
 
 		public object? Value => ( Data is JValue value ) ? value.Value : Data.ToString();
+		public T? GetValue<T> () => Data.ToObject<T>();
 
 		public override string ToString ()
 			=> $"{Value}";
@@ -36,7 +38,7 @@ namespace osu.Framework.XR.Parsing.Blender {
 						if ( i.Value.IsFunction ) {
 							fields.Add( i.Value, null );
 						}
-						else if ( i.Value.IsPointer ) {
+						else if ( i.Value.IsPointer ) { // TODO handle pointer pointers
 							ulong address = Data[ i.Key ]!.ToObject<ulong>();
 							if ( address != 0 && File.MemoryMap.TryGetValue( address, out var field ) ) {
 								fields.Add( i.Value, field );
@@ -46,8 +48,8 @@ namespace osu.Framework.XR.Parsing.Blender {
 							}
 						}
 						else if ( i.Value.IsArray ) {
-							if ( i.Value.IsPointerArray ) {
-								fields.Add( i.Value, null );
+							if ( i.Value.IsPointerArray ) { // TODO handle pointer pointers
+								fields.Add( i.Value, new LinkedArray( File, i.Value.Type, new JArray( ( (JArray)Data[ i.Key ]! ).Select( x => x is JValue val && val.Value is ulong addr && addr != 0 && File.MemoryMap.TryGetValue( addr, out var field ) ? field : null ) ) ) );
 							}
 							else {
 								if ( i.Value.Type.Name == "char" ) {
@@ -74,11 +76,14 @@ namespace osu.Framework.XR.Parsing.Blender {
 			}
 		}
 
+		public LinkedType? this[ string field ]
+			=> Fields[ DNA.Fields[ field ] ];
+
 		public override string ToString ()
 			=> $"{DNA.Name} {{ {string.Join( ", ", Fields.Select( x => $"{x.Key} = {(x.Key.IsPointer ? (x.Value is null ? "NULL" : "&") : x.Value)}" ) )} }}";
 	}
 
-	public class LinkedArray : LinkedType {
+	public class LinkedArray : LinkedType, IEnumerable<LinkedType?> {
 		new public JArray Data => (JArray)base.Data;
 
 		public LinkedArray ( BlendFile file, Type dna, JArray data ) : base( file, dna, data ) { }
@@ -104,7 +109,18 @@ namespace osu.Framework.XR.Parsing.Blender {
 			}
 		}
 
+		public LinkedType? this[ int index ]
+			=> Items[ index ];
+
 		public override string ToString ()
 			=> $"{DNA.Name} [ {string.Join( ", ", Items )} ]";
+
+		public IEnumerator<LinkedType?> GetEnumerator () {
+			return ( (IEnumerable<LinkedType?>)Items ).GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator () {
+			return ( (IEnumerable)Items ).GetEnumerator();
+		}
 	}
 }

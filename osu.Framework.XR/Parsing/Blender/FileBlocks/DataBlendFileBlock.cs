@@ -31,7 +31,7 @@ namespace osu.Framework.XR.Parsing.Blender.FileBlocks {
 				LinkedData.Add( new LinkedStructure( file, Structure, jo ) );
 			}
 
-			file.MemoryMap.Add( Header.OldPointerAddress, Header.Count == 1 ? new LinkedStructure( file, Structure, Data[0] ) : new LinkedArray( file, Structure, new JArray( Data ) ) );
+			file.MemoryMap.Add( Header.OldPointerAddress, new LinkedArray( file, Structure, new JArray( Data ) ) );
 		}
 	}
 
