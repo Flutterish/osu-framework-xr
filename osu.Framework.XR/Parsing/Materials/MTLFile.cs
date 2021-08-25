@@ -90,12 +90,8 @@ namespace osu.Framework.XR.Parsing.Materials {
 			uint L = 0;
 			foreach ( var line in lines ) {
 				L++;
-				var rest = line.Trim();
-
-				if ( rest.StartsWith( "#" ) ) {
-					file.Comments.Add( (L, line) );
-					continue;
-				}
+				var commentIndex = line.IndexOf( "#" );
+				var rest = ( commentIndex == -1 ? line : line.Substring( 0, commentIndex ) ).Trim();
 
 				var type = takeNext( ref rest );
 

@@ -144,15 +144,11 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 
 			uint L = 0;
 			foreach ( var line in lines ) {
-				var rest = line.Trim();
+				var commentIndex = line.IndexOf( "#" );
+				var rest = ( commentIndex == -1 ? line : line.Substring( 0, commentIndex ) ).Trim();
 				L++;
 
 				try {
-					if ( rest.StartsWith( "#" ) ) {
-						file.Comments.Add( (L, line) );
-						continue;
-					}
-
 					var type = takeNext( ref rest );
 					if ( type is null or "" ) {
 						continue;
