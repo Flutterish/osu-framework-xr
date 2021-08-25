@@ -9,10 +9,11 @@ namespace osu.Framework.XR.Parsing.Materials {
 		}
 
 		public readonly string Name;
-		public Color4 Ambient = Color4.White;
-		public Color4 Diffuse = Color4.White;
-		public Color4 Specular = Color4.White;
-		public Color4 TransmissionFilter = Color4.White;
+		public Color4? Ambient;
+		public Color4? Diffuse;
+		public Color4? Specular;
+		public Color4? EmissiveCoefficient;
+		public Color4? TransmissionFilte;
 		public IlluminationMode IlluminationMode = IlluminationMode.Mode1;
 		public float Opacity = 1;
 		public bool UseHaloOpacity = false;

@@ -107,6 +107,9 @@ namespace osu.Framework.XR.Parsing.Materials {
 					else if ( type == "Ka" ) {
 						Material().Ambient = parseReflectivity( rest, L, errors );
 					}
+					else if ( type == "Ke" ) {
+						Material().EmissiveCoefficient = parseReflectivity( rest, L, errors );
+					}
 					else if ( type == "Kd" ) {
 						Material().Diffuse = parseReflectivity( rest, L, errors );
 					}
