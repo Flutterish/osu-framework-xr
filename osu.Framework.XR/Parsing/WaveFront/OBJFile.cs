@@ -7,7 +7,7 @@ using System.IO;
 using System.Linq;
 
 namespace osu.Framework.XR.Parsing.WaveFront {
-	public class OBJFile {
+	public class OBJFile : IModelFile {
 		private OBJFile () { }
 
 		public readonly List<ParsingError> ParsingErrors = new();
@@ -564,6 +564,10 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 			}
 
 			return file;
+		}
+
+		public ModelGroup CreateModelGroup () {
+			throw new NotImplementedException();
 		}
 	}
 }

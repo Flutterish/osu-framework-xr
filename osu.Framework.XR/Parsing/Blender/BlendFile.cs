@@ -11,7 +11,7 @@ using System.Text;
 
 namespace osu.Framework.XR.Parsing.Blender {
 	// https://archive.blender.org/development/architecture/blender-file-format/index.html
-	public class BlendFile {
+	public class BlendFile : IModelFile {
 		private BlendFile() { }
 
 		public BlendFileHeader Header;
@@ -174,6 +174,10 @@ namespace osu.Framework.XR.Parsing.Blender {
 			jo.Add( "Blocks", blocks );
 
 			return jo;
+		}
+
+		public ModelGroup CreateModelGroup () {
+			throw new NotImplementedException();
 		}
 	}
 
