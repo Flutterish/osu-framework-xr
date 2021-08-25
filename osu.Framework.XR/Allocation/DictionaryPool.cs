@@ -4,8 +4,8 @@ using System.Collections.Generic;
 
 namespace osu.Framework.XR.Allocation {
 	public class DictionaryPool<K,V> where K : notnull {
-		private DictionaryPool () {
-			pool = ObjectPool.Create( new PoolPolicy( this ) );
+		public DictionaryPool () {
+			pool = new StackObjectPool<PooledDictionary<K, V>>( new PoolPolicy( this ) );
 		}
 
 		private ObjectPool<PooledDictionary<K,V>> pool;

@@ -4,8 +4,8 @@ using System.Collections.Generic;
 
 namespace osu.Framework.XR.Allocation {
 	public class StackPool<T> {
-		private StackPool () {
-			pool = ObjectPool.Create( new PoolPolicy( this ) );
+		public StackPool () {
+			pool = new StackObjectPool<PooledStack<T>>( new PoolPolicy( this ) );
 		}
 
 		private ObjectPool<PooledStack<T>> pool;
