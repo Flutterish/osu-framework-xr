@@ -8,7 +8,11 @@ namespace osu.Framework.XR.Physics {
 	public static class Sphere {
 		public static bool TryHit ( Vector3 origin, double radius, Face face, out SphereHit hit ) {
 			Vector3 normal = Vector3.Cross( face.A - face.B, face.C - face.B ).Normalized();
-			Raycast.TryHitPrenormalized( origin, normal, face.A, normal, out var rh, true );
+			if ( !Raycast.TryHitPrenormalized( origin, normal, face.A, normal, out var rh, true ) ) {
+				hit = default;
+				return false;
+			}
+
 			if ( Triangles.IsPointInside( rh.Point, face ) ) {
 				if ( Math.Abs( rh.Distance ) <= radius ) {
 					hit = new SphereHit(
@@ -46,7 +50,7 @@ namespace osu.Framework.XR.Physics {
 					);
 					return true;
 				}
-				else if ( bl < al && bl < cl ) {
+				else if ( bl < cl ) {
 					hit = new SphereHit(
 						distance: bl,
 						origin: origin,
@@ -133,8 +137,7 @@ namespace osu.Framework.XR.Physics {
 		}
 
 		public static bool TryHit ( Vector3 origin, double radius, Model target, out SphereHit hit ) {
-			var ok = TryHit( origin, radius, target.Mesh, target.Transform, target.Faces, out hit );
-			if ( ok ) {
+			if ( TryHit( origin, radius, target.Mesh, target.Transform, target.Faces, out hit ) ) {
 				hit = new SphereHit(
 					distance: hit.Distance,
 					origin: hit.Origin,
@@ -143,8 +146,9 @@ namespace osu.Framework.XR.Physics {
 					trisIndex: hit.TrisIndex,
 					collider: target as IHasCollider
 				);
+				return true;
 			}
-			return ok;
+			return false;
 		}
 	}
 

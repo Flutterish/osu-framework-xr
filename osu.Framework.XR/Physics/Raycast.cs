@@ -290,7 +290,10 @@ namespace osu.Framework.XR.Physics {
 		/// </summary>
 		public static Vector3 ClosestPoint ( Vector3 from, Vector3 to, Vector3 other ) {
 			var dir = (to - from).Normalized();
-			TryHitPrenormalized( from, dir, other, dir, out var hit, true );
+
+			var perp = Vector3.Cross( from - to, from - other );
+			var normal = Vector3.Cross( perp, from - to ).Normalized();
+			TryHitPrenormalized( other, normal, from, normal, out var hit, true ); // TODO I think this is still wrong for some reason
 
 			// P = from + (to-from) * T -> T = (P - from)/(to-from);
 			float t;
@@ -300,7 +303,7 @@ namespace osu.Framework.XR.Physics {
 
 			if ( t < 0 ) return from;
 			else if ( t > 1 ) return to;
-			else return hit.Point;
+			else return from + (to - from) * t;
 		}
 
 		public readonly struct RaycastHit {
