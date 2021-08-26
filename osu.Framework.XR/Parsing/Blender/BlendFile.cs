@@ -196,8 +196,21 @@ namespace osu.Framework.XR.Parsing.Blender {
 				var totPoly = rawMesh[ "totpoly" ]!.GetValue<int>()!; // N-gons defined as spans of edge loops
 				var totLoop = rawMesh[ "totloop" ]!.GetValue<int>()!; // Edge loops ( vertice + edge )
 																	  // MLoopTri defines a triangle in an N-gon
+				var loc = rawMesh[ "loc" ] as LinkedArray;
+				var size = rawMesh[ "size" ] as LinkedArray;
 
-				var model = new ImportedModel( ((string)id[ "name" ]!.Value!).FromCString() );
+				var model = new ImportedModel( ( (string)id[ "name" ]!.Value! ).FromCString() ) {
+					Position = new Vector3(
+						loc![ 0 ]!.GetValue<float>(),
+						loc![ 1 ]!.GetValue<float>(),
+						loc![ 2 ]!.GetValue<float>()
+					),
+					Scale = new Vector3(
+						size![ 0 ]!.GetValue<float>(),
+						size![ 1 ]!.GetValue<float>(),
+						size![ 2 ]!.GetValue<float>()
+					)
+				};
 				var mat = ImportedMaterial.Default;
 				var mesh = new Mesh();
 
