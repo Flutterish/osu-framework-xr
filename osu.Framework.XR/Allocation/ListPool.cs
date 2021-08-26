@@ -10,7 +10,10 @@ namespace osu.Framework.XR.Allocation {
 
 		private ObjectPool<PooledList<T>> pool;
 
-		public static ListPool<T> Shared { get; } = new();
+		[ThreadStatic]
+		private static ListPool<T>? shared;
+
+		public static ListPool<T> Shared => shared ??= new();
 
 		public PooledList<T> Rent ()
 			=> pool.Get();

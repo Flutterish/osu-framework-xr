@@ -9,7 +9,7 @@ namespace osu.Framework.XR.Parsing.Materials {
 		private MTLFile () { }
 
 		public readonly List<ParsingError> ParsingErrors = new();
-		public readonly List<(uint line, string content)> Comments = new(); // TODO not implemented
+		public readonly List<(uint line, string content)> Comments = new();
 
 		public readonly List<MTLMaterial> Materials = new();
 
@@ -91,7 +91,14 @@ namespace osu.Framework.XR.Parsing.Materials {
 			foreach ( var line in lines ) {
 				L++;
 				var commentIndex = line.IndexOf( "#" );
-				var rest = ( commentIndex == -1 ? line : line.Substring( 0, commentIndex ) ).Trim();
+				string rest;
+				if ( commentIndex != -1 ) {
+					file.Comments.Add( (L, line.Substring( commentIndex )) );
+					rest = line.Substring( 0, commentIndex ).Trim();
+				}
+				else {
+					rest = line.Trim();
+				}
 
 				var type = takeNext( ref rest );
 
