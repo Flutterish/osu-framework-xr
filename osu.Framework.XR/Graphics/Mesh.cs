@@ -344,7 +344,7 @@ namespace osu.Framework.XR.Graphics {
 			}
 
 			var (lastVerticeA, lastVerticeB) = addVertices( 0 );
-			for ( int i = 1; i < steps; i++ ) {
+			for ( int i = 1; i <= steps; i++ ) {
 				var (a, b) = addVertices( deltaAngle * i );
 
 				Tris.Add(new IndexedFace(lastVerticeA, lastVerticeB, b));
@@ -374,7 +374,7 @@ namespace osu.Framework.XR.Graphics {
 			}
 
 			var (lastVerticeA, lastVerticeB) = addVertices( 0 );
-			for ( int i = 1; i < steps; i++ ) {
+			for ( int i = 1; i <= steps; i++ ) {
 				var (a, b) = addVertices( deltaAngle * i );
 
 				Tris.Add(new IndexedFace(lastVerticeA, lastVerticeB, b));
