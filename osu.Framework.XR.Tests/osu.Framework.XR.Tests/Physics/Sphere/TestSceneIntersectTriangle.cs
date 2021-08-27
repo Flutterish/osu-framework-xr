@@ -4,7 +4,7 @@ using osu.Framework.XR.Testing.Components;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Framework.XR.Tests.Physics.Shpere {
+namespace osu.Framework.XR.Tests.Physics.Sphere {
 	public class TestSceneIntersectTriangle : TestScene3D {
 		TriangleIndicator triangle;
 		SphereShellIndicator sphere;
@@ -20,7 +20,7 @@ namespace osu.Framework.XR.Tests.Physics.Shpere {
 			triangle.PointC.Value = new Vector3( 0, 2, 0 );
 			sphere.Current.Value = new Vector3( 0, 0, 1 );
 
-			(triangle.PointA, triangle.PointB, triangle.PointC, sphere.Current, sphere.RadiusBindable).BindValuesChanged( (_, _, _, origin, radius) => {
+			(triangle.PointA, triangle.PointB, triangle.PointC, sphere.Current, sphere.RadiusBindable).BindValuesChanged( ( _, _, _, origin, radius ) => {
 				if ( XR.Physics.Sphere.TryHit( origin, radius, triangle.Face, out var sphereHit ) ) {
 					hit.Current.Value = sphereHit.Point;
 					hit.Alpha = 1;

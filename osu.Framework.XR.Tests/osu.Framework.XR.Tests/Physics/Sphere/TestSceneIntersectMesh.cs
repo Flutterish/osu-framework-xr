@@ -6,7 +6,7 @@ using osu.Framework.XR.Testing.Components;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Framework.XR.Tests.Physics.Shpere {
+namespace osu.Framework.XR.Tests.Physics.Sphere {
 	public class TestSceneIntersectMesh : TestScene3D {
 		Model model;
 		SphereShellIndicator sphere;
