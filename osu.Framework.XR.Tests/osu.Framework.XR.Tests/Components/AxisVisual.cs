@@ -1,0 +1,48 @@
+﻿using osu.Framework.XR.Components;
+using osu.Framework.XR.Graphics;
+using osuTK;
+using osuTK.Graphics;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace osu.Framework.XR.Tests.Components {
+	public class AxisVisual : CompositeDrawable3D {
+		public AxisVisual () {
+			AddRangeInternal( new Drawable3D[] {
+				new Model {
+					Mesh = Mesh.UnitCube,
+					Tint = Color4.Red,
+					Scale = new Vector3( 2, 0.05f, 0.05f ),
+					AutoOffsetOrigin = new Vector3( -0.5f, 0, 0 )
+				},
+				new Model {
+					Mesh = Mesh.UnitCube,
+					Tint = Color4.Green,
+					Scale = new Vector3( 0.05f, 2, 0.05f ),
+					AutoOffsetOrigin = new Vector3( 0, -0.5f, 0 )
+				},
+				new Model {
+					Mesh = Mesh.UnitCube,
+					Tint = Color4.Blue,
+					Scale = new Vector3( 0.05f, 0.05f, 2 ),
+					AutoOffsetOrigin = new Vector3( 0, 0, -0.5f )
+				}
+			} );
+		}
+
+		public override void Show () {
+			base.Show();
+			foreach ( var i in InternalChildren )
+				i.Show();
+		}
+
+		public override void Hide () {
+			base.Hide();
+			foreach ( var i in InternalChildren )
+				i.Hide();
+		}
+	}
+}

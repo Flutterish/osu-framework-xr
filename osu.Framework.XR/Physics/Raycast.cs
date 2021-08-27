@@ -289,7 +289,7 @@ namespace osu.Framework.XR.Physics {
 		/// The closest point to a line [from;to]
 		/// </summary>
 		public static Vector3 ClosestPoint ( Vector3 from, Vector3 to, Vector3 other ) {
-			var dir = (to - from).Normalized();
+			var dir = to - from;
 
 			var perp = Vector3.Cross( from - to, from - other );
 			var normal = Vector3.Cross( perp, from - to ).Normalized();
@@ -303,7 +303,7 @@ namespace osu.Framework.XR.Physics {
 
 			if ( t < 0 ) return from;
 			else if ( t > 1 ) return to;
-			else return from + (to - from) * t;
+			else return hit.Point;
 		}
 
 		public readonly struct RaycastHit {

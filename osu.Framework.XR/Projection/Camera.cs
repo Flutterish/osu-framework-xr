@@ -102,21 +102,50 @@ namespace osu.Framework.XR.Projection {
 			return p.Z > 0;
 		}
 
-		public void Render ( DepthFrameBuffer depthBuffer ) {
-			Vector2 scale;
-			var ratio = depthBuffer.Size.X / depthBuffer.Size.Y;
+		/// <summary>
+		/// Projects a given point to <0;width><0;height>. Returns false if the point is behind the camera.
+		/// </summary>
+		public bool Project ( Vector3 pos, float width, float height, out Vector2 proj ) {
+			var scale = createScale( width, height );
+
+			var p = ( Matrix4x4.CreateScale( scale.X, scale.Y ) * WorldClipMatrix ) * new Vector4( pos, 1 );
+			p /= p.W;
+			proj = new Vector2(
+				( p.X + 1 ) / 2 * width,
+				( 1 - p.Y ) / 2 * height
+			);
+
+			return p.Z > 0;
+		}
+
+		/// <summary>
+		/// Computes a normal vector pointing at a given screenspace position.
+		/// </summary>
+		public Vector3 DirectionOf ( Vector2 pos, float width, float height ) {
+			var scale = createScale( width, height );
+
+			return ( 
+				Forward
+				+ Right * ( pos.X / width - 0.5f ) * 2 * XSlope / scale.X
+				+ Down * ( pos.Y / height - 0.5f ) * 2 * YSlope / scale.Y 
+			).Normalized();
+		}
+
+		/// <summary>
+		/// Creates a scale vector which fits the renderspace into the target rect while padding excess space.
+		/// </summary>
+		private Vector2 createScale ( float targetWidth, float targetHeight ) {
+			var ratio = targetWidth / targetHeight;
 			if ( ratio > AspectRatio ) {
-				scale = new Vector2(
-					1 / ( ratio / AspectRatio ),
-					1
-				);
+				return new Vector2( AspectRatio / ratio, 1 );
 			}
 			else {
-				scale = new Vector2(
-					1,
-					1 * ( ratio / AspectRatio )
-				);
+				return new Vector2( 1, ratio / AspectRatio );
 			}
+		}
+
+		public void Render ( DepthFrameBuffer depthBuffer ) {
+			var scale = createScale( depthBuffer.Size.X, depthBuffer.Size.Y );
 
 			var settings = new DrawNode3D.DrawSettings {
 				Camera = this,

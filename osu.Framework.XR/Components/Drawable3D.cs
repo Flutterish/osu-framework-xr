@@ -14,7 +14,7 @@ namespace osu.Framework.XR.Components {
 	/// An <see cref="Drawable3D"/> is the 3D counterpart of a <see cref="Drawable"/>.
 	/// </summary>
 	public class Drawable3D : CompositeDrawable { // NOTE has to be a "Drawable" because it gives us cool stuff. It should eventually become a `(Composite)Component` when that is implemented
-		public override bool RemoveCompletedTransforms => true;
+		public override bool RemoveCompletedTransforms => true; // TODO override show/hide to work properly
 		public Drawable3D () {
 			Transform = new Transform( transformKey );
 			RelativeSizeAxes = Axes.Both;
