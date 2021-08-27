@@ -35,6 +35,7 @@ namespace osu.Framework.XR.Testing.Components {
 			Origin = Anchor.Centre;
 
 			this.scene = scene;
+			AlwaysPresent = true;
 		}
 
 		protected override void Update () {

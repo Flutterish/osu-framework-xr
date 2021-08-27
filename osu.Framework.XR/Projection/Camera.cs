@@ -96,8 +96,7 @@ namespace osu.Framework.XR.Projection {
 		/// </summary>
 		public bool Project ( Vector3 pos, out Vector2 proj ) {
 			var p = WorldClipMatrix * new Vector4( pos, 1 );
-			p /= p.W;
-			proj = p.Xy;
+			proj = p.Xy / p.W;
 
 			return p.Z > 0;
 		}
@@ -109,10 +108,9 @@ namespace osu.Framework.XR.Projection {
 			var scale = createScale( width, height );
 
 			var p = ( Matrix4x4.CreateScale( scale.X, scale.Y ) * WorldClipMatrix ) * new Vector4( pos, 1 );
-			p /= p.W;
 			proj = new Vector2(
-				( p.X + 1 ) / 2 * width,
-				( 1 - p.Y ) / 2 * height
+				( p.X / p.W + 1 ) / 2 * width,
+				( 1 - p.Y / p.W ) / 2 * height
 			);
 
 			return p.Z > 0;
