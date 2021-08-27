@@ -3,7 +3,8 @@ using osu.Framework.Graphics;
 using osu.Framework.XR.Components;
 using osu.Framework.XR.Extensions;
 using osu.Framework.XR.Physics;
-using osu.Framework.XR.Tests.Components;
+using osu.Framework.XR.Testing;
+using osu.Framework.XR.Testing.Components;
 using osuTK;
 
 namespace osu.Framework.XR.Tests.Physics.Lines {

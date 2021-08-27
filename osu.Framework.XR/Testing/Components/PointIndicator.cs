@@ -3,13 +3,11 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Framework.Layout;
 using osu.Framework.XR.Components;
-using osu.Framework.XR.Graphics;
 using osu.Framework.XR.Projection;
 using osuTK;
 
-namespace osu.Framework.XR.Tests.Components {
+namespace osu.Framework.XR.Testing.Components {
 	public class PointIndicator : CompositeDrawable {
 		readonly BindableWithCurrent<Vector3> current = new( Vector3.Zero );
 		public Bindable<Vector3> Current {

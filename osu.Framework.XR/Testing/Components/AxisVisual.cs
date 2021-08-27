@@ -2,13 +2,8 @@
 using osu.Framework.XR.Graphics;
 using osuTK;
 using osuTK.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace osu.Framework.XR.Tests.Components {
+namespace osu.Framework.XR.Testing.Components {
 	public class AxisVisual : CompositeDrawable3D {
 		public AxisVisual () {
 			AddRangeInternal( new Drawable3D[] {

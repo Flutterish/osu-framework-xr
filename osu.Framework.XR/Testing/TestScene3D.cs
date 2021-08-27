@@ -1,13 +1,11 @@
-﻿using osu.Framework.Bindables;
-using osu.Framework.Graphics;
-using osu.Framework.Input;
+﻿using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Framework.Testing;
 using osu.Framework.XR.Components;
-using osu.Framework.XR.Tests.Components;
+using osu.Framework.XR.Testing.Components;
 using osuTK;
 
-namespace osu.Framework.XR.Tests {
+namespace osu.Framework.XR.Testing {
 	public abstract class TestScene3D : TestScene {
 		protected readonly Scene Scene;
 		private Drawable3D cameraYRotContainer;
