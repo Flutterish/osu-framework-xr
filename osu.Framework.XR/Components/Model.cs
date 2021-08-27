@@ -81,8 +81,8 @@ namespace osu.Framework.XR.Components {
 			}
 
 			if ( lastUpdateVersion != mesh.UpdateVersion && mesh.IsReady ) {
-				UpdateMesh( mesh );
 				lastUpdateVersion = mesh.UpdateVersion;
+				UpdateMesh( mesh );
 			}
 
 			for ( int i = 0; i < Source.AllTextures.Count; i++ ) {

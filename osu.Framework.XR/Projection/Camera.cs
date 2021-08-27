@@ -124,10 +124,23 @@ namespace osu.Framework.XR.Projection {
 		public Vector3 DirectionOf ( Vector2 pos, float width, float height ) {
 			var scale = createScale( width, height );
 
-			return ( 
+			return (
 				Forward
 				+ Right * ( pos.X / width - 0.5f ) * 2 * XSlope / scale.X
-				+ Down * ( pos.Y / height - 0.5f ) * 2 * YSlope / scale.Y 
+				+ Down * ( pos.Y / height - 0.5f ) * 2 * YSlope / scale.Y
+			).Normalized();
+		}
+
+		/// <summary>
+		/// Computes a normal vector pointing at a given screenspace position.
+		/// </summary>
+		public Vector3 GlobalDirectionOf ( Vector2 pos, float width, float height ) {
+			var scale = createScale( width, height );
+
+			return (
+				GlobalForward
+				+ GlobalRight * ( pos.X / width - 0.5f ) * 2 * XSlope / scale.X
+				+ GlobalDown * ( pos.Y / height - 0.5f ) * 2 * YSlope / scale.Y
 			).Normalized();
 		}
 

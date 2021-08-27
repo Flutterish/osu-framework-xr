@@ -15,20 +15,23 @@ namespace osu.Framework.XR.Tests.Components {
 				new Model {
 					Mesh = Mesh.UnitCube,
 					Tint = Color4.Red,
-					Scale = new Vector3( 2, 0.05f, 0.05f ),
-					AutoOffsetOrigin = new Vector3( -0.5f, 0, 0 )
+					Scale = new Vector3( 2, 0.02f, 0.02f ),
+					AutoOffsetOrigin = new Vector3( -0.5f, 0, 0 ),
+					Alpha = 0.3f
 				},
 				new Model {
 					Mesh = Mesh.UnitCube,
 					Tint = Color4.Green,
-					Scale = new Vector3( 0.05f, 2, 0.05f ),
-					AutoOffsetOrigin = new Vector3( 0, -0.5f, 0 )
+					Scale = new Vector3( 0.02f, 2, 0.02f ),
+					AutoOffsetOrigin = new Vector3( 0, -0.5f, 0 ),
+					Alpha = 0.3f
 				},
 				new Model {
 					Mesh = Mesh.UnitCube,
 					Tint = Color4.Blue,
-					Scale = new Vector3( 0.05f, 0.05f, 2 ),
-					AutoOffsetOrigin = new Vector3( 0, 0, -0.5f )
+					Scale = new Vector3( 0.02f, 0.02f, 2 ),
+					AutoOffsetOrigin = new Vector3( 0, 0, -0.5f ),
+					Alpha = 0.3f
 				}
 			} );
 		}

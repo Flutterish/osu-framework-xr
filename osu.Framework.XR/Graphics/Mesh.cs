@@ -19,9 +19,9 @@ namespace osu.Framework.XR.Graphics {
 		public readonly ReadonlyIndexer<int, Face> Faces;
 		public ulong UpdateVersion { get; private set; } = 1;
 		/// <summary>
-		/// Whether this mesh is fully loaded and can be edited/used
+		/// Whether this mesh is fully loaded and can be edited/used.
 		/// </summary>
-		public bool IsReady = true;
+		public bool IsReady = true; // TODO instead of doing this, we should implement swap-meshes and prevent editing while the mesh is ready
 		public Mesh () {
 			Faces = new( index => {
 				var indices = Tris[ index ];
@@ -244,7 +244,9 @@ namespace osu.Framework.XR.Graphics {
 
 		public int UploadToGPU ( int positionLocation, int uvLocation, int attributeBuffer, int elementBuffer, BufferUsageHint hint = BufferUsageHint.StaticDraw ) {
 			if ( !IsReady ) {
-				throw new InvalidOperationException( "This mesh is not avaialbe" );
+				UpdateVersion++;
+				return 0;
+				//throw new InvalidOperationException( "This mesh is not avaialbe. This exception was probably caused by trying to edit a mesh which is attached to a drawable. Instead, you should create a new mesh and attach it after the work is done." );
 			}
 
 			FillTextureCoordinates();

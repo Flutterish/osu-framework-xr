@@ -11,8 +11,6 @@ using osuTK;
 
 namespace osu.Framework.XR.Tests.Components {
 	public class PointIndicator : CompositeDrawable {
-		LayoutValue<Vector2> parentSize = new LayoutValue<Vector2>( Invalidation.DrawSize, InvalidationSource.Parent );
-
 		readonly BindableWithCurrent<Vector3> current = new( Vector3.Zero );
 		public Bindable<Vector3> Current {
 			get => current;
@@ -39,24 +37,11 @@ namespace osu.Framework.XR.Tests.Components {
 			Origin = Anchor.Centre;
 
 			this.scene = scene;
-			AddLayout( parentSize );
 		}
 
-		protected override void LoadComplete () {
-			base.LoadComplete();
+		protected override void Update () {
+			base.Update();
 
-			Current.BindValueChanged( v => {
-				updatePosition();
-			}, true );
-		}
-
-		protected override bool OnInvalidate ( Invalidation invalidation, InvalidationSource source ) {
-			updatePosition();
-
-			return base.OnInvalidate( invalidation, source );
-		}
-
-		void updatePosition () {
 			if ( camera.Project( Current.Value, scene.DrawWidth, scene.DrawHeight, out var pos ) ) {
 				Show();
 				Position = pos;
@@ -75,9 +60,11 @@ namespace osu.Framework.XR.Tests.Components {
 			return false;
 		}
 
+		float dragDistance;
 		protected override bool OnDragStart ( DragStartEvent e ) {
 			if ( AllowDragging ) {
 				indicator.ScaleTo( 1.4f, 150, Easing.Out );
+				dragDistance = ( Current.Value - camera.GlobalPosition ).Length;
 				isDragged = true;
 				return true;
 			}
@@ -86,7 +73,7 @@ namespace osu.Framework.XR.Tests.Components {
 
 		protected override void OnDrag ( DragEvent e ) {
 			if ( AllowDragging ) {
-				var pos = camera.Position + camera.DirectionOf( e.MousePosition, scene.DrawWidth, scene.DrawHeight );
+				var pos = camera.GlobalPosition + camera.GlobalDirectionOf( e.MousePosition, scene.DrawWidth, scene.DrawHeight ) * dragDistance;
 				Current.Value = pos;
 			}
 			else {
