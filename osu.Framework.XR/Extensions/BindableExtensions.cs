@@ -204,5 +204,70 @@ namespace osu.Framework.XR.Extensions {
 				self.e.ValueChanged -= handlerE;
 			};
 		}
+
+		public static UnbindAction BindValuesChanged<Ta, Tb, Tc, Td, Te, Tf> (
+			this (Bindable<Ta> a, Bindable<Tb> b, Bindable<Tc> c, Bindable<Td> d, Bindable<Te> e, Bindable<Tf> f) self,
+			Action<Ta, Tb, Tc, Td, Te, Tf> handler,
+			bool runOnceImmediately = false
+		) {
+			Action<ValueChangedEvent<Ta>> handlerA = _ => handler( self.a.Value, self.b.Value, self.c.Value, self.d.Value, self.e.Value, self.f.Value );
+			Action<ValueChangedEvent<Tb>> handlerB = _ => handler( self.a.Value, self.b.Value, self.c.Value, self.d.Value, self.e.Value, self.f.Value );
+			Action<ValueChangedEvent<Tc>> handlerC = _ => handler( self.a.Value, self.b.Value, self.c.Value, self.d.Value, self.e.Value, self.f.Value );
+			Action<ValueChangedEvent<Td>> handlerD = _ => handler( self.a.Value, self.b.Value, self.c.Value, self.d.Value, self.e.Value, self.f.Value );
+			Action<ValueChangedEvent<Te>> handlerE = _ => handler( self.a.Value, self.b.Value, self.c.Value, self.d.Value, self.e.Value, self.f.Value );
+			Action<ValueChangedEvent<Tf>> handlerF = _ => handler( self.a.Value, self.b.Value, self.c.Value, self.d.Value, self.e.Value, self.f.Value );
+
+			self.a.BindValueChanged( handlerA );
+			self.b.BindValueChanged( handlerB );
+			self.c.BindValueChanged( handlerC );
+			self.d.BindValueChanged( handlerD );
+			self.e.BindValueChanged( handlerE );
+			self.f.BindValueChanged( handlerF );
+
+			if ( runOnceImmediately ) {
+				handler( self.a.Value, self.b.Value, self.c.Value, self.d.Value, self.e.Value, self.f.Value );
+			}
+
+			return () => {
+				self.a.ValueChanged -= handlerA;
+				self.b.ValueChanged -= handlerB;
+				self.c.ValueChanged -= handlerC;
+				self.d.ValueChanged -= handlerD;
+				self.e.ValueChanged -= handlerE;
+				self.f.ValueChanged -= handlerF;
+			};
+		}
+		public static UnbindAction BindValuesChanged<Ta, Tb, Tc, Td, Te, Tf> (
+			this (Bindable<Ta> a, Bindable<Tb> b, Bindable<Tc> c, Bindable<Td> d, Bindable<Te> e, Bindable<Tf> f) self,
+			Action handler,
+			bool runOnceImmediately = false
+		) {
+			Action<ValueChangedEvent<Ta>> handlerA = _ => handler();
+			Action<ValueChangedEvent<Tb>> handlerB = _ => handler();
+			Action<ValueChangedEvent<Tc>> handlerC = _ => handler();
+			Action<ValueChangedEvent<Td>> handlerD = _ => handler();
+			Action<ValueChangedEvent<Te>> handlerE = _ => handler();
+			Action<ValueChangedEvent<Tf>> handlerF = _ => handler();
+
+			self.a.BindValueChanged( handlerA );
+			self.b.BindValueChanged( handlerB );
+			self.c.BindValueChanged( handlerC );
+			self.d.BindValueChanged( handlerD );
+			self.e.BindValueChanged( handlerE );
+			self.f.BindValueChanged( handlerF );
+
+			if ( runOnceImmediately ) {
+				handler();
+			}
+
+			return () => {
+				self.a.ValueChanged -= handlerA;
+				self.b.ValueChanged -= handlerB;
+				self.c.ValueChanged -= handlerC;
+				self.d.ValueChanged -= handlerD;
+				self.e.ValueChanged -= handlerE;
+				self.f.ValueChanged -= handlerF;
+			};
+		}
 	}
 }

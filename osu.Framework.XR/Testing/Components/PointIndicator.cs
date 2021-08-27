@@ -38,6 +38,11 @@ namespace osu.Framework.XR.Testing.Components {
 			AlwaysPresent = true;
 		}
 
+		new public float Alpha {
+			get => indicator.Alpha;
+			set => indicator.Alpha = value;
+		}
+
 		protected override void Update () {
 			base.Update();
 

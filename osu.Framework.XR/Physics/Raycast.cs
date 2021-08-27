@@ -60,7 +60,7 @@ namespace osu.Framework.XR.Physics {
 		/// Finds points on both lines that are closest to the other line.
 		/// <paramref name="directionA"/> and <paramref name="directionB"/> must be normal vectors.
 		/// </summary>
-		public static (Vector3 pointOnA, Vector3 pointOnB) FindClosestPointsBetween2LinesPrenormalized ( Vector3 pointOnLineA, Vector3 directionA, Vector3 pointOnLineB, Vector3 directionB ) {
+		public static (Vector3 pointOnA, Vector3 pointOnB) FindClosestPointsBetween2RaysPrenormalized ( Vector3 pointOnLineA, Vector3 directionA, Vector3 pointOnLineB, Vector3 directionB ) {
 			// https://www.gamedev.net/forums/topic/520233-closest-point-on-a-line-to-another-line-in-3d/
 			var d = pointOnLineB - pointOnLineA;
 			var v1d = Vector3.Dot( directionA, d );
@@ -75,23 +75,24 @@ namespace osu.Framework.XR.Physics {
 		/// <summary>
 		/// Finds points on both lines that are closest to the other line.
 		/// </summary>
-		public static (Vector3 pointOnA, Vector3 pointOnB) FindClosestPointsBetween2Lines ( Vector3 pointOnLineA, Vector3 directionA, Vector3 pointOnLineB, Vector3 directionB )
-			=> FindClosestPointsBetween2LinesPrenormalized( pointOnLineA, directionA.Normalized(), pointOnLineB, directionB.Normalized() );
+		public static (Vector3 pointOnA, Vector3 pointOnB) FindClosestPointsBetween2Rays ( Vector3 pointOnLineA, Vector3 directionA, Vector3 pointOnLineB, Vector3 directionB )
+			=> FindClosestPointsBetween2RaysPrenormalized( pointOnLineA, directionA.Normalized(), pointOnLineB, directionB.Normalized() );
 
 		/// <summary>
 		/// Intersect 2 3D lines.
 		/// <paramref name="directionA"/> and <paramref name="directionB"/> must be normal vectors.
 		/// </summary>
-		public static bool TryHitLinePrenormalized ( Vector3 pointOnLineA, Vector3 directionA, Vector3 pointOnLineB, Vector3 directionB, out Vector3 hit ) {
+		/// <param name="tolerance">How close the rays need to be to intersect. For performance reasons, this is the square of the actual tolerance.</param>
+		public static bool TryHitRayPrenormalized ( Vector3 pointOnLineA, Vector3 directionA, Vector3 pointOnLineB, Vector3 directionB, out Vector3 hit, float tolerance = 0.000001f ) {
 			Vector3 b;
-			(hit, b) = FindClosestPointsBetween2LinesPrenormalized( pointOnLineA, directionA, pointOnLineB, directionB );
-			return ( hit - b ).LengthSquared < 0.01f;
+			(hit, b) = FindClosestPointsBetween2RaysPrenormalized( pointOnLineA, directionA, pointOnLineB, directionB );
+			return ( hit - b ).LengthSquared <= tolerance;
 		}
 		/// <summary>
 		/// Intersect 2 3D lines.
 		/// </summary>
-		public static bool TryHitLine ( Vector3 pointOnLineA, Vector3 directionA, Vector3 pointOnLineB, Vector3 directionB, out Vector3 hit )
-			=> TryHitLinePrenormalized( pointOnLineA, directionA.Normalized(), pointOnLineB, directionB.Normalized(), out hit );
+		public static bool TryHitRay ( Vector3 pointOnLineA, Vector3 directionA, Vector3 pointOnLineB, Vector3 directionB, out Vector3 hit, float tolerance = 0.001f )
+			=> TryHitRayPrenormalized( pointOnLineA, directionA.Normalized(), pointOnLineB, directionB.Normalized(), out hit, tolerance * tolerance );
 
 		/// <summary>
 		/// Intersect a ray and a triangle.
@@ -106,7 +107,7 @@ namespace osu.Framework.XR.Physics {
 
 			if ( TryHitPrenormalized( origin, direction, face.A, normal.Normalized(), out hit, includeBehind ) ) {
 				var directionFromC = ( face.C - hit.Point ).Normalized();
-				if ( TryHitLinePrenormalized( hit.Point, directionFromC, face.A, (face.B - face.A).Normalized(), out var pointOnAB ) ) {
+				if ( TryHitRayPrenormalized( hit.Point, directionFromC, face.A, (face.B - face.A).Normalized(), out var pointOnAB ) ) {
 					var distanceFromAToB = SignedDistance( face.A, pointOnAB, face.B );
 					if ( distanceFromAToB >= -0.01f && distanceFromAToB <= ( face.B - face.A ).Length + 0.01f ) {
 						var distanceToC = SignedDistance( face.C, hit.Point, pointOnAB );
@@ -293,7 +294,7 @@ namespace osu.Framework.XR.Physics {
 
 			var perp = Vector3.Cross( from - to, from - other );
 			var normal = Vector3.Cross( perp, from - to ).Normalized();
-			TryHitPrenormalized( other, normal, from, normal, out var hit, true ); // TODO I think this is still wrong for some reason
+			TryHitPrenormalized( other, normal, from, normal, out var hit, true );
 
 			// P = from + (to-from) * T -> T = (P - from)/(to-from);
 			float t;
