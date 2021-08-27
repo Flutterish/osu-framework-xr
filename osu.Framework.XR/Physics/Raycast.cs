@@ -291,20 +291,20 @@ namespace osu.Framework.XR.Physics {
 		/// </summary>
 		public static Vector3 ClosestPoint ( Vector3 from, Vector3 to, Vector3 other ) {
 			var dir = to - from;
+			var ndir = dir.Normalized();
 
-			var perp = Vector3.Cross( from - to, from - other );
-			var normal = Vector3.Cross( perp, from - to ).Normalized();
-			TryHitPrenormalized( other, normal, from, normal, out var hit, true );
+			TryHitPrenormalized( from, ndir, other, ndir, out var hit, true );
+			Vector3 point = hit.Point;
 
 			// P = from + (to-from) * T -> T = (P - from)/(to-from);
 			float t;
-			if ( dir.X != 0 ) t = ( hit.Point.X - from.X ) / dir.X;
-			else if ( dir.Y != 0 ) t = ( hit.Point.Y - from.Y ) / dir.Y;
-			else t = ( hit.Point.Z - from.Z ) / dir.Z;
+			if ( dir.X != 0 ) t = ( point.X - from.X ) / dir.X;
+			else if ( dir.Y != 0 ) t = ( point.Y - from.Y ) / dir.Y;
+			else t = ( point.Z - from.Z ) / dir.Z;
 
 			if ( t < 0 ) return from;
 			else if ( t > 1 ) return to;
-			else return hit.Point;
+			else return point;
 		}
 
 		public readonly struct RaycastHit {
