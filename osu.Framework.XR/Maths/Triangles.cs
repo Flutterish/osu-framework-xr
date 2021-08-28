@@ -30,9 +30,16 @@ namespace osu.Framework.XR.Maths {
 		/// Calculates the barycentric coordinates of a point on a simplex.
 		/// </summary>
 		public static Vector3 Barycentric ( Vector2 A, Vector2 B, Vector2 C, Vector2 point ) {
-			var det = ( B.Y - C.Y ) * ( A.X - C.X ) + ( C.X - B.X ) * ( A.Y - C.Y );
-			var r1 = ( ( B.Y - C.Y ) * ( point.X - C.X ) + ( C.X - B.X ) * ( point.Y - C.Y ) ) / det;
-			var r2 = ( ( C.Y - A.Y ) * ( point.X - C.X ) + ( A.X - C.X ) * ( point.Y - C.Y ) ) / det;
+			var bycy = B.Y - C.Y;
+			var axcx = A.X - C.X;
+			var cxbx = C.X - B.X;
+			var aycy = A.Y - C.Y;
+			var pycy = point.Y - C.Y;
+			var pxcx = point.X - C.X;
+
+			var det = bycy * axcx + cxbx * aycy;
+			var r1 = ( bycy * pxcx + cxbx * pycy ) / det;
+			var r2 = ( axcx * pycy - aycy * pxcx ) / det;
 			return new Vector3( r1, r2, 1 - r1 - r2 );
 		}
 
