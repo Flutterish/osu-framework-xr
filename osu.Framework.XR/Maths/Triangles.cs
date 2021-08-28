@@ -1,5 +1,4 @@
 ﻿using osu.Framework.XR.Graphics;
-using osu.Framework.XR.Physics;
 using osuTK;
 using System;
 
@@ -14,12 +13,12 @@ namespace osu.Framework.XR.Maths {
 			var dotX = MathF.Abs( Vector3.Dot( normal, Vector3.UnitX ) );
 			var dotY = MathF.Abs( Vector3.Dot( normal, Vector3.UnitY ) );
 			var dotZ = MathF.Abs( Vector3.Dot( normal, Vector3.UnitZ ) );
-
+			
 			// choosing the least distorting plane
 			if ( dotZ > dotX && dotZ > dotY ) {
 				return Barycentric( face.A.Xy, face.B.Xy, face.C.Xy, point.Xy );
 			}
-			else if ( dotY > dotX && dotY > dotZ ) {
+			else if ( dotY > dotX ) {
 				return Barycentric( face.A.Xz, face.B.Xz, face.C.Xz, point.Xz );
 			}
 			else {
@@ -37,18 +36,12 @@ namespace osu.Framework.XR.Maths {
 			return new Vector3( r1, r2, 1 - r1 - r2 );
 		}
 
+		/// <summary>
+		/// Checks whether a given point is inside a triangle, given that the point lies on the triangle plane already.
+		/// </summary>
 		public static bool IsPointInside ( Vector3 p, Face face ) {
-			var directionFromC = ( face.C - p ).Normalized();
-			if ( Raycast.TryHitRayPrenormalized( p, directionFromC, face.A, (face.B - face.A).Normalized(), out var pointOnAB ) ) {
-				var distanceFromAToB = Extensions.SignedDistance( face.A, pointOnAB, face.B );
-				if ( distanceFromAToB >= -0.01f && distanceFromAToB <= ( face.B - face.A ).Length + 0.01f ) {
-					var distanceToC = Extensions.SignedDistance( face.C, p, pointOnAB );
-					if ( distanceToC >= -0.01f && distanceToC <= ( face.C - pointOnAB ).Length + 0.01f ) {
-						return true;
-					}
-				}
-			}
-			return false;
+			var b = Barycentric( face, p );
+			return b.X >= 0 && b.Y >= 0 && b.Z >= 0;
 		}
 	}
 }

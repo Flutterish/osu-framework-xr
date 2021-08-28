@@ -106,16 +106,7 @@ namespace osu.Framework.XR.Physics {
 			}
 
 			if ( TryHitPrenormalized( origin, direction, face.A, normal.Normalized(), out hit, includeBehind ) ) {
-				var directionFromC = ( face.C - hit.Point ).Normalized();
-				if ( TryHitRayPrenormalized( hit.Point, directionFromC, face.A, (face.B - face.A).Normalized(), out var pointOnAB ) ) {
-					var distanceFromAToB = SignedDistance( face.A, pointOnAB, face.B );
-					if ( distanceFromAToB >= -0.01f && distanceFromAToB <= ( face.B - face.A ).Length + 0.01f ) {
-						var distanceToC = SignedDistance( face.C, hit.Point, pointOnAB );
-						if ( distanceToC >= -0.01f && distanceToC <= ( face.C - pointOnAB ).Length + 0.01f ) {
-							return true;
-						}
-					}
-				}
+				return Triangles.IsPointInside( hit.Point, face );
 			}
 
 			hit = default;
