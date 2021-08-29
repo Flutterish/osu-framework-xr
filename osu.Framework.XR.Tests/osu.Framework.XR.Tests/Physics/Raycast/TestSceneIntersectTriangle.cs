@@ -2,7 +2,6 @@
 using osu.Framework.XR.Testing;
 using osu.Framework.XR.Testing.Components;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Framework.XR.Tests.Physics.Raycast {
 	public class TestSceneIntersectTriangle : TestScene3D {

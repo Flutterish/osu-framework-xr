@@ -1,5 +1,4 @@
-﻿using osu.Framework.Graphics;
-using osu.Framework.XR.Extensions;
+﻿using osu.Framework.XR.Extensions;
 using osu.Framework.XR.Testing;
 using osu.Framework.XR.Testing.Components;
 using osuTK;

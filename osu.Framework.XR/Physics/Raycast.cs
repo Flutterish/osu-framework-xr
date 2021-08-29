@@ -3,7 +3,6 @@ using osu.Framework.XR.Graphics;
 using osu.Framework.XR.Maths;
 using osuTK;
 using System;
-using static osu.Framework.XR.Maths.Extensions;
 
 namespace osu.Framework.XR.Physics {
 	public static class Raycast {

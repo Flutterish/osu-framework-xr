@@ -4,7 +4,6 @@ using osu.Framework.XR.Graphics;
 using osu.Framework.XR.Testing;
 using osu.Framework.XR.Testing.Components;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Framework.XR.Tests.Physics.Raycast {
 	public class TestSceneIntersectMesh : TestScene3D {

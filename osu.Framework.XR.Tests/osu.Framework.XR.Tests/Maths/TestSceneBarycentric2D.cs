@@ -3,7 +3,6 @@ using osu.Framework.XR.Maths;
 using osu.Framework.XR.Testing;
 using osu.Framework.XR.Testing.Components;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Framework.XR.Tests.Maths {
 	public class TestSceneBarycentric2D : TestScene3D {
