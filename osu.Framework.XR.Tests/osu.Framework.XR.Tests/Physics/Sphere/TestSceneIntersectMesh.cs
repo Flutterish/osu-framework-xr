@@ -14,8 +14,8 @@ namespace osu.Framework.XR.Tests.Physics.Sphere {
 
 		public TestSceneIntersectMesh () {
 			Add( model = new Model { Mesh = Mesh.UnitCube } );
-			Add( sphere = new SphereShellIndicator( Scene ) { Colour = Color4.Red, Tint = Color4.Orange } );
-			Add( hit = new PointIndicator( Scene ) { Colour = Color4.Violet, AllowDragging = false } );
+			Add( sphere = new SphereShellIndicator( Scene ) { Kind = Kind.Control } );
+			Add( hit = new PointIndicator( Scene ) { Kind = Kind.Result } );
 
 			sphere.Current.Value = new Vector3( 0, 0, 1 );
 

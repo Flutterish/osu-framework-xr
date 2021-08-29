@@ -12,11 +12,11 @@ namespace osu.Framework.XR.Tests.Physics.Lines {
 		PointIndicator pointB;
 
 		public TestSceneClosestPoints () {
-			Add( rayA = new RayIndicator( Scene ) { Colour = Color4.Blue, Tint = Color4.Cyan, IsBidirectional = true } );
-			Add( rayB = new RayIndicator( Scene ) { Colour = Color4.Red, Tint = Color4.Orange, IsBidirectional = true } );
+			Add( rayA = new RayIndicator( Scene ) { Kind = Kind.Component, IsBidirectional = true } );
+			Add( rayB = new RayIndicator( Scene ) { Kind = Kind.Control, Tint = Color4.Orange, IsBidirectional = true } );
 
-			Add( pointA = new PointIndicator( Scene ) { Colour = Color4.Violet, AllowDragging = false } );
-			Add( pointB = new PointIndicator( Scene ) { Colour = Color4.Violet, AllowDragging = false } );
+			Add( pointA = new PointIndicator( Scene ) { Kind = Kind.Result } );
+			Add( pointB = new PointIndicator( Scene ) { Kind = Kind.Result } );
 
 			rayA.OriginCurrent.Value = new Vector3( 1, 0, 0 );
 			rayA.LookCurrent.Value = new Vector3( 1, 1, 1 );

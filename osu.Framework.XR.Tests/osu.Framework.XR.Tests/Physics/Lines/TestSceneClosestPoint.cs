@@ -17,10 +17,10 @@ namespace osu.Framework.XR.Tests.Physics.Lines {
 			=> MathF.Abs( a - b ) < delta;
 
 		public TestSceneClosestPoint () {
-			Add( line = new LineIndicator( Scene ) { Colour = Colour4.Blue, Tint = Colour4.Cyan } );
-			Add( point = new PointIndicator( Scene ) { Colour = Colour4.Red } );
-			Add( closest = new PointIndicator( Scene ) { Colour = Colour4.Violet, AllowDragging = false } );
-			Add( dash = new DashedLineVisual( Scene ) { Colour = Colour4.Violet } );
+			Add( line = new LineIndicator( Scene ) { Kind = Kind.Component } );
+			Add( point = new PointIndicator( Scene ) { Kind = Kind.Control } );
+			Add( closest = new PointIndicator( Scene ) { Kind = Kind.Result } );
+			Add( dash = new DashedLineVisual( Scene ) { Kind = Kind.Result } );
 
 			line.PointA.Value = new Vector3( -1, 0, 0 );
 			line.PointB.Value = new Vector3( 1, 0, 0 );

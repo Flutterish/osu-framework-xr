@@ -12,9 +12,9 @@ namespace osu.Framework.XR.Tests.Maths {
 		PointIndicator indicator;
 
 		public TestSceneBarycentric3D () {
-			Add( simplex = new Simplex3ShellIndicator( Scene ) { Colour = Color4.Blue, Tint = Color4.Cyan } );
-			Add( point = new PointIndicator( Scene ) { Colour = Color4.Red } );
-			Add( indicator = new PointIndicator( Scene ) { Colour = Color4.Violet, AllowDragging = false, Scale = new Vector2( 0.7f ) } );
+			Add( simplex = new Simplex3ShellIndicator( Scene ) { Kind = Kind.Component } );
+			Add( point = new PointIndicator( Scene ) { Kind = Kind.Control } );
+			Add( indicator = new PointIndicator( Scene ) { Kind = Kind.Result, Scale = new Vector2( 0.7f ) } );
 
 			simplex.PointA.Value = new Vector3( 1, 0, 0 );
 			simplex.PointB.Value = new Vector3( 0, 0, 1 );

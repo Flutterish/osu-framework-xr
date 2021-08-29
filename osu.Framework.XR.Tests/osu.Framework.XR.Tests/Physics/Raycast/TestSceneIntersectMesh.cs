@@ -14,8 +14,8 @@ namespace osu.Framework.XR.Tests.Physics.Raycast {
 
 		public TestSceneIntersectMesh () {
 			Add( model = new Model { Mesh = Mesh.UnitCube } );
-			Add( ray = new RayIndicator( Scene ) { Colour = Color4.Red, Tint = Color4.Orange } );
-			Add( hit = new PointIndicator( Scene ) { Colour = Color4.Violet, AllowDragging = false } );
+			Add( ray = new RayIndicator( Scene ) { Kind = Kind.Control } );
+			Add( hit = new PointIndicator( Scene ) { Kind = Kind.Result } );
 
 			ray.OriginCurrent.Value = new Vector3( 2, 1, 0 );
 			ray.LookCurrent.Value = -Vector3.UnitY;

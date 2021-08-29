@@ -84,5 +84,13 @@ namespace osu.Framework.XR.Testing.Components {
 			get => plane.Tint;
 			set => plane.Tint = value;
 		}
+
+		public Kind Kind {
+			set {
+				AllowDragging = value.IsEditable();
+				Colour = value.MainColour();
+				Tint = value.SecondaryColour();
+			}
+		}
 	}
 }

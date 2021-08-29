@@ -11,8 +11,8 @@ namespace osu.Framework.XR.Tests.Physics.Raycast {
 		PointIndicator point;
 
 		public TestSceneIntersectRays () {
-			Add( rayA = new RayIndicator( Scene ) { Colour = Color4.Blue, Tint = Color4.Cyan, IsBidirectional = true } );
-			Add( rayB = new RayIndicator( Scene ) { Colour = Color4.Red, Tint = Color4.Orange, IsBidirectional = true } );
+			Add( rayA = new RayIndicator( Scene ) { Kind = Kind.Component, IsBidirectional = true } );
+			Add( rayB = new RayIndicator( Scene ) { Kind = Kind.Control, IsBidirectional = true } );
 
 			Add( point = new PointIndicator( Scene ) { Colour = Color4.Violet, AllowDragging = false } );
 

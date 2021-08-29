@@ -76,5 +76,13 @@ namespace osu.Framework.XR.Testing.Components {
 			get => tris.Tint;
 			set => tris.Tint = value;
 		}
+
+		public Kind Kind {
+			set {
+				AllowDragging = value.IsEditable();
+				Colour = value.MainColour();
+				Tint = value.SecondaryColour();
+			}
+		}
 	}
 }

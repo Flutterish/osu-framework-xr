@@ -12,9 +12,9 @@ namespace osu.Framework.XR.Tests.Maths {
 		PointIndicator indicator;
 
 		public TestSceneBarycentric2D () {
-			Add( triangle = new TriangleIndicator( Scene ) { Colour = Color4.Blue } );
-			Add( point = new PointIndicator( Scene ) { Colour = Color4.Red } );
-			Add( indicator = new PointIndicator( Scene ) { Colour = Color4.Violet, AllowDragging = false } );
+			Add( triangle = new TriangleIndicator( Scene ) { Kind = Kind.Component } );
+			Add( point = new PointIndicator( Scene ) { Kind = Kind.Control } );
+			Add( indicator = new PointIndicator( Scene ) { Kind = Kind.Result } );
 
 			triangle.PointA.Value = new Vector3( 1, 0, 0 );
 			triangle.PointB.Value = new Vector3( -1, 0, 0 );

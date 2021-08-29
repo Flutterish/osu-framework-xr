@@ -93,5 +93,12 @@ namespace osu.Framework.XR.Testing.Components {
 		protected override void OnHoverLost ( HoverLostEvent e ) {
 			if ( !isDragged ) indicator.ScaleTo( 1, 150, Easing.In );
 		}
+
+		public Kind Kind {
+			set {
+				AllowDragging = value.IsEditable();
+				Colour = value.MainColour();
+			}
+		}
 	}
 }

@@ -11,9 +11,9 @@ namespace osu.Framework.XR.Tests.Physics.Raycast {
 		PointIndicator hit;
 
 		public TestSceneIntersectPlane () {
-			Add( plane = new PlaneIndicator( Scene ) { Colour = Color4.Blue } );
-			Add( ray = new RayIndicator( Scene ) { Colour = Color4.Red, Tint = Color4.Orange } );
-			Add( hit = new PointIndicator( Scene ) { Colour = Color4.Violet, AllowDragging = false } );
+			Add( plane = new PlaneIndicator( Scene ) { Kind = Kind.Component } );
+			Add( ray = new RayIndicator( Scene ) { Kind = Kind.Control } );
+			Add( hit = new PointIndicator( Scene ) { Kind = Kind.Result } );
 
 			plane.LookCurrent.Value = Vector3.UnitY;
 			ray.OriginCurrent.Value = new Vector3( 1, 1, 0 );

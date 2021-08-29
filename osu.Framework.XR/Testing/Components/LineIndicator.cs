@@ -58,5 +58,13 @@ namespace osu.Framework.XR.Testing.Components {
 			get => line.Tint;
 			set => line.Tint = value;
 		}
+
+		public Kind Kind {
+			set {
+				AllowDragging = value.IsEditable();
+				Colour = value.MainColour();
+				Tint = value.AccentColour();
+			}
+		}
 	}
 }

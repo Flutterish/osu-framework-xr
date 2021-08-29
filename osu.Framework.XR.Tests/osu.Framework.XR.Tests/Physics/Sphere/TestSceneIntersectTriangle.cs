@@ -11,9 +11,9 @@ namespace osu.Framework.XR.Tests.Physics.Sphere {
 		PointIndicator hit;
 
 		public TestSceneIntersectTriangle () {
-			Add( triangle = new TriangleIndicator( Scene ) { Colour = Color4.Blue } );
-			Add( sphere = new SphereShellIndicator( Scene ) { Colour = Color4.Red, Tint = Color4.Orange } );
-			Add( hit = new PointIndicator( Scene ) { Colour = Color4.Violet, AllowDragging = false } );
+			Add( triangle = new TriangleIndicator( Scene ) { Kind = Kind.Component } );
+			Add( sphere = new SphereShellIndicator( Scene ) { Kind = Kind.Control } );
+			Add( hit = new PointIndicator( Scene ) { Kind = Kind.Result } );
 
 			triangle.PointA.Value = new Vector3( 1, 0, 0 );
 			triangle.PointB.Value = new Vector3( -1, 0, 0 );

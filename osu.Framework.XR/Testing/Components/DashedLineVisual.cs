@@ -34,5 +34,11 @@ namespace osu.Framework.XR.Testing.Components {
 			line.Tint = Colour;
 			base.Update();
 		}
+
+		public Kind Kind {
+			set {
+				line.Tint = value.AccentColour();
+			}
+		}
 	}
 }
