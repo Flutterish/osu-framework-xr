@@ -466,6 +466,9 @@ namespace osu.Framework.XR.Graphics {
 			C = c;
 		}
 
+		public Vector3 Centre
+			=> ( A + B + C ) / 3;
+
 		public static Face operator * ( Matrix4x4 matrix, Face face ) {
 			return new Face(
 				( matrix * new Vector4( face.A, 1 ) ).Xyz,

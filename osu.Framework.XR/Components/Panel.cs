@@ -118,7 +118,7 @@ namespace osu.Framework.XR.Components {
 		/// </summary>
 		public Vector2 TexturePositionAt ( int trisIndex, Vector3 position ) {
 			var face = Faces[ trisIndex ];
-			var barycentric = Triangles.Barycentric( face, position );
+			var barycentric = Triangles.BarycentricFast( face, position );
 			var tris = Mesh.Tris[ trisIndex ];
 			var textureCoord =
 				  Mesh.TextureCoordinates[ (int)tris.A ] * barycentric.X
