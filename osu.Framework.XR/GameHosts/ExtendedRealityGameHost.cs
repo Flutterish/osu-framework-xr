@@ -35,7 +35,7 @@ namespace osu.Framework.XR.GameHosts {
 		public override void OpenFileExternally ( string filename ) {
 			throw new NotImplementedException( "File dialog panel is not yet implemented" ); // TODO file dialog and browser panels
 		}
-
+		
 		public override void OpenUrlExternally ( string url ) {
 			throw new NotImplementedException( "Web browser panel is not yet implemented" );
 		}

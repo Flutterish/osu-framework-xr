@@ -84,11 +84,13 @@ namespace osu.Framework.XR.Input {
 					Mouse.EmulateMouseUp( MouseButton.Right );
 			}
 		}
+
+		public bool AllowScroll = true;
 		private Vector2 scroll;
 		public Vector2 Scroll {
 			get => scroll;
 			set {
-				Mouse.EmulateMouseWheel( value - scroll, false );
+				if ( AllowScroll ) Mouse.EmulateMouseWheel( value - scroll, false );
 				scroll = value;
 			}
 		}

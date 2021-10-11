@@ -3,6 +3,7 @@ using osu.Framework.XR.Graphics;
 using osuTK;
 using osuTK.Graphics;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Framework.XR.Parsing {
 	public class ImportedModelGroup {
@@ -14,6 +15,9 @@ namespace osu.Framework.XR.Parsing {
 
 		public readonly List<ImportedModelGroup> SubGroups = new();
 		public readonly List<ImportedModel> Models = new();
+
+		public IEnumerable<ImportedModel> AllModels
+			=> Models.Concat( SubGroups.SelectMany( x => x.AllModels ) );
 	}
 
 	public class ImportedModel {
