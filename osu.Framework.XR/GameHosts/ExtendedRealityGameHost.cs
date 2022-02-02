@@ -25,7 +25,8 @@ namespace osu.Framework.XR.GameHosts {
 		}
 
 		public VirtualTextInput TextInput { get; } = new VirtualTextInput();
-		public override ITextInputSource GetTextInput ()
+
+		protected override TextInputSource CreateTextInput ()
 			=> TextInput;
 
 		VirtualClipboard clipboard = new();

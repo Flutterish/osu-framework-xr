@@ -1,4 +1,5 @@
-﻿using osu.Framework.Input;
+﻿using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
 using osu.Framework.Platform.Windows;
@@ -16,7 +17,7 @@ namespace osu.XR.GameHosts {
 		[MaybeNull, NotNull]
 		private TimePeriod timePeriod;
 
-		public override string UserStoragePath => Environment.GetFolderPath( Environment.SpecialFolder.ApplicationData );
+		public override IEnumerable<string> UserStoragePaths => Environment.GetFolderPath( Environment.SpecialFolder.ApplicationData ).Yield();
 
 		public override Clipboard GetClipboard () => new WindowsClipboard();
 
@@ -25,6 +26,10 @@ namespace osu.XR.GameHosts {
 
 		public ExtendedRealityWindowsGameHost ( string gameName, bool bindIPC = false, bool portableInstallation = false, bool useOsuTK = false )
 			: base( gameName, bindIPC, portableInstallation, useOsuTK ) {
+		}
+
+		public override void PresentFileExternally ( string filename ) {
+			OpenFileExternally( filename );
 		}
 
 		public override void OpenFileExternally ( string filename ) {

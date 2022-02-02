@@ -40,21 +40,21 @@ namespace osu.Framework.XR.GameHosts {
 		}
 
 		private void startIPC () {
-			Debug.Assert( ipcProvider == null );
-
-			ipcProvider = new TcpIpcProvider();
-			IsPrimaryInstance = ipcProvider.Bind();
-
-			if ( IsPrimaryInstance ) {
-				ipcProvider.MessageReceived += OnMessageReceived;
-
-				ipcThread = new Thread( () => ipcProvider.StartAsync().Wait() ) {
-					Name = "IPC",
-					IsBackground = true
-				};
-
-				ipcThread.Start();
-			}
+			//Debug.Assert( ipcProvider == null );
+			
+			//ipcProvider = new TcpIpcProvider( 45356 );
+			//IsPrimaryInstance = ipcProvider.Bind();
+			
+			//if ( IsPrimaryInstance ) {
+			//	ipcProvider.MessageReceived += OnMessageReceived;
+			
+			//	ipcThread = new Thread( () => ipcProvider.StartAsync().Wait() ) {
+			//		Name = "IPC",
+			//		IsBackground = true
+			//	};
+			
+			//	ipcThread.Start();
+			//}
 		}
 
 		public bool IsPortableInstallation { get; }
