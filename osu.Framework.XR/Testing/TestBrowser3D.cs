@@ -7,7 +7,7 @@ using osu.Framework.Platform;
 using osu.Framework.Testing;
 
 namespace osu.Framework.XR.Testing {
-	public class TestBrowser3D : Game {
+	public class TestBrowser3D : Game3D {
 		[BackgroundDependencyLoader]
 		private void load () {
 			Resources.AddStore( new DllResourceStore( XR.Resources.ResourceAssembly ) );

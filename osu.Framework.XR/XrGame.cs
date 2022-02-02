@@ -3,7 +3,7 @@ using osu.Framework.XR.Components;
 using System.Diagnostics.CodeAnalysis;
 
 namespace osu.Framework.XR {
-	public abstract class XrGame : Game {
+	public abstract class XrGame : Game3D {
 		[MaybeNull, NotNull]
 		public Scene Scene { get; protected set; }
 		[MaybeNull, NotNull]

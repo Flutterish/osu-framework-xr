@@ -13,7 +13,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace osu.Framework.XR.Components {
 	/// <summary>
-	/// A scene containing Xr objects.
+	/// A scene containing 3D objects.
 	/// </summary>
 	public class Scene : Container {
 		public Scene () {
@@ -44,9 +44,9 @@ namespace osu.Framework.XR.Components {
 		[MaybeNull, NotNull]
 		private IShader TextureShader;
 		private DepthFrameBuffer depthBuffer = new();
+
 		[BackgroundDependencyLoader]
 		private void load ( ShaderManager shaders ) {
-			Shaders.Shader3D ??= (Shader)shaders.Load( Shaders.VERTEX_3D, Shaders.FRAGMENT_3D );
 			TextureShader = shaders.Load( VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE );
 		}
 
@@ -75,7 +75,6 @@ namespace osu.Framework.XR.Components {
 
 			Vector2 size;
 			Quad quad;
-			RectangleF textureCoords;
 			[MaybeNull, NotNull]
 			IShader textureShader;
 			public override void ApplyState () {

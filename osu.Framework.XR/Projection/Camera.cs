@@ -160,8 +160,8 @@ namespace osu.Framework.XR.Projection {
 
 			var settings = new DrawNode3D.DrawSettings {
 				Camera = this,
-				CameraToClip = CameraClipMatrix,
-				WorldToCamera = Matrix4x4.CreateScale( scale.X, scale.Y ) * WorldCameraMatrix,
+				CameraToClip = CameraClipMatrix.Transposed,
+				WorldToCamera = (Matrix4x4.CreateScale( scale.X, scale.Y ) * WorldCameraMatrix).Transposed,
 				GlobalCameraPos = GlobalPosition,
 				GlobalCameraRot = GlobalRotation
 			};

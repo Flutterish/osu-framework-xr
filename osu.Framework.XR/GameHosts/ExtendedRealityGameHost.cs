@@ -115,14 +115,14 @@ namespace osu.Framework.XR.GameHosts {
 			runningGame.Player.Camera.Rotation = runningGame.Player.Rotation.Inverted() * rot;
 
 			runningGame.Player.Camera.Render( leftEye, new Drawable3D.DrawNode3D.DrawSettings { 
-				WorldToCamera = headToLeftEye * runningGame.Scene.Camera.WorldCameraMatrix,
-				CameraToClip = leftEyeMatrix,
+				WorldToCamera = (headToLeftEye * runningGame.Scene.Camera.WorldCameraMatrix).Transposed,
+				CameraToClip = leftEyeMatrix.Transposed,
 				GlobalCameraPos = runningGame.Player.Camera.GlobalPosition,
 				GlobalCameraRot = runningGame.Player.Camera.GlobalRotation
 			} );
 			runningGame.Player.Camera.Render( rightEye, new Drawable3D.DrawNode3D.DrawSettings { 
-				WorldToCamera = headToRightEye * runningGame.Scene.Camera.WorldCameraMatrix, 
-				CameraToClip = rightEyeMatrix,
+				WorldToCamera = (headToRightEye * runningGame.Scene.Camera.WorldCameraMatrix).Transposed, 
+				CameraToClip = rightEyeMatrix.Transposed,
 				GlobalCameraPos = runningGame.Player.Camera.GlobalPosition,
 				GlobalCameraRot = runningGame.Player.Camera.GlobalRotation
 			} );

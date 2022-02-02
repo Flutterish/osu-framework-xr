@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -6,13 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Shaders\sh_3DFrag.fs" />
-    <None Remove="Shaders\sh_3DVertex.vs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Shaders\sh_3DFrag.fs" />
-    <EmbeddedResource Include="Shaders\sh_3DVertex.vs" />
+	  <EmbeddedResource Include="Shaders\*" />
+	  <EmbeddedResource Include="Shaders\Materials\*" />
   </ItemGroup>
 
   <ItemGroup>

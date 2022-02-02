@@ -1,5 +1,6 @@
 ﻿using osu.Framework.XR.Components;
 using osu.Framework.XR.Maths;
+using static osu.Framework.XR.Components.Model;
 
 namespace osu.Framework.XR.Rendering {
 	public class CameraPositionTrackingDrawNode : CameraPositionTrackingDrawNode<Model> {
