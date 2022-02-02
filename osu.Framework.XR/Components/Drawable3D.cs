@@ -246,7 +246,7 @@ namespace osu.Framework.XR.Components {
 
 		public bool ShouldBeDepthSorted { get; init; } = false;
 		private DrawNode3D? drawNode;
-		public DrawNode3D? DrawNode => drawNode ??= CreateDrawNode();
+		public DrawNode3D? DrawNode => drawNode ??= ( IsLoaded ? CreateDrawNode() : null );
 		new protected virtual DrawNode3D? CreateDrawNode () => null;
 
 		protected override void Dispose ( bool isDisposing ) {
