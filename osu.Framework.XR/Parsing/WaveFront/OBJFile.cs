@@ -5,6 +5,7 @@ using osu.Framework.XR.Parsing.Materials;
 using osuTK;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 
@@ -72,15 +73,15 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 			}
 
 			float[] parseFloats ( string data ) {
-				return data.Split( ' ', StringSplitOptions.RemoveEmptyEntries ).Select( float.Parse ).ToArray();
+				return data.Split( ' ', StringSplitOptions.RemoveEmptyEntries ).Select( x => float.Parse( x, CultureInfo.InvariantCulture ) ).ToArray();
 			}
 
 			uint[] parseUints ( string data ) {
-				return data.Split( ' ', StringSplitOptions.RemoveEmptyEntries ).Select( uint.Parse ).ToArray();
+				return data.Split( ' ', StringSplitOptions.RemoveEmptyEntries ).Select( x => uint.Parse( x, CultureInfo.InvariantCulture ) ).ToArray();
 			}
 
 			uint?[][] parseMultiReferences ( string data ) {
-				return data.Split( ' ', StringSplitOptions.RemoveEmptyEntries ).Select( x => x.Split( '/' ).Select( x => x == "" ? null : (uint?)uint.Parse( x ) ).ToArray() ).ToArray();
+				return data.Split( ' ', StringSplitOptions.RemoveEmptyEntries ).Select( x => x.Split( '/' ).Select( x => x == "" ? null : (uint?)uint.Parse( x, CultureInfo.InvariantCulture ) ).ToArray() ).ToArray();
 			}
 
 			bool transformMultiIndicesNotnull ( int sourceSize, uint?[][] source, int index, out uint[] indices ) {
@@ -129,9 +130,9 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 					}
 
 					data.Add( new CurveParameterData(
-						float.Parse( a ),
-						float.Parse( b ),
-						uint.Parse( c )
+						float.Parse( a, CultureInfo.InvariantCulture ),
+						float.Parse( b, CultureInfo.InvariantCulture ),
+						uint.Parse( c, CultureInfo.InvariantCulture )
 					) );
 				}
 
@@ -334,8 +335,8 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 							errors.Add( new( $"Expected curve at L{L} to have at least 2 vertices, but it had {@params.Length}.", ParsingErrorSeverity.Issue ) );
 						}
 						else {
-							var start = float.Parse( a );
-							var end = float.Parse( b );
+							var start = float.Parse( a, CultureInfo.InvariantCulture );
+							var end = float.Parse( b, CultureInfo.InvariantCulture );
 
 							if ( !transformIndices( source.Vertices.Count, @params, out var vertices ) ) {
 								errors.Add( new( $"Curve at L{L} is malformed as it has invalid vertice indices declared.", ParsingErrorSeverity.Issue ) );
@@ -381,10 +382,10 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 						}
 						else {
 							source.Surfaces.Add( new SurfaceData(
-								float.Parse( s1 ),
-								float.Parse( s2 ),
-								float.Parse( t1 ),
-								float.Parse( t2 ),
+								float.Parse( s1, CultureInfo.InvariantCulture ),
+								float.Parse( s2, CultureInfo.InvariantCulture ),
+								float.Parse( t1, CultureInfo.InvariantCulture ),
+								float.Parse( t2, CultureInfo.InvariantCulture ),
 								vertices,
 								tx,
 								nor
@@ -464,14 +465,14 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 						}
 
 						source.Connections.Add( new ConnectivityData(
-							uint.Parse( surf1 ),
-							float.Parse( q01 ),
-							float.Parse( q11 ),
-							uint.Parse( curv1 ),
-							uint.Parse( surf2 ),
-							float.Parse( q02 ),
-							float.Parse( q12 ),
-							uint.Parse( curv2 )
+							uint.Parse( surf1, CultureInfo.InvariantCulture ),
+							float.Parse( q01, CultureInfo.InvariantCulture ),
+							float.Parse( q11, CultureInfo.InvariantCulture ),
+							uint.Parse( curv1, CultureInfo.InvariantCulture ),
+							uint.Parse( surf2, CultureInfo.InvariantCulture ),
+							float.Parse( q02, CultureInfo.InvariantCulture ),
+							float.Parse( q12, CultureInfo.InvariantCulture ),
+							uint.Parse( curv2, CultureInfo.InvariantCulture )
 						) );
 					}
 					// Grouping
@@ -507,7 +508,7 @@ namespace osu.Framework.XR.Parsing.WaveFront {
 							name = $"Merging Group {rest}";
 							mergingGroup = file.MergingGroups.FirstOrDefault( x => x.Name == name );
 							if ( mergingGroup is null ) {
-								mergingGroup = new MergingGroup( name, float.TryParse( rest, out var res ) ? res : 0 );
+								mergingGroup = new MergingGroup( name, float.TryParse( rest, NumberStyles.Any, CultureInfo.InvariantCulture, out var res ) ? res : 0 );
 								file.MergingGroups.Add( mergingGroup );
 							}
 						}
