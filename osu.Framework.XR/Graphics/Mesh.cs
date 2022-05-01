@@ -7,6 +7,7 @@ using osuTK;
 using osuTK.Graphics.OpenGL4;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 
@@ -109,7 +110,7 @@ namespace osu.Framework.XR.Graphics {
 				L++;
 
 				if ( line.StartsWith( "v " ) ) {
-					var coords = line.Substring( 2 ).Split( ' ', options: StringSplitOptions.RemoveEmptyEntries ).Select( x => float.Parse( x ) ).ToArray();
+					var coords = line.Substring( 2 ).Split( ' ', options: StringSplitOptions.RemoveEmptyEntries ).Select( x => float.Parse( x, CultureInfo.InvariantCulture ) ).ToArray();
 					if ( coords.Length is < 3 or ( > 4 and not 7 ) ) {
 						errors.Add( new( $"Expected vertice at L{L} to have between 3 and 4 coordinates or exactly 7, but it had {coords.Length}.", MeshParsingErrorSeverity.Hard ) );
 						current.Vertices.Add( new Vector3( coords.ElementAtOrDefault( 0 ), coords.ElementAtOrDefault( 1 ), coords.ElementAtOrDefault( 2 ) ) );
@@ -123,7 +124,7 @@ namespace osu.Framework.XR.Graphics {
 					}
 				}
 				else if ( line.StartsWith( "vt " ) ) {
-					var coords = line.Substring( 3 ).Split( ' ', options: StringSplitOptions.RemoveEmptyEntries ).Select( x => float.Parse( x ) ).ToArray();
+					var coords = line.Substring( 3 ).Split( ' ', options: StringSplitOptions.RemoveEmptyEntries ).Select( x => float.Parse( x, CultureInfo.InvariantCulture ) ).ToArray();
 					if ( coords.Length is < 1 or > 3 ) {
 						errors.Add( new( $"Expected texture coordinate at L{L} to have between 1 and 3 coordinates, but it had {coords.Length}.", MeshParsingErrorSeverity.Soft ) );
 						current.TextureCoordinates.Add( new Vector2( coords.ElementAtOrDefault( 0 ), coords.ElementAtOrDefault( 1 ) ) );
@@ -133,7 +134,7 @@ namespace osu.Framework.XR.Graphics {
 					}
 				}
 				else if ( line.StartsWith( "vn " ) ) {
-					var coords = line.Substring( 3 ).Split( ' ', options: StringSplitOptions.RemoveEmptyEntries ).Select( x => float.Parse( x ) ).ToArray();
+					var coords = line.Substring( 3 ).Split( ' ', options: StringSplitOptions.RemoveEmptyEntries ).Select( x => float.Parse( x, CultureInfo.InvariantCulture ) ).ToArray();
 					if ( coords.Length is not 3 ) {
 						errors.Add( new( $"Expected vertex normal at L{L} to have 3 coordinates, but it had {coords.Length}.", MeshParsingErrorSeverity.Soft ) );
 					}
@@ -141,7 +142,7 @@ namespace osu.Framework.XR.Graphics {
 					errors.Add( new( $"Vertex normal was declared at L{L}, but they are not implemented yet.", MeshParsingErrorSeverity.NotImplemented ) );
 				}
 				else if ( line.StartsWith( "vp " ) ) {
-					var coords = line.Substring( 3 ).Split( ' ', options: StringSplitOptions.RemoveEmptyEntries ).Select( x => float.Parse( x ) ).ToArray();
+					var coords = line.Substring( 3 ).Split( ' ', options: StringSplitOptions.RemoveEmptyEntries ).Select( x => float.Parse( x, CultureInfo.InvariantCulture ) ).ToArray();
 					if ( coords.Length is < 1 or > 3 ) {
 						errors.Add( new( $"Expected free-form geometry vertice at L{L} to have between 1 and 3 coordinates, but it had {coords.Length}.", MeshParsingErrorSeverity.Hard ) );
 					}
@@ -149,7 +150,7 @@ namespace osu.Framework.XR.Graphics {
 				}
 				else if ( line.StartsWith( "f " ) ) {
 					var coords = line.Substring( 2 ).Split( ' ', options: StringSplitOptions.RemoveEmptyEntries )
-						.Select( x => x.Split( '/' ).Select( y => y == "" ? null : (uint?)uint.Parse( y ) ).ToArray() ).ToArray();
+						.Select( x => x.Split( '/' ).Select( y => y == "" ? null : (uint?)uint.Parse( y, CultureInfo.InvariantCulture ) ).ToArray() ).ToArray();
 
 					if ( coords.Length < 3 ) {
 						errors.Add( new( $"Expected face at L{L} to have at least 3 indices, but it had {coords.Length}.", MeshParsingErrorSeverity.Soft ) );
@@ -177,7 +178,7 @@ namespace osu.Framework.XR.Graphics {
 					}
 				}
 				else if ( line.StartsWith( "l " ) ) {
-					var coords = line.Substring( 2 ).Split( ' ', options: StringSplitOptions.RemoveEmptyEntries ).Select( x => uint.Parse( x ) );
+					var coords = line.Substring( 2 ).Split( ' ', options: StringSplitOptions.RemoveEmptyEntries ).Select( x => uint.Parse( x, CultureInfo.InvariantCulture ) );
 					
 					errors.Add( new( $"Line segment was declared at L{L}, but they are not implemented yet.", MeshParsingErrorSeverity.NotImplemented ) );
 				}
