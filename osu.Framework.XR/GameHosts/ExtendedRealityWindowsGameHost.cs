@@ -28,17 +28,18 @@ namespace osu.XR.GameHosts {
 			: base( gameName, bindIPC, portableInstallation, useOsuTK ) {
 		}
 
-		public override void PresentFileExternally ( string filename ) {
+		public override bool PresentFileExternally ( string filename ) {
+			return false;
 			OpenFileExternally( filename );
 		}
 
-		public override void OpenFileExternally ( string filename ) {
+		public override bool OpenFileExternally ( string filename ) {
 			if ( Directory.Exists( filename ) ) {
 				Process.Start( "explorer.exe", filename );
-				return;
+				return true;
 			}
 
-			base.OpenFileExternally( filename );
+			return base.OpenFileExternally( filename );
 		}
 
 		protected override void SetupForRun () {

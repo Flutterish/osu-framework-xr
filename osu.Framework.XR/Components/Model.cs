@@ -42,6 +42,7 @@ namespace osu.Framework.XR.Components {
 		private void load ( MaterialManager materials ) {
 			unlitMaterial = materials.LoadNew( UnlitMaterialDescriptor.Name );
 			if ( textures != null ) {
+				unlitMaterial.AllTextures.Clear();
 				unlitMaterial.AllTextures.AddRange( textures );
 				textures = null;
 			}

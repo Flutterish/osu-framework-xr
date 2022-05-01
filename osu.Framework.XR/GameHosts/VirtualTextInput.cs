@@ -5,7 +5,7 @@ using System;
 namespace osu.Framework.XR.GameHosts {
 	public class VirtualTextInput : TextInputSource {
 		public void AppendText ( string text ) {
-			AddPendingText( text );
+			TriggerTextInput( text );
 		}
 
 		protected override void ActivateTextInput ( bool allowIme ) {

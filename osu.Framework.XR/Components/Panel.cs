@@ -1,6 +1,9 @@
-﻿using osu.Framework.Bindables;
+﻿using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input;
 using osu.Framework.XR.Input;
 using osu.Framework.XR.Maths;
@@ -13,7 +16,8 @@ namespace osu.Framework.XR.Components {
 	/// <summary>
 	/// A 3D panel that displays an image from a <see cref="BufferedCapture"/>.
 	/// </summary>
-	public abstract partial class Panel : Model, IHasCollider {
+	[Cached(type: typeof(ISafeArea))]
+	public abstract partial class Panel : Model, IHasCollider, ISafeArea {
 		public PhysicsLayer PhysicsLayer { get; set; } = PhysicsLayer.All;
 		public readonly VirtualInputManager EmulatedInput = new();
 		private PlatformActionContainer platformActions = new();
@@ -172,5 +176,16 @@ namespace osu.Framework.XR.Components {
 				base.Draw( settings );
 			}
 		}
+
+		public Framework.Graphics.Primitives.Quad ExpandRectangleToSpaceOfOtherDrawable ( IDrawable other ) {
+			return ToSpaceOfOtherDrawable( DrawRectangle, other );
+		}
+
+		private readonly BindableSafeArea safeArea = new BindableSafeArea();
+		public RectangleF AvailableNonSafeSpace => DrawRectangle;
+		public BindableSafeArea SafeAreaPadding => safeArea;
+		EdgeEffectParameters IContainer.EdgeEffect { get => EdgeEffect; set => EdgeEffect = value; }
+		Vector2 IContainer.RelativeChildSize { get => RelativeChildSize; set => RelativeChildSize = value; }
+		Vector2 IContainer.RelativeChildOffset { get => RelativeChildOffset; set => RelativeChildOffset = value; }
 	}
 }

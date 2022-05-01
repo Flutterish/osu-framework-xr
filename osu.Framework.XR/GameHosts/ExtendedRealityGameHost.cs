@@ -33,7 +33,8 @@ namespace osu.Framework.XR.GameHosts {
 		public override Clipboard GetClipboard ()
 			=> clipboard;
 
-		public override void OpenFileExternally ( string filename ) {
+		public override bool OpenFileExternally ( string filename ) {
+			return false;
 			throw new NotImplementedException( "File dialog panel is not yet implemented" ); // TODO file dialog and browser panels
 		}
 		
