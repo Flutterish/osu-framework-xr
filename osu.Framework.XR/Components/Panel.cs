@@ -17,7 +17,7 @@ namespace osu.Framework.XR.Components {
 	/// A 3D panel that displays an image from a <see cref="BufferedCapture"/>.
 	/// </summary>
 	[Cached(type: typeof(ISafeArea))]
-	public abstract partial class Panel : Model, IHasCollider, ISafeArea {
+	public abstract partial class Panel : Model, IHasCollider, ISafeArea, IDrawable {
 		public PhysicsLayer PhysicsLayer { get; set; } = PhysicsLayer.All;
 		public readonly VirtualInputManager EmulatedInput = new();
 		private PlatformActionContainer platformActions = new();
@@ -28,6 +28,9 @@ namespace osu.Framework.XR.Components {
 		public Bindable<Vector2> ContentScale = new( Vector2.One );
 		public BufferedCapture SourceCapture { get; } = new();
 		protected bool IsMeshInvalidated = true;
+
+		// this ensures that the panel is the "root node" for cases like buffered containers which clip their size to the root node
+		CompositeDrawable IDrawable.Parent => null!;
 
 		// TODO remove the autosizes
 		/// <summary>
