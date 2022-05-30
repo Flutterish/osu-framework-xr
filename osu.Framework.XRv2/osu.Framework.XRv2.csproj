@@ -5,7 +5,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>osu.Framework.XR</RootNamespace>
+	<EnablePreviewFeatures>True</EnablePreviewFeatures>
   </PropertyGroup>
+	
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="OpenVR.NET" Version="0.8.1" />

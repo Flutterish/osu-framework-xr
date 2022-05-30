@@ -1,13 +1,8 @@
-﻿using OpenVR.NET;
-using osu.Framework.Bindables;
+﻿using osu.Framework.Bindables;
 using osu.Framework.Input;
 using osu.Framework.Platform;
-using osu.Framework.XR.Components;
 using osu.Framework.XR.Graphics;
-using osu.Framework.XR.Maths;
-using osuTK;
 using System;
-using Valve.VR;
 
 namespace osu.Framework.XR.GameHosts {
 	public abstract class ExtendedRealityGameHost : GameHost { // TODO scale is not included in autosizing

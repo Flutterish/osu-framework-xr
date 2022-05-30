@@ -1,6 +1,5 @@
 ﻿using osu.Framework.Bindables;
 using osu.Framework.Input;
-using System;
 
 namespace osu.Framework.XR.GameHosts {
 	public class VirtualTextInput : TextInputSource {
