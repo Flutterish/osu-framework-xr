@@ -1,4 +1,4 @@
-﻿using OpenVR.NET.Manifests;
+﻿//using OpenVR.NET.Manifests;
 using osu.Framework.XR.Components;
 using System.Diagnostics.CodeAnalysis;
 
@@ -8,6 +8,6 @@ namespace osu.Framework.XR {
 		public Scene Scene { get; protected set; }
 		[MaybeNull, NotNull]
 		public XrPlayer Player { get; protected set; }
-		public abstract Manifest XrManifest { get; }
+		//public abstract Manifest XrManifest { get; }
 	}
 }
