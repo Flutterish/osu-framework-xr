@@ -54,15 +54,14 @@ public class Scene : CompositeDrawable {
 			if ( VAO == 0 ) {
 				VAO = GL.GenVertexArray();
 				GL.BindVertexArray( VAO );
-				
-				mesh.VertexBuffers[0].CreateUnsafeUpload().Upload(); // this also binds the VBO, so its safe to link it
+
+				mesh.CreateFullUnsafeUpload().Upload(); // this also binds the VBOs and the EBO, so its safe to link it
 				mesh.VertexBuffers[0].Link( shader, new int[] { shader.GetAttrib( "aPos" ) } );
-				mesh.ElementBuffer.CreateUnsafeUpload().Upload(); // this also binds the EBO, so its linked to the VAO
 			}
 			else GL.BindVertexArray( VAO );
 
 			shader.Bind();
-			mesh.ElementBuffer.Draw();
+			mesh.Draw();
 			GL.BindVertexArray( 0 );
 		}
 	}

@@ -10,8 +10,11 @@ namespace osu.Framework.XR.Graphics.Buffers;
 /// using a method defined by <see cref="PrimitiveType"/>. A given mesh can only use one
 /// element buffer, but that buffer can be shared across different meshes. It is also possible to
 /// create several "partial" meshes, each using a different element buffer, but the same vertice buffers
-/// and possibly a different material
+/// and possibly a different material.
 /// </summary>
+/// <remarks>
+/// Note that drawing with an element buffer requires a linked attribute array to be bound
+/// </remarks>
 public interface IElementBuffer {
 	/// <summary>
 	/// Uploads the data to the element buffer. The created upload will *copy*

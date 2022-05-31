@@ -30,12 +30,19 @@ public interface IVertexBuffer {
 	/// the current data, therefore you need to make sure the data will *not be modified* while it is being uploaded
 	/// </summary>
 	IUpload CreateUnsafeUpload ( BufferUsageHint usage = BufferUsageHint.StaticDraw );
+
+	/// <summary>
+	/// The amount of uploaded vertices stored by this buffer
+	/// </summary>
+	int Count { get; }
 }
 
 /// <inheritdoc cref="IVertexBuffer"/>
 public class VertexBuffer<Tvertex> : IVertexBuffer where Tvertex : struct, IVertex<Tvertex> {
 	public readonly List<Tvertex> Data = new();
 	public GlHandle Handle { get; private set; }
+
+	public int Count { get; private set; }
 
 	public int Stride => default(Tvertex).Stride;
 
@@ -67,6 +74,7 @@ public class VertexBuffer<Tvertex> : IVertexBuffer where Tvertex : struct, IVert
 
 			GL.BindBuffer( BufferTarget.ArrayBuffer, source.Handle );
 			default(Tvertex).Upload( data, usage );
+			source.Count = data.Length;
 			data.Dispose();
 		}
 	}
@@ -86,6 +94,7 @@ public class VertexBuffer<Tvertex> : IVertexBuffer where Tvertex : struct, IVert
 
 			GL.BindBuffer( BufferTarget.ArrayBuffer, source.Handle );
 			default(Tvertex).Upload( CollectionsMarshal.AsSpan( source.Data ), usage );
+			source.Count = source.Data.Count;
 		}
 	}
 }
