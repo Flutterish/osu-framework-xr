@@ -9,6 +9,8 @@
 		<IsPackable>false</IsPackable>
 		<OutputType>WinExe</OutputType>
 		<RootNamespace>osu.Framework.XR.Tests</RootNamespace>
+		<EnablePreviewFeatures>True</EnablePreviewFeatures>
+		<AssemblyName>osu.Framework.XR.Tests</AssemblyName>
 	</PropertyGroup>
 
 	<ItemGroup>

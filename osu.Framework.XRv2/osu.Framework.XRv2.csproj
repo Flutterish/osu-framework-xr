@@ -6,10 +6,15 @@
     <Nullable>enable</Nullable>
     <RootNamespace>osu.Framework.XR</RootNamespace>
 	<EnablePreviewFeatures>True</EnablePreviewFeatures>
+	<AssemblyName>osu.Framework.XR</AssemblyName>
   </PropertyGroup>
 	
   <ItemGroup>
     <EmbeddedResource Include="Resources\**" />
+  </ItemGroup>
+	
+  <ItemGroup>
+    <Content Remove="C:\Users\Charm\.nuget\packages\openvr.net\0.8.1\contentFiles\any\net6.0\openvr_api.dll" />
   </ItemGroup>
 
   <ItemGroup>

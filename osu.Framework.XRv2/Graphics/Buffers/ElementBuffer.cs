@@ -65,9 +65,6 @@ public class ElementBuffer<Tindex> : IElementBuffer where Tindex : unmanaged {
 
 		void IUpload.Upload () {
 			GL.BufferData( BufferTarget.ElementArrayBuffer, data.Length * Stride, ref MemoryMarshal.GetReference( data.AsSpan() ), usage );
-		}
-
-		public void Dispose () {
 			data.Dispose();
 		}
 	}
@@ -84,7 +81,5 @@ public class ElementBuffer<Tindex> : IElementBuffer where Tindex : unmanaged {
 		void IUpload.Upload () {
 			GL.BufferData( BufferTarget.ElementArrayBuffer, data.Count * Stride, ref MemoryMarshal.GetReference( CollectionsMarshal.AsSpan( data ) ), usage );
 		}
-
-		public void Dispose () { }
 	}
 }

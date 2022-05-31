@@ -52,9 +52,6 @@ public class VertexBuffer<Tvertex> : IVertexBuffer where Tvertex : struct, IVert
 
 		void IUpload.Upload () {
 			IVertex<Tvertex>.Upload( data, usage );
-		}
-
-		public void Dispose () {
 			data.Dispose();
 		}
 	}
@@ -71,7 +68,5 @@ public class VertexBuffer<Tvertex> : IVertexBuffer where Tvertex : struct, IVert
 		void IUpload.Upload () {
 			IVertex<Tvertex>.Upload( CollectionsMarshal.AsSpan( data ), usage );
 		}
-
-		public void Dispose () { }
 	}
 }

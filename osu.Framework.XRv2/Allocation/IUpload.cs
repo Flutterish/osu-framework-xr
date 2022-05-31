@@ -1,8 +1,8 @@
 ﻿namespace osu.Framework.XR.Allocation;
 
-public interface IUpload : IDisposable {
+public interface IUpload {
 	/// <summary>
-	/// Uploads the data on the draw thread. This resource will be disposed immediately after the call to this method
+	/// Uploads the data on the draw thread
 	/// </summary>
 	void Upload ();
 }
