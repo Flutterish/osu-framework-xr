@@ -48,17 +48,16 @@ public class Scene : CompositeDrawable {
 			shader = Source.shader;
 		}
 
-		GlHandle VAO;
+		AttributeArray VAO = new();
 		Mesh mesh;
 		public override void Draw ( Action<TexturedVertex2D> vertexAction ) {
-			if ( VAO == 0 ) {
-				VAO = GL.GenVertexArray();
-				GL.BindVertexArray( VAO );
+			if ( VAO.Handle == 0 ) {
+				VAO.Bind();
 
-				mesh.CreateFullUnsafeUpload().Upload(); // this also binds the VBOs and the EBO, so its safe to link it
+				mesh.CreateFullUnsafeUpload().Upload(); // this also binds the VBOs and the EBO
 				mesh.VertexBuffers[0].Link( shader, new int[] { shader.GetAttrib( "aPos" ) } );
 			}
-			else GL.BindVertexArray( VAO );
+			else VAO.Bind();
 
 			shader.Bind();
 			mesh.Draw();
