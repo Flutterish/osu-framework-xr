@@ -4,6 +4,13 @@ using System.Runtime.InteropServices;
 
 namespace osu.Framework.XR.Graphics.Buffers;
 
+/// <summary>
+/// A vertex buffer is a GPU array of geometry data such as position, uv coordinates, normals,
+/// or any other custom data that is different per drawn vertex. A given property of a vertex 
+/// such as position, a normal, etc. is called an attribute, or an attrib.
+/// Multiple vertice buffers can be used to draw a single object (as long as they are the same length) 
+/// and they can be shared across different meshes
+/// </summary>
 public interface IVertexBuffer {
 	/// <inheritdoc cref="IVertex{Tself}.Stride"/>
 	int Stride { get; }
@@ -25,6 +32,7 @@ public interface IVertexBuffer {
 	IUpload CreateUnsafeUpload ( BufferUsageHint usage = BufferUsageHint.StaticDraw );
 }
 
+/// <inheritdoc cref="IVertexBuffer"/>
 public class VertexBuffer<Tvertex> : IVertexBuffer where Tvertex : struct, IVertex<Tvertex> {
 	public readonly List<Tvertex> Data = new();
 	public GlHandle Handle { get; private set; }

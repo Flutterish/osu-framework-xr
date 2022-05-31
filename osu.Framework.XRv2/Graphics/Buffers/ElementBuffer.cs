@@ -4,6 +4,14 @@ using System.Runtime.InteropServices;
 
 namespace osu.Framework.XR.Graphics.Buffers;
 
+/// <summary>
+/// An element buffer is a GPU array of indices which point into vertice buffers
+/// in order to not duplicate vetrex data. This creates elements such as triangles or lines,
+/// using a method defined by <see cref="PrimitiveType"/>. A given mesh can only use one
+/// element buffer, but that buffer can be shared across different meshes. It is also possible to
+/// create several "partial" meshes, each using a different element buffer, but the same vertice buffers
+/// and possibly a different material
+/// </summary>
 public interface IElementBuffer {
 	/// <summary>
 	/// Uploads the data to the element buffer. The created upload will *copy*
@@ -38,6 +46,7 @@ public interface IElementBuffer {
 		=> Draw( Count, 0 );
 }
 
+/// <inheritdoc cref="IElementBuffer"/>
 public class ElementBuffer<Tindex> : IElementBuffer where Tindex : unmanaged {
 	public readonly List<Tindex> Indices = new();
 	public readonly PrimitiveType PrimitiveType;
