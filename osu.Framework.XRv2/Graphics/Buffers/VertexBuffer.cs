@@ -5,16 +5,17 @@ using System.Runtime.InteropServices;
 namespace osu.Framework.XR.Graphics.Buffers;
 
 /// <summary>
-/// A vertex buffer is a GPU array of geometry data such as position, uv coordinates, normals,
-/// or any other custom data that is different per drawn vertex. A given property of a vertex 
-/// such as position, a normal, etc. is called an attribute, or an attrib.
-/// Multiple vertice buffers can be used to draw a single object (as long as they are the same length) 
-/// and they can be shared across different meshes
+/// A GPU array of geometry data such as position, uv coordinates, normals,
+/// or any other custom attributes that are different per drawn vertex.
 /// </summary>
+/// <remarks>
+/// Multiple vertice buffers can be used to draw a single object (so long they are the same length) 
+/// and they can be shared across different meshes
+/// </remarks>
 public interface IVertexBuffer {
-	/// <inheritdoc cref="IVertex{Tself}.Stride"/>
+	/// <inheritdoc cref="IVertex.Stride"/>
 	int Stride { get; }
-	/// <inheritdoc cref="IVertex{Tself}.Link(Shader, int[])"/>
+	/// <inheritdoc cref="IVertex.Link(Shader, int[])"/>
 	void Link ( Shader shader, int[] attribs );
 
 	/// <summary>
@@ -46,8 +47,13 @@ public class VertexBuffer<Tvertex> : IVertexBuffer where Tvertex : struct, IVert
 
 	public int Stride => default(Tvertex).Stride;
 
-	public void Link ( Shader shader, int[] attribs )
-		=> default(Tvertex).Link( shader, attribs );
+	public void Link ( Shader shader, int[] attribs ) {
+		if ( Handle == 0 )
+			Handle = GL.GenBuffer();
+
+		GL.BindBuffer( BufferTarget.ArrayBuffer, Handle );
+		default( Tvertex ).Link( shader, attribs );
+	}
 
 	public IUpload CreateUpload ( BufferUsageHint usage = BufferUsageHint.StaticDraw ) {
 		return new Upload( this, usage );

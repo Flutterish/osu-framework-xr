@@ -5,14 +5,13 @@ using System.Runtime.InteropServices;
 namespace osu.Framework.XR.Graphics.Buffers;
 
 /// <summary>
-/// An element buffer is a GPU array of indices which point into vertice buffers
-/// in order to not duplicate vetrex data. This creates elements such as triangles or lines,
-/// using a method defined by <see cref="PrimitiveType"/>. A given mesh can only use one
-/// element buffer, but that buffer can be shared across different meshes. It is also possible to
-/// create several "partial" meshes, each using a different element buffer, but the same vertice buffers
-/// and possibly a different material.
+/// A GPU array of indices which point into vertice buffers in order to not duplicate vetrex data. 
+/// Elements such as triangles or lines are created using a method defined by <see cref="PrimitiveType"/>. 
 /// </summary>
 /// <remarks>
+/// A given mesh can only use one element buffer, but that buffer can be shared across different meshes. 
+/// It is also possible to create several "partial" meshes, each using a different element buffer, 
+/// but the same vertice buffers and possibly a different material.
 /// Note that drawing with an element buffer requires a linked attribute array to be bound
 /// </remarks>
 public interface IElementBuffer {
@@ -34,6 +33,11 @@ public interface IElementBuffer {
 	/// The amount of uploaded indices stored by this buffer
 	/// </summary>
 	int Count { get; }
+
+	/// <summary>
+	/// Binds the <see cref="IElementBuffer"/> to the currently bound <see cref="IAttributeArray"/>
+	/// </summary>
+	void Bind ();
 
 	/// <summary>
 	/// Draws the elements specified by the indices of this buffer
@@ -71,6 +75,13 @@ public class ElementBuffer<Tindex> : IElementBuffer where Tindex : unmanaged {
 
 	public ElementBuffer ( PrimitiveType primitive = PrimitiveType.Triangles ) {
 		PrimitiveType = primitive;
+	}
+
+	public void Bind () {
+		if ( Handle == 0 )
+			Handle = GL.GenBuffer();
+
+		GL.BindBuffer( BufferTarget.ElementArrayBuffer, Handle );
 	}
 
 	public IUpload CreateUpload ( BufferUsageHint usage = BufferUsageHint.StaticDraw ) {
