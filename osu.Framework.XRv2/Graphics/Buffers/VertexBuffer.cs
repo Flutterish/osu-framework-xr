@@ -27,46 +27,57 @@ public interface IVertexBuffer {
 
 public class VertexBuffer<Tvertex> : IVertexBuffer where Tvertex : struct, IVertex<Tvertex> {
 	public readonly List<Tvertex> Data = new();
+	public GlHandle Handle { get; private set; }
 
-	public int Stride => Tvertex.Stride;
+	public int Stride => default(Tvertex).Stride;
 
 	public void Link ( Shader shader, int[] attribs )
-		=> Tvertex.Link( shader, attribs );
+		=> default(Tvertex).Link( shader, attribs );
 
 	public IUpload CreateUpload ( BufferUsageHint usage = BufferUsageHint.StaticDraw ) {
-		return new Upload( MemoryPool<Tvertex>.Shared.Rent( Data ), usage );
+		return new Upload( this, usage );
 	}
 
 	public IUpload CreateUnsafeUpload ( BufferUsageHint usage = BufferUsageHint.StaticDraw ) {
-		return new UnsafeUpload( Data, usage );
+		return new UnsafeUpload( this, usage );
 	}
 
 	class Upload : IUpload {
 		RentedArray<Tvertex> data;
 		BufferUsageHint usage;
+		VertexBuffer<Tvertex> source;
 
-		public Upload ( RentedArray<Tvertex> data, BufferUsageHint usage ) {
-			this.data = data;
+		public Upload ( VertexBuffer<Tvertex> source, BufferUsageHint usage ) {
+			data = MemoryPool<Tvertex>.Shared.Rent( source.Data );
 			this.usage = usage;
+			this.source = source;
 		}
 
 		void IUpload.Upload () {
-			IVertex<Tvertex>.Upload( data, usage );
+			if ( source.Handle == 0 )
+				source.Handle = GL.GenBuffer();
+
+			GL.BindBuffer( BufferTarget.ArrayBuffer, source.Handle );
+			default(Tvertex).Upload( data, usage );
 			data.Dispose();
 		}
 	}
 
 	class UnsafeUpload : IUpload {
-		List<Tvertex> data;
+		VertexBuffer<Tvertex> source;
 		BufferUsageHint usage;
 
-		public UnsafeUpload ( List<Tvertex> data, BufferUsageHint usage ) {
-			this.data = data;
+		public UnsafeUpload ( VertexBuffer<Tvertex> source, BufferUsageHint usage ) {
+			this.source = source;
 			this.usage = usage;
 		}
 
 		void IUpload.Upload () {
-			IVertex<Tvertex>.Upload( CollectionsMarshal.AsSpan( data ), usage );
+			if ( source.Handle == 0 )
+				source.Handle = GL.GenBuffer();
+
+			GL.BindBuffer( BufferTarget.ArrayBuffer, source.Handle );
+			default(Tvertex).Upload( CollectionsMarshal.AsSpan( source.Data ), usage );
 		}
 	}
 }
