@@ -42,18 +42,27 @@ public class Scene : CompositeDrawable {
 				VBO = GL.GenBuffer();
 				GL.BindBuffer( BufferTarget.ArrayBuffer, VBO );
 				var data = new float[] {
-					-0.5f, -0.5f, 0.0f,
-					 0.5f, -0.5f, 0.0f,
-					 0.0f,  0.5f, 0.0f
+					 0.5f,  0.5f, 0.0f,  // top right
+					 0.5f, -0.5f, 0.0f,  // bottom right
+					-0.5f, -0.5f, 0.0f,  // bottom left
+					-0.5f,  0.5f, 0.0f   // top left 
 				};
 				GL.BufferData( BufferTarget.ArrayBuffer, data.Length * sizeof( float ), data, BufferUsageHint.StaticDraw );
 				GL.VertexAttribPointer( 0, 3, VertexAttribPointerType.Float, false, 3 * sizeof( float ), 0 );
 				GL.EnableVertexAttribArray( 0 );
+
+				EBO = GL.GenBuffer();
+				GL.BindBuffer( BufferTarget.ElementArrayBuffer, EBO );
+				var eData = new uint[] {
+					0, 1, 3,   // first triangle
+					1, 2, 3    // second triangle
+				};
+				GL.BufferData( BufferTarget.ElementArrayBuffer, 6 * sizeof( uint ), eData, BufferUsageHint.StaticDraw );
 			}
 			else GL.BindVertexArray( VAO );
 
 			shader.Bind();
-			GL.DrawArrays( PrimitiveType.Triangles, 0, 3 );
+			GL.DrawElements( BeginMode.Triangles, 6, DrawElementsType.UnsignedInt, 0 );
 			GL.BindVertexArray( 0 );
 		}
 	}
