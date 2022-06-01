@@ -68,7 +68,7 @@ public class Model : Drawable3D {
 	class ModelDrawNode : DrawNode3D {
 		new protected Model Source => (Model)base.Source;
 
-		AttributeArray VAO = new();
+		AttributeArray VAO;
 		Mesh mesh;
 		public ModelDrawNode ( Model source ) : base( source ) {
 			mesh = source.mesh;
