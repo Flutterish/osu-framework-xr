@@ -1,6 +1,7 @@
 ﻿using osu.Framework.IO.Stores;
+using osu.Framework.XR.Graphics.Shaders;
 
-namespace osu.Framework.XR.Graphics;
+namespace osu.Framework.XR.Graphics.Materials;
 
 public class MaterialStore {
 	IResourceStore<byte[]> resourceStore;
@@ -10,9 +11,8 @@ public class MaterialStore {
 
 	Dictionary<(string material, string name), Material> sharedMaterials = new();
 	public Material GetShared ( string material, string sharedName ) {
-		if ( !sharedMaterials.TryGetValue( (material, sharedName), out var mat ) ) {
+		if ( !sharedMaterials.TryGetValue( (material, sharedName), out var mat ) )
 			sharedMaterials.Add( (material, sharedName), mat = GetNew( material ) );
-		}
 
 		return mat;
 	}

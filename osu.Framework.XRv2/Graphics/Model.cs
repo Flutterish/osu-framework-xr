@@ -1,5 +1,6 @@
 ﻿using osu.Framework.Graphics.Textures;
 using osu.Framework.XR.Graphics.Buffers;
+using osu.Framework.XR.Graphics.Materials;
 using osu.Framework.XR.Graphics.Vertices;
 
 namespace osu.Framework.XR.Graphics;
@@ -45,7 +46,7 @@ public class Model : Drawable3D {
 	}
 
 	protected override void Update () {
-		//Rotation = Quaternion.FromAxisAngle( new Vector3( 1, 0, 1 ).Normalized(), (float)Time.Current / 1000 );
+		Rotation = Quaternion.FromAxisAngle( new Vector3( 1, 0, 1 ).Normalized(), (float)Time.Current / 1000 );
 	}
 
 	[BackgroundDependencyLoader]

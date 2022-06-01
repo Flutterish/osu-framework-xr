@@ -1,4 +1,5 @@
 ﻿using osu.Framework.XR.Allocation;
+using osu.Framework.XR.Graphics.Shaders;
 using osu.Framework.XR.Graphics.Vertices;
 using System.Runtime.InteropServices;
 

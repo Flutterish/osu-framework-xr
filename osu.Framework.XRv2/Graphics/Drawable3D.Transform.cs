@@ -104,7 +104,7 @@ public partial class Drawable3D {
 
 	public Matrix4 LocalMatrix {
 		get {
-			if ( !localMatrix.IsValid ) {
+			if ( !localMatrix.IsValid ) { // TODO combine into one operation
 				localMatrix.Value = Matrix4.CreateTranslation( offset )
 					* Matrix4.CreateScale( scale )
 					* Matrix4.CreateFromQuaternion( rotation )

@@ -31,3 +31,17 @@ public class CombinedUpload : IUpload {
 		uploads.Dispose();
 	}
 }
+
+public class DelegateUpload<T> : IUpload {
+	T context;
+	Action<T> action;
+
+	public DelegateUpload ( T context, Action<T> action ) {
+		this.context = context;
+		this.action = action;
+	}
+
+	public void Upload () {
+		action( context );
+	}
+}

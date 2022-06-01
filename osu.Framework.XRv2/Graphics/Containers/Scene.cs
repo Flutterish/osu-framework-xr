@@ -4,6 +4,7 @@ using osu.Framework.Graphics.OpenGL;
 using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shaders;
+using osu.Framework.XR.Graphics.Materials;
 
 namespace osu.Framework.XR.Graphics.Containers;
 
@@ -124,6 +125,8 @@ public class Scene : CompositeDrawable {
 				}
 			}
 
+			Shaders.Shader.Unbind();
+			Material.Unbind();
 			GL.BindVertexArray( 0 );
 			GLWrapper.PopDepthInfo();
 			GLWrapper.PopScissorState();
@@ -132,6 +135,7 @@ public class Scene : CompositeDrawable {
 
 			blitShader.Bind();
 			frameBuffer.Texture.Bind();
+			// the texture is upside-down because o!f says Y+ is down but we and GL say Y+ is up
 			DrawQuad( frameBuffer.Texture, new Quad(
 				screenSpaceDrawQuad.BottomLeft,
 				screenSpaceDrawQuad.BottomRight,

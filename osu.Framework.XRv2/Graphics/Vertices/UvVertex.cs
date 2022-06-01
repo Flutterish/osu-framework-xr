@@ -1,4 +1,6 @@
-﻿namespace osu.Framework.XR.Graphics.Vertices;
+﻿using osu.Framework.XR.Graphics.Shaders;
+
+namespace osu.Framework.XR.Graphics.Vertices;
 
 public struct UvVertex : IVertex<UvVertex> {
 	public float U;

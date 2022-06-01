@@ -1,5 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 using osu.Framework.XR.Graphics.Buffers;
+using osu.Framework.XR.Graphics.Shaders;
 
 namespace osu.Framework.XR.Graphics.Vertices;
 
