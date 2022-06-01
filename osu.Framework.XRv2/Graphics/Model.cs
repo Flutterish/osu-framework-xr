@@ -58,7 +58,7 @@ public class Model : Drawable3D {
 			if ( VAO.Handle == 0 ) {
 				VAO.Bind();
 
-				mesh.CreateFullUnsafeUpload().Upload(); // this also binds the VBOs and the EBO
+				mesh.ElementBuffer!.Bind();
 				mesh.VertexBuffers[0].Link( material.Shader, new int[] { material.Shader.GetAttrib( "aPos" ) } );
 			}
 			else VAO.Bind();
