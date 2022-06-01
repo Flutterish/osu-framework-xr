@@ -26,9 +26,9 @@ public class Model : Drawable3D {
 
 	[BackgroundDependencyLoader]
 	private void load ( MaterialStore materials ) {
-		shader = materials.GetShader( "unlit" );
+		material = materials.GetNew( "unlit" );
 	}
-	Shader shader = null!;
+	Material material = null!;
 
 	protected override DrawNode3D? CreateDrawNode3D ()
 		=> new ModelDrawNode( this );
@@ -43,9 +43,9 @@ public class Model : Drawable3D {
 			VAO = source.VAO;
 		}
 		
-		Shader shader = null!;
+		Material material = null!;
 		protected override void UpdateState () {
-			shader = Source.shader;
+			material = Source.material;
 		}
 
 		public override void Draw () {
@@ -55,11 +55,11 @@ public class Model : Drawable3D {
 				VAO.Bind();
 
 				mesh.CreateFullUnsafeUpload().Upload(); // this also binds the VBOs and the EBO
-				mesh.VertexBuffers[0].Link( shader, new int[] { shader.GetAttrib( "aPos" ) } );
+				mesh.VertexBuffers[0].Link( material.Shader, new int[] { material.Shader.GetAttrib( "aPos" ) } );
 			}
 			else VAO.Bind();
 
-			shader.Bind();
+			material.Shader.Bind();
 			mesh.Draw();
 
 			GL.Enable( EnableCap.DepthTest );
