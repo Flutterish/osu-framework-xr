@@ -1,4 +1,6 @@
-﻿namespace osu.Framework.XR.Graphics;
+﻿using osu.Framework.Graphics.Primitives;
+
+namespace osu.Framework.XR.Graphics;
 
 public class Shader {
 	ShaderPart[] parts;
@@ -41,6 +43,10 @@ public class Shader {
 	}
 	public void SetUniform ( string name, Matrix4 value ) {
 		GL.UniformMatrix4( getUniform( name ), true, ref value );
+	}
+
+	public void SetUniform ( string name, RectangleF value ) {
+		GL.Uniform4( getUniform( name ), value.X, value.Y, value.Width, value.Height );
 	}
 
 	void compile () {

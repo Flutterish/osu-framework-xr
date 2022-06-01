@@ -1,4 +1,5 @@
-﻿using osu.Framework.XR.Graphics.Buffers;
+﻿using osu.Framework.Graphics.Textures;
+using osu.Framework.XR.Graphics.Buffers;
 using osu.Framework.XR.Graphics.Vertices;
 
 namespace osu.Framework.XR.Graphics;
@@ -7,28 +8,47 @@ public class Model : Drawable3D {
 	AttributeArray VAO = new();
 	Mesh mesh;
 	public Model () {
-		ElementBuffer<uint> EBO = new( PrimitiveType.Triangles );
-		EBO.Indices.AddRange( new uint[] {
-			0, 4, 6, 0, 6, 2,
-			3, 2, 6, 3, 6, 7,
-			7, 6, 4, 7, 4, 5,
-			5, 1, 3, 5, 3, 7,
-			1, 0, 2, 1, 2, 3,
-			5, 4, 0, 5, 0, 1
-		} );
-		VertexBuffer<PositionVertex> VBO = new();
-		VBO.Data.AddRange( new PositionVertex[] {
-			new() { Position = new Vector3(  1,  1, -1 ) },
-			new() { Position = new Vector3(  1, -1, -1 ) },
-			new() { Position = new Vector3(  1,  1,  1 ) },
-			new() { Position = new Vector3(  1, -1,  1 ) },
-			new() { Position = new Vector3( -1,  1, -1 ) },
-			new() { Position = new Vector3( -1, -1, -1 ) },
-			new() { Position = new Vector3( -1,  1,  1 ) },
-			new() { Position = new Vector3( -1, -1,  1 ) }
+		VertexBuffer<TexturedVertex> VBO = new();
+		VBO.Data.AddRange( new TexturedVertex[] {
+			new() { Position = new( -1, -1, -1 ), UV = new( 0, 0 ) },
+			new() { Position = new(  1, -1, -1 ), UV = new( 1, 0 ) },
+			new() { Position = new(  1,  1, -1 ), UV = new( 1, 1 ) },
+			new() { Position = new(  1,  1, -1 ), UV = new( 1, 1 ) },
+			new() { Position = new( -1,  1, -1 ), UV = new( 0, 1 ) },
+			new() { Position = new( -1, -1, -1 ), UV = new( 0, 0 ) },
+			new() { Position = new( -1, -1,  1 ), UV = new( 0, 0 ) },
+			new() { Position = new(  1, -1,  1 ), UV = new( 1, 0 ) },
+			new() { Position = new(  1,  1,  1 ), UV = new( 1, 1 ) },
+			new() { Position = new(  1,  1,  1 ), UV = new( 1, 1 ) },
+			new() { Position = new( -1,  1,  1 ), UV = new( 0, 1 ) },
+			new() { Position = new( -1, -1,  1 ), UV = new( 0, 0 ) },
+			new() { Position = new( -1,  1,  1 ), UV = new( 1, 0 ) },
+			new() { Position = new( -1,  1, -1 ), UV = new( 1, 1 ) },
+			new() { Position = new( -1, -1, -1 ), UV = new( 0, 1 ) },
+			new() { Position = new( -1, -1, -1 ), UV = new( 0, 1 ) },
+			new() { Position = new( -1, -1,  1 ), UV = new( 0, 0 ) },
+			new() { Position = new( -1,  1,  1 ), UV = new( 1, 0 ) },
+			new() { Position = new(  1,  1,  1 ), UV = new( 1, 0 ) },
+			new() { Position = new(  1,  1, -1 ), UV = new( 1, 1 ) },
+			new() { Position = new(  1, -1, -1 ), UV = new( 0, 1 ) },
+			new() { Position = new(  1, -1, -1 ), UV = new( 0, 1 ) },
+			new() { Position = new(  1, -1,  1 ), UV = new( 0, 0 ) },
+			new() { Position = new(  1,  1,  1 ), UV = new( 1, 0 ) },
+			new() { Position = new( -1, -1, -1 ), UV = new( 0, 1 ) },
+			new() { Position = new(  1, -1, -1 ), UV = new( 1, 1 ) },
+			new() { Position = new(  1, -1,  1 ), UV = new( 1, 0 ) },
+			new() { Position = new(  1, -1,  1 ), UV = new( 1, 0 ) },
+			new() { Position = new( -1, -1,  1 ), UV = new( 0, 0 ) },
+			new() { Position = new( -1, -1, -1 ), UV = new( 0, 1 ) },
+			new() { Position = new( -1,  1, -1 ), UV = new( 0, 1 ) },
+			new() { Position = new(  1,  1, -1 ), UV = new( 1, 1 ) },
+			new() { Position = new(  1,  1,  1 ), UV = new( 1, 0 ) },
+			new() { Position = new(  1,  1,  1 ), UV = new( 1, 0 ) },
+			new() { Position = new( -1,  1,  1 ), UV = new( 0, 0 ) },
+			new() { Position = new( -1,  1, -1 ), UV = new( 0, 1 ) }
 		} );
 
-		mesh = new( EBO, VBO );
+		mesh = new( null, VBO );
 		mesh.CreateFullUnsafeUpload().Enqueue();
 
 		Z = 5;
@@ -39,10 +59,12 @@ public class Model : Drawable3D {
 	}
 
 	[BackgroundDependencyLoader]
-	private void load ( MaterialStore materials ) {
+	private void load ( MaterialStore materials, TextureStore textures ) {
 		material = materials.GetNew( "unlit" );
+		texture = textures.Get( "susie", Framework.Graphics.OpenGL.Textures.WrapMode.ClampToEdge, Framework.Graphics.OpenGL.Textures.WrapMode.ClampToEdge );
 	}
 	Material material = null!;
+	Texture texture = null!;
 
 	protected override DrawNode3D? CreateDrawNode3D ()
 		=> new ModelDrawNode( this );
@@ -56,27 +78,30 @@ public class Model : Drawable3D {
 			mesh = source.mesh;
 			VAO = source.VAO;
 		}
-		
+
+		Texture texture = null!;
 		Material material = null!;
 		Matrix4 matrix;
 		protected override void UpdateState () {
 			material = Source.material;
 			matrix = Source.Matrix;
+			texture = Source.texture;
 		}
 
 		public override void Draw ( object? ctx = null ) {
 			if ( VAO.Handle == 0 ) {
 				VAO.Bind();
 
-				mesh.ElementBuffer!.Bind();
-				mesh.VertexBuffers[0].Link( material.Shader, new int[] { material.Shader.GetAttrib( "aPos" ) } );
+				mesh.VertexBuffers[0].Link( material.Shader, new int[] { material.Shader.GetAttrib( "aPos" ), material.Shader.GetAttrib( "aUv" ) } );
 			}
 			else VAO.Bind();
 
 			material.Shader.Bind();
+			texture.TextureGL.Bind();
 			material.Shader.SetUniform( "matrix", ref matrix );
 			material.Shader.SetUniform( "gProj", ((BasicDrawContext)ctx!).ProjectionMatrix );
-			mesh.Draw();
+			material.Shader.SetUniform( "subImage", texture.GetTextureRect() );
+			mesh.Draw( PrimitiveType.Triangles );
 		}
 	}
 }

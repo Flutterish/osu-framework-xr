@@ -104,8 +104,8 @@ public class Scene : CompositeDrawable {
 			frameBuffer.Bind();
 			GLWrapper.PushViewport( new( 0, 0, (int)frameBuffer.Size.X, (int)frameBuffer.Size.Y ) );
 			GLWrapper.PushScissorState( false );
-			GLWrapper.PushDepthInfo( new() );
-			GLWrapper.Clear( new( depth: 0 ) );
+			GLWrapper.PushDepthInfo( new( function: osuTK.Graphics.ES30.DepthFunction.Less ) );
+			GLWrapper.Clear( new( depth: 1 ) );
 
 			var ctx = new BasicDrawContext( Matrix4.CreateScale( 1, 1, -1 ) * Matrix4.CreatePerspectiveFieldOfView(
 				MathF.PI / 2,

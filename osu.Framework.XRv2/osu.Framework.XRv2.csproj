@@ -16,6 +16,10 @@
   <ItemGroup>
     <Content Remove="C:\Users\Charm\.nuget\packages\openvr.net\0.8.1\contentFiles\any\net6.0\openvr_api.dll" />
   </ItemGroup>
+	
+  <ItemGroup>
+    <None Remove="Resources\Textures\susie.png" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="OpenVR.NET" Version="0.8.1" />
