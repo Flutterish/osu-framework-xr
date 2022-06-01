@@ -11,6 +11,12 @@ namespace osu.Framework.XR.Graphics.Containers;
 
 [Cached]
 public class Scene : CompositeDrawable {
+	public readonly Container3D Root = new();
+
+	public Scene () {
+		AddInternal( Root );
+	}
+
 	[BackgroundDependencyLoader]
 	private void load ( MaterialStore materials, ShaderManager shaders ) {
 		shader = materials.GetShader( "unlit" );

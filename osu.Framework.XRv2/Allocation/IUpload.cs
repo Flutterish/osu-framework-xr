@@ -5,6 +5,12 @@ public interface IUpload {
 	/// Uploads the data on the draw thread
 	/// </summary>
 	void Upload ();
+
+	/// <summary>
+	/// Enqueues this <see cref="IUpload"/> to the default <see cref="UploadScheduler"/>
+	/// </summary>
+	public void Enqueue ()
+		=> UploadScheduler.Enqueue( this );
 }
 
 public class CombinedUpload : IUpload {

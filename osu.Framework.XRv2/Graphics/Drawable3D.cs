@@ -1,20 +1,65 @@
 ﻿using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using System.ComponentModel;
 
 namespace osu.Framework.XR.Graphics;
 
 // ideally we would be : Transformable, IDrawable, IDisposable but composite drawable provides us with DI and lifetime management.
 // perhaps in the future, as Component will be the base class of Drawable, we could inherit from that
-public class Drawable3D : CompositeDrawable {
-	new public CompositeDrawable3D? Parent { get; [Friend<CompositeDrawable3D>] internal set; }
+public partial class Drawable3D : CompositeDrawable {
+	CompositeDrawable3D? parent;
+	new public CompositeDrawable3D? Parent { 
+		get => parent; 
+		[Friend<CompositeDrawable3D>] internal set {
+			parent = value;
+			matrix.Invalidate();
+		}
+	}
+	public Drawable3D Root => Parent?.Root ?? this;
 
+	Enum renderStage = InvalidRenderStage.None;
 	/// <summary>
 	/// Specifies where in the render pipeline this drawable appears. By default this is
 	/// <see cref="InvalidRenderStage.None"/> (-1) and will not be rendered. The valid values
 	/// of this property depend on the containing scene/render pipeline
 	/// </summary>
-	public Enum RenderStage { get; protected set; } = InvalidRenderStage.None;
+	public Enum RenderStage {
+		get => renderStage;
+		set {
+			if ( Enum.Equals( renderStage, value ) )
+				return;
 
+			var from = renderStage;
+			renderStage = value;
+			RenderStageChanged?.Invoke( this, from, value );
+		}
+	}
+	public delegate void RenderStageChangedHandler ( Drawable3D drawable, Enum from, Enum to );
+	public event RenderStageChangedHandler? RenderStageChanged;
+
+	/// <summary>
+	/// Render layer expressed as a bitfield (or custom via the given render pipeline).
+	/// This defines a mask that allows to select which drawables should be rendered.
+	/// The default value is 1
+	/// </summary>
+	public ulong RenderLayer = 1;
+
+	DrawNode3D?[] subtreeNodes = new DrawNode3D?[3];
+	public DrawNode3D? GetDrawNodeAtSubtree ( int subtreeIndex ) {
+		var node = subtreeNodes[subtreeIndex];
+
+		if ( node is null ) {
+			subtreeNodes[subtreeIndex] = node = CreateDrawNode3D();
+			node?.UpdateNode();
+		}
+		else if ( node.InvalidationID != InvalidationID ) {
+			node.UpdateNode();
+		}
+		
+		return node;
+	}
+
+	[EditorBrowsable( EditorBrowsableState.Never )]
 	protected sealed override DrawNode? CreateDrawNode ()
 		=> throw new InvalidOperationException( "Cannot create a 2D draw node for a 3D drawable. This probably means the drawable is located outside of a scene" );
 

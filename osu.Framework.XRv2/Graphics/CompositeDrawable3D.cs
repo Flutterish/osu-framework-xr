@@ -1,4 +1,5 @@
 ﻿using osu.Framework.Graphics;
+using System.ComponentModel;
 
 namespace osu.Framework.XR.Graphics;
 
@@ -11,6 +12,7 @@ public class CompositeDrawable3D : Drawable3D {
 		InternalChildren = children.AsReadOnly();
 	}
 
+	[EditorBrowsable( EditorBrowsableState.Never )]
 	protected sealed override void AddInternal ( Drawable drawable )
 		=> throw new InvalidOperationException( "Cannot add a 2D drawable into a 3D container" );
 	protected virtual void AddInternal ( Drawable3D child ) {
@@ -45,6 +47,7 @@ public class CompositeDrawable3D : Drawable3D {
 		}
 	}
 
+	[EditorBrowsable( EditorBrowsableState.Never )]
 	protected sealed override bool RemoveInternal ( Drawable drawable )
 		=> throw new InvalidOperationException( "Cannot remove a 2D drawable from a 3D container" );
 	protected virtual void RemoveInternal ( Drawable3D child ) {
