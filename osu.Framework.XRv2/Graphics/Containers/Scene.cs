@@ -23,7 +23,7 @@ public class Scene : CompositeDrawable {
 	protected override DrawNode CreateDrawNode ()
 		=> singleDrawNode ??= new SceneDrawNode( this );
 
-	class SceneDrawNode : CompositeDrawableDrawNode {
+	class SceneDrawNode : DrawNode, ICompositeDrawNode {
 		new protected Scene Source => (Scene)base.Source;
 
 		public SceneDrawNode ( Scene source ) : base( source ) {
@@ -90,5 +90,8 @@ public class Scene : CompositeDrawable {
 			frameBuffer.Texture.Bind();
 			DrawQuad( frameBuffer.Texture, screenSpaceDrawQuad, DrawColourInfo.Colour );
 		}
+
+		public List<DrawNode>? Children { get; set; }
+		public bool AddChildDrawNodes => false;
 	}
 }
