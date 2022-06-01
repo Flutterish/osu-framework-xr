@@ -1,18 +1,20 @@
-﻿namespace osu.Framework.XR.Graphics.Shaders;
+﻿using osu.Framework.XR.Allocation;
 
+namespace osu.Framework.XR.Graphics.Shaders;
+
+/// <summary>
+/// A GPU program responsible for drawing
+/// </summary>
 public class Shader {
 	ShaderPart[] parts;
 	public Shader ( ShaderPart[] parts ) {
 		this.parts = parts;
+		IUpload upload = new DelegateUpload<Shader>( this, static s => s.compile() );
+		upload.Enqueue();
 	}
 
 	public GlHandle Handle { get; private set; }
 	public bool IsCompiled => Handle != 0;
-
-	public void EnsureCompiled () {
-		if ( !IsCompiled )
-			compile();
-	}
 
 	static Shader? boundShader;
 	public void Bind () {
@@ -20,7 +22,6 @@ public class Shader {
 			return;
 
 		boundShader = this;
-		EnsureCompiled();
 		GL.UseProgram( Handle );
 	}
 
@@ -31,7 +32,6 @@ public class Shader {
 	Dictionary<string, int> attribLocations = new();
 	public int GetAttrib ( string name ) {
 		if ( !attribLocations.TryGetValue( name, out var location ) ) {
-			EnsureCompiled();
 			attribLocations.Add( name, location = GL.GetAttribLocation( Handle, name ) );
 		}
 

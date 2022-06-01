@@ -174,9 +174,6 @@ public class Sampler2DUniform : IUniform<Texture?> {
 	}
 
 	public void UpdateValue ( ref Texture? value ) {
-		if ( this.value == value )
-			return;
-
 		this.value = value;
 		if ( value is null ) {
 			GL.ActiveTexture( TextureUnit );

@@ -1,50 +1,57 @@
 ﻿using osu.Framework.XR.Allocation;
 using osu.Framework.XR.Graphics.Shaders;
-using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 
 namespace osu.Framework.XR.Graphics.Materials;
 
+/// <summary>
+/// A collection of uniform values
+/// </summary>
+/// <remarks>
+/// Uniforms prefixed with "g" for "global" (ex. "gProj" - values set once per batch) 
+/// as well as "m" for "my" (ex. "mMatrix" - local values that change every frame) arent considered material uniforms
+/// (exception being if the next letter is also lowercase - use an underscore if this is intentional)
+/// </remarks>
 public class Material {
 	public readonly Shader Shader;
 
 	public Material ( Shader shader ) {
 		Shader = shader;
+		IUpload upload = new DelegateUpload<Material>( this, static m => m.createUniforms() );
+		upload.Enqueue();
 	}
 
-	public bool IsLoaded => Shader.IsCompiled;
+	static Regex nameIsNotMaterialUniformRegex = new( "^(m|g)[A-Z_]", RegexOptions.Compiled );
 
-	Dictionary<string, IMaterialUniform>? uniforms;
-	IMaterialUniform[]? uniformArray;
-	[MemberNotNull(nameof(uniforms), nameof(uniformArray))]
-	void ensureUniformsCreated () {
-		if ( uniforms is null ) {
-			uniforms = new();
+	public bool IsLoaded => uniforms != null;
 
-			Shader.EnsureCompiled();
-			uniformArray = new IMaterialUniform[Shader.AllUniforms.Count()];
-			int i = 0;
-			foreach ( var (name, uniform) in Shader.AllUniforms ) {
-				var mat = uniform.CreateMaterialUniform();
-				uniforms.Add( name, mat );
-				uniformArray[i++] = mat;
-			}
+	Dictionary<string, IMaterialUniform> uniforms = null!;
+	IMaterialUniform[] uniformArray = null!;
+	void createUniforms () {
+		var uniforms = new Dictionary<string, IMaterialUniform>();
+		foreach ( var (name, uniform) in Shader.AllUniforms ) {
+			if ( nameIsNotMaterialUniformRegex.IsMatch( name ) )
+				continue;
+
+			var mat = uniform.CreateMaterialUniform();
+			uniforms.Add( name, mat );
 		}
+
+		this.uniformArray = uniforms.Values.ToArray();
+		this.uniforms = uniforms;
 	}
 
-	public IEnumerable<KeyValuePair<string, IMaterialUniform>> AllUniforms {
-		get {
-			ensureUniformsCreated();
-			return uniforms;
-		}
-	}
+	public IEnumerable<KeyValuePair<string, IMaterialUniform>> AllUniforms
+		=> uniforms;
 
-	public IMaterialUniform<T> GetUniform<T> ( string name ) {
-		ensureUniformsCreated();
-		return (IMaterialUniform<T>)uniforms[name];
-	}
+	/// <summary>
+	/// Retreives a material uniform. If the material is bound and a value is updated through
+	/// this uniform, it will not be immediately updated - you need to call <see cref="IMaterialUniform.Apply"/>
+	/// </summary>
+	public IMaterialUniform<T> GetUniform<T> ( string name ) 
+		=> (IMaterialUniform<T>)uniforms[name];
 
-	public void SetUniform<T> ( string name, T value ) {
-		ensureUniformsCreated();
+	public void Set<T> ( string name, T value ) {
 		var mat = GetUniform<T>( name );
 		mat.Value = value;
 
@@ -52,10 +59,8 @@ public class Material {
 			mat.Apply();
 	}
 
-	public T GetUniformValue<T> ( string name ) {
-		ensureUniformsCreated();
-		return GetUniform<T>( name ).Value;
-	}
+	public T Get<T> ( string name )
+		=> GetUniform<T>( name ).Value;
 
 	static Material? boundMaterial;
 	public void Bind () {
@@ -65,7 +70,6 @@ public class Material {
 		Shader.Bind();
 		boundMaterial = this;
 
-		ensureUniformsCreated();
 		foreach ( var i in uniformArray ) {
 			i.Apply();
 		}

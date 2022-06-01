@@ -53,6 +53,11 @@ public class Model : Drawable3D {
 	private void load ( MaterialStore materials, TextureStore textures ) {
 		material = materials.GetNew( "unlit" );
 		texture = textures.Get( "susie", Framework.Graphics.OpenGL.Textures.WrapMode.ClampToEdge, Framework.Graphics.OpenGL.Textures.WrapMode.ClampToEdge );
+
+		material.CreateUpload( m => {
+			m.Set( "tex", texture );
+			m.Set( "subImage", texture.GetTextureRect() );
+		} ).Enqueue();
 	}
 	Material material = null!;
 	Texture texture = null!;
@@ -70,13 +75,11 @@ public class Model : Drawable3D {
 			VAO = source.VAO;
 		}
 
-		Texture texture = null!;
 		Material material = null!;
 		Matrix4 matrix;
 		protected override void UpdateState () {
 			material = Source.material;
 			matrix = Source.Matrix;
-			texture = Source.texture;
 		}
 
 		public override void Draw ( object? ctx = null ) {
@@ -88,11 +91,9 @@ public class Model : Drawable3D {
 			}
 			else VAO.Bind();
 
-			material.Shader.Bind();
-			texture.TextureGL.Bind();
-			material.Shader.SetUniform( "matrix", ref matrix );
+			material.Bind();
+			material.Shader.SetUniform( "mMatrix", ref matrix );
 			material.Shader.SetUniform( "gProj", ((BasicDrawContext)ctx!).ProjectionMatrix );
-			material.Shader.SetUniform( "subImage", texture.GetTextureRect() );
 			mesh.Draw();
 		}
 	}
