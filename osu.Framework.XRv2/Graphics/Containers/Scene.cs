@@ -104,6 +104,7 @@ public class Scene : CompositeDrawable {
 			frameBuffer.Bind();
 			GLWrapper.PushViewport( new( 0, 0, (int)frameBuffer.Size.X, (int)frameBuffer.Size.Y ) );
 			GLWrapper.PushScissorState( false );
+			GLWrapper.PushDepthInfo( new() );
 			GLWrapper.Clear( new( depth: 0 ) );
 
 			using ( var read = Source.tripleBuffer.Get( UsageType.Read ) ) {
@@ -113,6 +114,7 @@ public class Scene : CompositeDrawable {
 			}
 
 			GL.BindVertexArray( 0 );
+			GLWrapper.PopDepthInfo();
 			GLWrapper.PopScissorState();
 			GLWrapper.PopViewport();
 			frameBuffer.Unbind();

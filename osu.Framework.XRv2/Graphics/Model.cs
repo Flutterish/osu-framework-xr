@@ -24,6 +24,10 @@ public class Model : Drawable3D {
 		mesh.CreateFullUnsafeUpload().Enqueue();
 	}
 
+	protected override void Update () {
+		Rotation = Quaternion.FromAxisAngle( new Vector3( 1, 0, 1 ).Normalized(), (float)Time.Current / 1000 );
+	}
+
 	[BackgroundDependencyLoader]
 	private void load ( MaterialStore materials ) {
 		material = materials.GetNew( "unlit" );
@@ -44,13 +48,13 @@ public class Model : Drawable3D {
 		}
 		
 		Material material = null!;
+		Matrix4 matrix;
 		protected override void UpdateState () {
 			material = Source.material;
+			matrix = Source.Matrix;
 		}
 
 		public override void Draw () {
-			GL.Disable( EnableCap.DepthTest );
-
 			if ( VAO.Handle == 0 ) {
 				VAO.Bind();
 
@@ -60,9 +64,8 @@ public class Model : Drawable3D {
 			else VAO.Bind();
 
 			material.Shader.Bind();
+			material.Shader.SetUniform( "matrix", ref matrix );
 			mesh.Draw();
-
-			GL.Enable( EnableCap.DepthTest );
 		}
 	}
 }

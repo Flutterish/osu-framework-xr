@@ -28,6 +28,18 @@ public class Shader {
 		return location;
 	}
 
+	Dictionary<string, int> uniformLocations = new();
+	int getUniform ( string name ) {
+		if ( !uniformLocations.TryGetValue( name, out var location ) )
+			uniformLocations.Add( name, location = GL.GetUniformLocation( Handle, name ) );
+
+		return location;
+	}
+
+	public void SetUniform ( string name, ref Matrix4 value ) {
+		GL.UniformMatrix4( getUniform( name ), true, ref value );
+	}
+
 	void compile () {
 		Handle = GL.CreateProgram();
 
