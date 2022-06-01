@@ -46,17 +46,7 @@ public partial class Drawable3D : CompositeDrawable {
 
 	DrawNode3D?[] subtreeNodes = new DrawNode3D?[3];
 	public DrawNode3D? GetDrawNodeAtSubtree ( int subtreeIndex ) {
-		var node = subtreeNodes[subtreeIndex];
-
-		if ( node is null ) {
-			subtreeNodes[subtreeIndex] = node = CreateDrawNode3D();
-			node?.UpdateNode();
-		}
-		else if ( node.InvalidationID != InvalidationID ) {
-			node.UpdateNode();
-		}
-		
-		return node;
+		return subtreeNodes[subtreeIndex] ??= CreateDrawNode3D();
 	}
 
 	[EditorBrowsable( EditorBrowsableState.Never )]

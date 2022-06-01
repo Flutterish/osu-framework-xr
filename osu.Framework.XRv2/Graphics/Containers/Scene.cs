@@ -4,90 +4,115 @@ using osu.Framework.Graphics.OpenGL;
 using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shaders;
-using osu.Framework.XR.Graphics.Buffers;
-using osu.Framework.XR.Graphics.Vertices;
 
 namespace osu.Framework.XR.Graphics.Containers;
 
 [Cached]
 public class Scene : CompositeDrawable {
 	public readonly Container3D Root = new();
+	Queue<(Drawable3D drawable, bool added, Enum stage)> drawableQueue = new();
+	Queue<(Drawable3D drawable, bool added, Enum stage)> uploadableQueue = new();
+	HashSet<Drawable3D> drawables = new();
 
 	public Scene () {
 		AddInternal( Root );
+		Root.SubtreeChildAdded += ( d, p ) => {
+			drawables.Add( d );
+			drawableQueue.Enqueue( (d, true, d.RenderStage) );
+			d.RenderStageChanged += onRenderStageChanged;
+		};
+		Root.SubtreeChildRemoved += ( d, p ) => {
+			drawables.Remove( d );
+			drawableQueue.Enqueue( (d, false, d.RenderStage) );
+			d.RenderStageChanged -= onRenderStageChanged;
+		};
+
+		Root.Add( new Model() );
+	}
+
+	private void onRenderStageChanged ( Drawable3D drawable, Enum from, Enum to ) {
+		drawableQueue.Enqueue( (drawable, false, from) );
+		drawableQueue.Enqueue( (drawable, true, to) );
+	}
+
+	TripleBuffer<Drawable3D> tripleBuffer = new();
+	object uploadMutex = new();
+	protected override void UpdateAfterChildren () {
+		base.UpdateAfterChildren();
+
+		using ( var write = tripleBuffer.Get( UsageType.Write ) ) {
+			foreach ( var i in drawables ) {
+				var node = i.GetDrawNodeAtSubtree( write.Index );
+				if ( node != null && i.InvalidationID != node.InvalidationID )
+					node.UpdateNode();
+			}
+		}
+
+		lock ( uploadMutex ) {
+			while ( drawableQueue.TryDequeue( out var data ) ) {
+				uploadableQueue.Enqueue( data );
+			}
+		}
 	}
 
 	[BackgroundDependencyLoader]
-	private void load ( MaterialStore materials, ShaderManager shaders ) {
-		shader = materials.GetShader( "unlit" );
+	private void load ( ShaderManager shaders ) {
 		blitShader = shaders.Load( VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE );
 	}
-	Shader shader = null!;
 	IShader blitShader = null!;
 
 	SceneDrawNode? singleDrawNode;
-	protected override DrawNode CreateDrawNode ()
+	protected sealed override DrawNode CreateDrawNode ()
 		=> singleDrawNode ??= new SceneDrawNode( this );
 
 	class SceneDrawNode : DrawNode, ICompositeDrawNode {
+		HashSet<Drawable3D> defaultDrawLayer = new();
+
 		new protected Scene Source => (Scene)base.Source;
 
 		public SceneDrawNode ( Scene source ) : base( source ) {
-			ElementBuffer<uint> EBO = new( PrimitiveType.Triangles );
-			EBO.Indices.AddRange( new uint[] {
-				0, 1, 3,
-				1, 2, 3
-			} );
-			VertexBuffer<PositionVertex> VBO = new();
-			VBO.Data.AddRange( new PositionVertex[] {
-				new() { Position = new(  0.5f,  0.5f, 0.0f ) },
-				new() { Position = new(  0.5f, -0.5f, 0.0f ) },
-				new() { Position = new( -0.5f, -0.5f, 0.0f ) },
-				new() { Position = new( -0.5f,  0.5f, 0.0f ) }
-			} );
-
-			mesh = new( EBO, VBO );
-
 			frameBuffer = new( new[] { osuTK.Graphics.ES30.RenderbufferInternalFormat.DepthComponent32f } );
 		}
 
 		Quad screenSpaceDrawQuad;
 		Vector2 size;
 		osu.Framework.Graphics.OpenGL.Buffers.FrameBuffer frameBuffer;
-		Shader shader = null!;
 		IShader blitShader = null!;
 		public override void ApplyState () {
 			base.ApplyState();
 
 			screenSpaceDrawQuad = Source.ScreenSpaceDrawQuad;
-			shader = Source.shader;
 			blitShader = Source.blitShader;
 			size = Source.DrawSize;
 		}
 
-		AttributeArray VAO = new();
-		Mesh mesh;
 		public override void Draw ( Action<TexturedVertex2D> vertexAction ) {
+			lock ( Source.uploadMutex ) {
+				while ( Source.uploadableQueue.TryDequeue( out var data ) ) {
+					if ( data.added ) {
+						defaultDrawLayer.Add( data.drawable );
+					}
+					else {
+						defaultDrawLayer.Remove( data.drawable );
+					}
+				}
+			}
+
+			UploadScheduler.Execute();
+
 			frameBuffer.Size = size;
 			frameBuffer.Bind();
 			GLWrapper.PushViewport( new( 0, 0, (int)frameBuffer.Size.X, (int)frameBuffer.Size.Y ) );
 			GLWrapper.PushScissorState( false );
 			GLWrapper.Clear( new( depth: 0 ) );
-			GL.Disable( EnableCap.DepthTest );
 
-			if ( VAO.Handle == 0 ) {
-				VAO.Bind();
-
-				mesh.CreateFullUnsafeUpload().Upload(); // this also binds the VBOs and the EBO
-				mesh.VertexBuffers[0].Link( shader, new int[] { shader.GetAttrib( "aPos" ) } );
+			using ( var read = Source.tripleBuffer.Get( UsageType.Read ) ) {
+				foreach ( var i in defaultDrawLayer ) {
+					i.GetDrawNodeAtSubtree( read.Index )?.Draw();
+				}
 			}
-			else VAO.Bind();
 
-			shader.Bind();
-			mesh.Draw();
 			GL.BindVertexArray( 0 );
-
-			GL.Enable( EnableCap.DepthTest );
 			GLWrapper.PopScissorState();
 			GLWrapper.PopViewport();
 			frameBuffer.Unbind();

@@ -1,4 +1,6 @@
 ﻿using osu.Framework.Caching;
+using osu.Framework.Graphics;
+using osu.Framework.Layout;
 using System.Runtime.CompilerServices;
 
 namespace osu.Framework.XR.Graphics;
@@ -12,7 +14,7 @@ public partial class Drawable3D {
 		field = value;
 		localMatrix.Invalidate();
 		matrix.Invalidate();
-		Invalidate( Framework.Graphics.Invalidation.DrawNode );
+		Invalidate( Invalidation.DrawNode | Invalidation.DrawInfo );
 	}
 
 	[MethodImpl( MethodImplOptions.AggressiveInlining )]
@@ -23,7 +25,7 @@ public partial class Drawable3D {
 		field = value;
 		localMatrix.Invalidate();
 		matrix.Invalidate();
-		Invalidate( Framework.Graphics.Invalidation.DrawNode );
+		Invalidate( Invalidation.DrawNode | Invalidation.DrawInfo );
 	}
 
 	Vector3 position;
@@ -72,7 +74,7 @@ public partial class Drawable3D {
 			rotation = value;
 			localMatrix.Invalidate();
 			matrix.Invalidate();
-			Invalidate( Framework.Graphics.Invalidation.DrawNode );
+			Invalidate( Invalidation.DrawNode | Invalidation.DrawInfo );
 		}
 	}
 
@@ -93,6 +95,9 @@ public partial class Drawable3D {
 		get => offset.Z;
 		set => trySet( ref offset.Z, ref value );
 	}
+
+	protected override bool OnInvalidate ( Invalidation invalidation, InvalidationSource source )
+		=> (invalidation & Invalidation.DrawInfo) != 0;
 
 	Cached<Matrix4> localMatrix = new();
 	Cached<Matrix4> matrix = new();
