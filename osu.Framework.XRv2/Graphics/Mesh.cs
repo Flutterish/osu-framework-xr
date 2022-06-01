@@ -7,7 +7,7 @@ namespace osu.Framework.XR.Graphics;
 /// Geometry data defined by one or more vertice buffers and an optional element buffer.
 /// </summary>
 /// <remarks>
-/// Note that drawing a mesh requires a linked attribute array to be bound
+/// Note that drawing a mesh requires a linked <see cref="IAttributeArray"/> to be bound
 /// </remarks>
 public class Mesh {
 	public IReadOnlyList<IVertexBuffer> VertexBuffers => vertexBuffers;
@@ -26,7 +26,7 @@ public class Mesh {
 	public int VertexCout => vertexBuffers[0].Count;
 
 	/// <summary>
-	/// Draws the elements specified by the element buffer
+	/// Draws the elements specified by the <see cref="IElementBuffer"/>
 	/// </summary>
 	/// <param name="count">The amount of indices to draw. For example, this means that if the element buffer is a triangle buffer, this number needs to be a multiple of 3</param>
 	/// <param name="offset">The amount of indices to offset by</param>
@@ -34,13 +34,13 @@ public class Mesh {
 		=> ElementBuffer!.Draw( count, offset );
 
 	/// <summary>
-	/// Draws all elements specified by the element buffer
+	/// Draws all elements specified by the <see cref="IElementBuffer"/>
 	/// </summary>
 	public void Draw ()
 		=> ElementBuffer!.Draw();
 
 	/// <summary>
-	/// Draws vertices using a given primitive without an element buffer 
+	/// Draws vertices using a given primitive without an <see cref="IElementBuffer"/>
 	/// </summary>
 	/// <param name="count">The amount of vertices to draw. For example, this means that if the primitive is a triangle, this number needs to be a multiple of 3</param>
 	/// <param name="offset">The amount of vertices to offset by</param>
@@ -48,7 +48,7 @@ public class Mesh {
 		=> GL.DrawArrays( primitive, offset, count );
 
 	/// <summary>
-	/// Draws all vertices using a given primitive without an element buffer 
+	/// Draws all vertices using a given primitive without an <see cref="IElementBuffer"/>
 	/// </summary>
 	public void Draw ( PrimitiveType primitive )
 		=> Draw( primitive, VertexCout, 0 );
