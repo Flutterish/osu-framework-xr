@@ -1,16 +1,20 @@
 ﻿using osu.Framework.Allocation;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Input.Events;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Framework.XR.Graphics;
 using osu.Framework.XR.Graphics.Containers;
+using osuTK;
+using System;
 
 namespace osu.Framework.XR.Tests;
 
 public class SampleTestScene : TestScene {
+	protected readonly Scene Scene;
 	public SampleTestScene () {
-		Add( new Scene { RelativeSizeAxes = Framework.Graphics.Axes.Both } );
+		Add( Scene = new Scene { RelativeSizeAxes = Framework.Graphics.Axes.Both } );
 	}
 
 	protected override IReadOnlyDependencyContainer CreateChildDependencies ( IReadOnlyDependencyContainer parent ) {
@@ -27,5 +31,42 @@ public class SampleTestScene : TestScene {
 		deps.Cache( materials );
 		deps.Cache( textures );
 		return base.CreateChildDependencies( deps );
+	}
+
+	protected override bool OnMouseMove ( MouseMoveEvent e ) {
+		e.Target = Scene;
+
+		var eulerX = Math.Clamp( e.MousePosition.Y / DrawHeight * 180 - 90, -89, 89 );
+		var eulerY = e.MousePosition.X / DrawWidth * 720 + 360;
+
+		Scene.Camera.Rotation = Quaternion.FromAxisAngle( Vector3.UnitY, eulerY * MathF.PI / 180 )
+			* Quaternion.FromAxisAngle( Vector3.UnitX, eulerX * MathF.PI / 180 );
+
+		return false;
+	}
+
+	protected override void Update () {
+		base.Update();
+
+		var camera = Scene.Camera;
+		var state = GetContainingInputManager().CurrentState;
+		var keyboard = state.Keyboard;
+
+		Vector3 dir = Vector3.Zero;
+		if ( keyboard.Keys.IsPressed( osuTK.Input.Key.W ) )
+			dir += camera.Forward;
+		if ( keyboard.Keys.IsPressed( osuTK.Input.Key.S ) )
+			dir += camera.Back;
+		if ( keyboard.Keys.IsPressed( osuTK.Input.Key.A ) )
+			dir += camera.Left;
+		if ( keyboard.Keys.IsPressed( osuTK.Input.Key.D ) )
+			dir += camera.Right;
+		if ( keyboard.Keys.IsPressed( osuTK.Input.Key.Space ) )
+			dir += camera.Up;
+		if ( keyboard.Keys.IsPressed( osuTK.Input.Key.ControlLeft ) )
+			dir += camera.Down;
+
+		if ( dir != Vector3.Zero )
+			camera.Position += dir.Normalized() * (float)Time.Elapsed / 300;
 	}
 }

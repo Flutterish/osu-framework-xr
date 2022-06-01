@@ -14,6 +14,12 @@ public class Scene : CompositeDrawable {
 	Queue<(Drawable3D drawable, bool added, Enum stage)> uploadableQueue = new();
 	HashSet<Drawable3D> drawables = new();
 
+	Camera? camera;
+	public Camera Camera {
+		get => camera ??= new();
+		set => camera = value;
+	}
+
 	public Scene () {
 		AddInternal( Root );
 		Root.SubtreeChildAdded += ( d, p ) => {
@@ -53,6 +59,8 @@ public class Scene : CompositeDrawable {
 				uploadableQueue.Enqueue( data );
 			}
 		}
+
+		Invalidate( Invalidation.DrawNode ); // camera updates are not invalidated
 	}
 
 	[BackgroundDependencyLoader]
@@ -78,12 +86,14 @@ public class Scene : CompositeDrawable {
 		Vector2 size;
 		osu.Framework.Graphics.OpenGL.Buffers.FrameBuffer frameBuffer;
 		IShader blitShader = null!;
+		Matrix4 projectionMatrix;
 		public override void ApplyState () {
 			base.ApplyState();
 
 			screenSpaceDrawQuad = Source.ScreenSpaceDrawQuad;
 			blitShader = Source.blitShader;
 			size = Source.DrawSize;
+			projectionMatrix = Source.Camera.GetProjectionMatrix( size.X, size.Y );
 		}
 
 		public override void Draw ( Action<TexturedVertex2D> vertexAction ) {
@@ -107,12 +117,7 @@ public class Scene : CompositeDrawable {
 			GLWrapper.PushDepthInfo( new( function: osuTK.Graphics.ES30.DepthFunction.Less ) );
 			GLWrapper.Clear( new( depth: 1 ) );
 
-			var ctx = new BasicDrawContext( Matrix4.CreateScale( 1, 1, -1 ) * Matrix4.CreatePerspectiveFieldOfView(
-				MathF.PI / 2,
-				size.X / size.Y,
-				0.01f,
-				1000f
-			) );
+			var ctx = new BasicDrawContext( projectionMatrix );
 			using ( var read = Source.tripleBuffer.Get( UsageType.Read ) ) {
 				foreach ( var i in defaultDrawLayer ) {
 					i.GetDrawNodeAtSubtree( read.Index )?.Draw( ctx );
@@ -127,7 +132,12 @@ public class Scene : CompositeDrawable {
 
 			blitShader.Bind();
 			frameBuffer.Texture.Bind();
-			DrawQuad( frameBuffer.Texture, screenSpaceDrawQuad, DrawColourInfo.Colour );
+			DrawQuad( frameBuffer.Texture, new Quad(
+				screenSpaceDrawQuad.BottomLeft,
+				screenSpaceDrawQuad.BottomRight,
+				screenSpaceDrawQuad.TopLeft,
+				screenSpaceDrawQuad.TopRight
+			), DrawColourInfo.Colour );
 		}
 
 		public List<DrawNode>? Children { get; set; }

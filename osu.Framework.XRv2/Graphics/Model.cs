@@ -45,7 +45,7 @@ public class Model : Drawable3D {
 	}
 
 	protected override void Update () {
-		Rotation = Quaternion.FromAxisAngle( new Vector3( 1, 0, 1 ).Normalized(), (float)Time.Current / 1000 );
+		//Rotation = Quaternion.FromAxisAngle( new Vector3( 1, 0, 1 ).Normalized(), (float)Time.Current / 1000 );
 	}
 
 	[BackgroundDependencyLoader]

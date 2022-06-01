@@ -126,4 +126,11 @@ public partial class Drawable3D {
 			return matrix.Value;
 		}
 	}
+
+	public Vector3 Forward => ( Rotation * new Vector4( 0, 0, 1, 1 ) ).Xyz;
+	public Vector3 Right => ( Rotation * new Vector4( 1, 0, 0, 1 ) ).Xyz;
+	public Vector3 Up => ( Rotation * new Vector4( 0, 1, 0, 1 ) ).Xyz;
+	public Vector3 Back => ( Rotation * new Vector4( 0, 0, -1, 1 ) ).Xyz;
+	public Vector3 Left => ( Rotation * new Vector4( -1, 0, 0, 1 ) ).Xyz;
+	public Vector3 Down => ( Rotation * new Vector4( 0, -1, 0, 1 ) ).Xyz;
 }
