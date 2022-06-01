@@ -92,5 +92,9 @@ public abstract class DrawNode3D {
 	/// Changes such as modifications of a mesh should be updated with a scheduled <see cref="Allocation.IUpload"/>
 	/// </remarks>
 	protected abstract void UpdateState ();
-	public abstract void Draw ();
+	/// <summary>
+	/// Draws the drawable, or otherwise interacts with the render pipeline
+	/// </summary>
+	/// <param name="ctx">An optional context to be passed by the render pipeline</param>
+	public abstract void Draw ( object? ctx = null );
 }

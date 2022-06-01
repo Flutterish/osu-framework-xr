@@ -39,6 +39,9 @@ public class Shader {
 	public void SetUniform ( string name, ref Matrix4 value ) {
 		GL.UniformMatrix4( getUniform( name ), true, ref value );
 	}
+	public void SetUniform ( string name, Matrix4 value ) {
+		GL.UniformMatrix4( getUniform( name ), true, ref value );
+	}
 
 	void compile () {
 		Handle = GL.CreateProgram();

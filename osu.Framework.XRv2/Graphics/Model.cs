@@ -9,19 +9,29 @@ public class Model : Drawable3D {
 	public Model () {
 		ElementBuffer<uint> EBO = new( PrimitiveType.Triangles );
 		EBO.Indices.AddRange( new uint[] {
-			0, 1, 3,
-			1, 2, 3
+			0, 4, 6, 0, 6, 2,
+			3, 2, 6, 3, 6, 7,
+			7, 6, 4, 7, 4, 5,
+			5, 1, 3, 5, 3, 7,
+			1, 0, 2, 1, 2, 3,
+			5, 4, 0, 5, 0, 1
 		} );
 		VertexBuffer<PositionVertex> VBO = new();
 		VBO.Data.AddRange( new PositionVertex[] {
-			new() { Position = new(  0.5f,  0.5f, 0.0f ) },
-			new() { Position = new(  0.5f, -0.5f, 0.0f ) },
-			new() { Position = new( -0.5f, -0.5f, 0.0f ) },
-			new() { Position = new( -0.5f,  0.5f, 0.0f ) }
+			new() { Position = new Vector3(  1,  1, -1 ) },
+			new() { Position = new Vector3(  1, -1, -1 ) },
+			new() { Position = new Vector3(  1,  1,  1 ) },
+			new() { Position = new Vector3(  1, -1,  1 ) },
+			new() { Position = new Vector3( -1,  1, -1 ) },
+			new() { Position = new Vector3( -1, -1, -1 ) },
+			new() { Position = new Vector3( -1,  1,  1 ) },
+			new() { Position = new Vector3( -1, -1,  1 ) }
 		} );
 
 		mesh = new( EBO, VBO );
 		mesh.CreateFullUnsafeUpload().Enqueue();
+
+		Z = 5;
 	}
 
 	protected override void Update () {
@@ -54,7 +64,7 @@ public class Model : Drawable3D {
 			matrix = Source.Matrix;
 		}
 
-		public override void Draw () {
+		public override void Draw ( object? ctx = null ) {
 			if ( VAO.Handle == 0 ) {
 				VAO.Bind();
 
@@ -65,6 +75,7 @@ public class Model : Drawable3D {
 
 			material.Shader.Bind();
 			material.Shader.SetUniform( "matrix", ref matrix );
+			material.Shader.SetUniform( "gProj", ((BasicDrawContext)ctx!).ProjectionMatrix );
 			mesh.Draw();
 		}
 	}

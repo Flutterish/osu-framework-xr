@@ -107,9 +107,15 @@ public class Scene : CompositeDrawable {
 			GLWrapper.PushDepthInfo( new() );
 			GLWrapper.Clear( new( depth: 0 ) );
 
+			var ctx = new BasicDrawContext( Matrix4.CreateScale( 1, 1, -1 ) * Matrix4.CreatePerspectiveFieldOfView(
+				MathF.PI / 2,
+				size.X / size.Y,
+				0.01f,
+				1000f
+			) );
 			using ( var read = Source.tripleBuffer.Get( UsageType.Read ) ) {
 				foreach ( var i in defaultDrawLayer ) {
-					i.GetDrawNodeAtSubtree( read.Index )?.Draw();
+					i.GetDrawNodeAtSubtree( read.Index )?.Draw( ctx );
 				}
 			}
 
