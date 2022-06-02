@@ -4,8 +4,8 @@ using osu.Framework.Input.Events;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
-using osu.Framework.XR.Graphics.Containers;
 using osu.Framework.XR.Graphics.Materials;
+using osu.Framework.XR.Graphics.Rendering;
 using osuTK;
 using System;
 

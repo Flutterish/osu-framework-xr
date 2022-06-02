@@ -1,7 +1,9 @@
 ﻿using osu.Framework.Graphics.Textures;
+using osu.Framework.Utils;
 using osu.Framework.XR.Graphics.Buffers;
 using osu.Framework.XR.Graphics.Materials;
 using osu.Framework.XR.Graphics.Vertices;
+using osuTK.Graphics;
 
 namespace osu.Framework.XR.Graphics;
 
@@ -56,6 +58,7 @@ public class Model : Drawable3D { // TODO dispose things
 
 		material.CreateUpload( m => {
 			m.Set( "tex", texture );
+			m.Set( "tint", new Color4( RNG.NextSingle(), RNG.NextSingle(), RNG.NextSingle(), 1 ) );
 			m.Set( "subImage", texture.GetTextureRect() );
 		} ).Enqueue();
 	}
