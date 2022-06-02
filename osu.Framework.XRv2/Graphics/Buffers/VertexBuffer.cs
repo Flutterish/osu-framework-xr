@@ -1,4 +1,5 @@
-﻿using osu.Framework.XR.Allocation;
+﻿using osu.Framework.Development;
+using osu.Framework.XR.Allocation;
 using osu.Framework.XR.Graphics.Shaders;
 using osu.Framework.XR.Graphics.Vertices;
 using System.Runtime.InteropServices;
@@ -40,7 +41,7 @@ public interface IVertexBuffer {
 }
 
 /// <inheritdoc cref="IVertexBuffer"/>
-public class VertexBuffer<Tvertex> : IVertexBuffer where Tvertex : struct, IVertex<Tvertex> {
+public class VertexBuffer<Tvertex> : IVertexBuffer, IDisposable where Tvertex : struct, IVertex<Tvertex> {
 	public readonly List<Tvertex> Data = new();
 	public GlHandle Handle { get; private set; }
 
@@ -62,6 +63,20 @@ public class VertexBuffer<Tvertex> : IVertexBuffer where Tvertex : struct, IVert
 
 	public IUpload CreateUnsafeUpload ( BufferUsageHint usage = BufferUsageHint.StaticDraw ) {
 		return new UnsafeUpload( this, usage );
+	}
+
+	public void Dispose () {
+		DisposeScheduler.Enqueue( this, v => {
+			GL.DeleteBuffer( Handle );
+			v.Handle = 0;
+		} );
+		GC.SuppressFinalize( this );
+	}
+
+	~VertexBuffer () {
+		if ( DebugUtils.IsDebugBuild )
+			throw new InvalidOperationException( $"A {nameof( VertexBuffer<Tvertex> )} has not been disposed correctly" );
+		Dispose();
 	}
 
 	class Upload : IUpload {

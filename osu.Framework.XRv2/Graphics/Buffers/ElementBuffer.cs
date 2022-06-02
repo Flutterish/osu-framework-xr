@@ -1,4 +1,5 @@
-﻿using osu.Framework.Extensions.TypeExtensions;
+﻿using osu.Framework.Development;
+using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.XR.Allocation;
 using System.Runtime.InteropServices;
 
@@ -54,7 +55,7 @@ public interface IElementBuffer {
 }
 
 /// <inheritdoc cref="IElementBuffer"/>
-public class ElementBuffer<Tindex> : IElementBuffer where Tindex : unmanaged {
+public class ElementBuffer<Tindex> : IElementBuffer, IDisposable where Tindex : unmanaged {
 	public readonly List<Tindex> Indices = new();
 	public readonly PrimitiveType PrimitiveType;
 	public static readonly DrawElementsType ElementType;
@@ -94,6 +95,20 @@ public class ElementBuffer<Tindex> : IElementBuffer where Tindex : unmanaged {
 
 	public void Draw ( int count, int offset = 0 ) {
 		GL.DrawElements( PrimitiveType, count, ElementType, offset * Stride );
+	}
+
+	public void Dispose () {
+		DisposeScheduler.Enqueue( this, v => {
+			GL.DeleteBuffer( Handle );
+			v.Handle = 0;
+		} );
+		GC.SuppressFinalize( this );
+	}
+
+	~ElementBuffer () {
+		if ( DebugUtils.IsDebugBuild )
+			throw new InvalidOperationException( $"An {nameof( ElementBuffer<Tindex> )} has not been disposed correctly" );
+		Dispose();
 	}
 
 	class Upload : IUpload {

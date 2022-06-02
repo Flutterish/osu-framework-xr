@@ -1,4 +1,6 @@
-﻿namespace osu.Framework.XR.Graphics.Buffers;
+﻿using osu.Framework.Development;
+
+namespace osu.Framework.XR.Graphics.Buffers;
 
 /// <summary>
 /// A "link" between geometry data (<see cref="IVertexBuffer"/>s + <see cref="IElementBuffer"/>)
@@ -22,7 +24,7 @@ public interface IAttributeArray {
 }
 
 /// <inheritdoc cref="IAttributeArray"/>
-public class AttributeArray : IAttributeArray {
+public class AttributeArray : IAttributeArray, IDisposable {
 	public GlHandle Handle { get; private set; }
 	
 	public void Bind () {
@@ -31,5 +33,19 @@ public class AttributeArray : IAttributeArray {
 		}
 
 		GL.BindVertexArray( Handle );
+	}
+
+	public void Dispose () {
+		DisposeScheduler.Enqueue( this, v => {
+			GL.DeleteVertexArray( Handle );
+			v.Handle = 0;
+		} );
+		GC.SuppressFinalize( this );
+	}
+
+	~AttributeArray () {
+		if ( DebugUtils.IsDebugBuild )
+			throw new InvalidOperationException( $"An {nameof(AttributeArray)} has not been disposed correctly" );
+		Dispose();
 	}
 }

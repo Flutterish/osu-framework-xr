@@ -4,6 +4,7 @@ using osu.Framework.Graphics.OpenGL;
 using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shaders;
+using osu.Framework.Utils;
 using osu.Framework.XR.Graphics.Materials;
 
 namespace osu.Framework.XR.Graphics.Containers;
@@ -34,7 +35,13 @@ public class Scene : CompositeDrawable {
 			d.RenderStageChanged -= onRenderStageChanged;
 		};
 
-		Root.Add( new Model() );
+		for ( int i = 0; i < 10; i++ ) {
+			Root.Add( new Model() {
+				X = RNG.NextSingle( -5, 5 ),
+				Y = RNG.NextSingle( -5, 5 ),
+				Z = RNG.NextSingle( -5, 5 )
+			} );
+		}
 	}
 
 	private void onRenderStageChanged ( Drawable3D drawable, Enum from, Enum to ) {
@@ -110,6 +117,7 @@ public class Scene : CompositeDrawable {
 			}
 
 			UploadScheduler.Execute();
+			DisposeScheduler.Execute();
 
 			frameBuffer.Size = size;
 			frameBuffer.Bind();
