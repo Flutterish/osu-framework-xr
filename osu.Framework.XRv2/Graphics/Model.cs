@@ -5,7 +5,7 @@ using osu.Framework.XR.Graphics.Vertices;
 
 namespace osu.Framework.XR.Graphics;
 
-public class Model : Drawable3D {
+public class Model : Drawable3D { // TODO dispose things
 	AttributeArray VAO = new();
 	Mesh mesh;
 	public Model () {

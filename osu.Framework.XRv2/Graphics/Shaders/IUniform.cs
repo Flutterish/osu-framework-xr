@@ -7,7 +7,7 @@ namespace osu.Framework.XR.Graphics.Shaders;
 
 public interface IUniform {
 	int Location { get; }
-	IMaterialUniform CreateMaterialUniform ();
+	IMaterialUniform? CreateMaterialUniform ();
 }
 
 public interface IUniform<T> : IUniform {

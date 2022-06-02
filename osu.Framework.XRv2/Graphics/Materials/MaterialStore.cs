@@ -10,19 +10,25 @@ public class MaterialStore {
 	}
 
 	Dictionary<(string material, string name), Material> sharedMaterials = new();
-	public Material GetShared ( string material, string sharedName ) {
-		if ( !sharedMaterials.TryGetValue( (material, sharedName), out var mat ) )
-			sharedMaterials.Add( (material, sharedName), mat = GetNew( material ) );
+	public Material GetShared ( string material, string sharedName ) => GetShared<Material, Shader>( material, sharedName );
+	public Tmaterial GetShared<Tmaterial, Tshader> ( string material, string sharedName ) where Tmaterial : Material where Tshader : Shader {
 
-		return mat;
+		if ( !sharedMaterials.TryGetValue( (material, sharedName), out var mat ) )
+			sharedMaterials.Add( (material, sharedName), mat = GetNew<Tmaterial, Tshader>( material ) );
+
+		return (Tmaterial)mat;
 	}
 
-	public Material GetNew ( string material ) {
-		return new( GetShader( material ) );
+	public Material GetNew ( string material ) => GetNew<Material, Shader>( material );
+	public Tmaterial GetNew<Tmaterial, Tshader> ( string material ) where Tmaterial : Material where Tshader : Shader {
+
+		var shader = GetShader<Tshader>( material );
+		return (Tmaterial)Activator.CreateInstance( typeof(Tmaterial), new object[] { shader } )!;
 	}
 
 	Dictionary<string, Shader> cachedShaders = new();
-	public Shader GetShader ( string name ) {
+	public Shader GetShader ( string name ) => GetShader<Shader>( name );
+	public Tshader GetShader<Tshader> ( string name ) where Tshader : Shader {
 		if ( !cachedShaders.TryGetValue( name, out var shader ) ) {
 			ShaderPart[] parts;
 			if ( resourceStore.Get( $"{name}.geom" ) is byte[] geom ) {
@@ -37,10 +43,10 @@ public class MaterialStore {
 			parts[0] = new( fromBytes( resourceStore.Get( $"{name}.vert" ) ), ShaderType.VertexShader );
 			parts[1] = new( fromBytes( resourceStore.Get( $"{name}.frag" ) ), ShaderType.FragmentShader );
 
-			cachedShaders.Add( name, shader = new( parts ) );
+			cachedShaders.Add( name, shader = (Tshader)Activator.CreateInstance( typeof( Tshader ), new object[] { parts } )! );
 		}
 
-		return shader;
+		return (Tshader)shader;
 	}
 
 	string fromBytes ( byte[] bytes ) {

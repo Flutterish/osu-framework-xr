@@ -5,6 +5,9 @@ namespace osu.Framework.XR.Graphics.Shaders;
 /// <summary>
 /// A GPU program responsible for drawing
 /// </summary>
+/// <remarks>
+/// A shader is always safe to use on the draw thread, and only safe to *introspect* on other threads when <see cref="IsCompiled"/>
+/// </remarks>
 public class Shader {
 	ShaderPart[] parts;
 	public Shader ( ShaderPart[] parts ) {
@@ -14,7 +17,7 @@ public class Shader {
 	}
 
 	public GlHandle Handle { get; private set; }
-	public bool IsCompiled => Handle != 0;
+	public bool IsCompiled { get; private set; }
 
 	static Shader? boundShader;
 	public void Bind () {
@@ -53,6 +56,10 @@ public class Shader {
 	public T GetUniformValue<T> ( string name )
 		=> GetUniform<T>( name ).Value;
 
+	/// <returns>Whether default uniforms should be created</returns>
+	protected virtual bool PerformCustomCompilation ( Dictionary<string, IUniform> uniforms, ref TextureUnit currentTextureUnit )
+		=> true;
+
 	void compile () {
 		Handle = GL.CreateProgram();
 
@@ -63,27 +70,31 @@ public class Shader {
 
 		GL.LinkProgram( Handle );
 
-		GL.GetProgram( Handle, GetProgramParameterName.ActiveUniforms, out int uniformCount );
 		TextureUnit unit = TextureUnit.Texture0;
-		for ( int i = 0; i < uniformCount; i++ ) {
-			GL.GetActiveUniform( Handle, i, 100, out _, out _, out ActiveUniformType type, out string uniformName );
-			var location = GL.GetUniformLocation( Handle, uniformName );
+		if ( PerformCustomCompilation( uniforms, ref unit ) ) {
+			GL.GetProgram( Handle, GetProgramParameterName.ActiveUniforms, out int uniformCount );
+			for ( int i = 0; i < uniformCount; i++ ) {
+				GL.GetActiveUniform( Handle, i, 100, out _, out _, out ActiveUniformType type, out string uniformName );
+				var location = GL.GetUniformLocation( Handle, uniformName );
 
-			var uniform = type switch {
-				ActiveUniformType.Bool => new BoolUniform { Location = location },
-				ActiveUniformType.Int => new IntUniform { Location = location },
-				ActiveUniformType.Float => new FloatUniform { Location = location },
-				ActiveUniformType.FloatVec2 => new Vector2Uniform { Location = location },
-				ActiveUniformType.FloatVec3 => new Vector3Uniform { Location = location },
-				ActiveUniformType.FloatVec4 => new Vector4Uniform { Location = location },
-				ActiveUniformType.FloatMat4 => new Matrix4Uniform { Location = location },
-				ActiveUniformType.Sampler2D => new Sampler2DUniform { Location = location, TextureUnit = unit++ },
-				_ => (IUniform?)null
-			};
+				var uniform = type switch {
+					ActiveUniformType.Bool => new BoolUniform { Location = location },
+					ActiveUniformType.Int => new IntUniform { Location = location },
+					ActiveUniformType.Float => new FloatUniform { Location = location },
+					ActiveUniformType.FloatVec2 => new Vector2Uniform { Location = location },
+					ActiveUniformType.FloatVec3 => new Vector3Uniform { Location = location },
+					ActiveUniformType.FloatVec4 => new Vector4Uniform { Location = location },
+					ActiveUniformType.FloatMat4 => new Matrix4Uniform { Location = location },
+					ActiveUniformType.Sampler2D => new Sampler2DUniform { Location = location, TextureUnit = unit++ },
+					_ => (IUniform?)null
+				};
 
-			if ( uniform != null )
-				uniforms.Add( uniformName, uniform );
+				if ( uniform != null )
+					uniforms.Add( uniformName, uniform );
+			}
 		}
+
+		IsCompiled = true;
 	}
 }
 

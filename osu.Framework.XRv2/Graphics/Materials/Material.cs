@@ -10,7 +10,10 @@ namespace osu.Framework.XR.Graphics.Materials;
 /// <remarks>
 /// Uniforms prefixed with "g" for "global" (ex. "gProj" - values set once per batch) 
 /// as well as "m" for "my" (ex. "mMatrix" - local values that change every frame) arent considered material uniforms
-/// (exception being if the next letter is also lowercase - use an underscore if this is intentional)
+/// (exception being if the next letter is also lowercase - use an underscore if this is intentional).
+/// 
+/// A material is always safe to use on the draw thread, and only safe to *introspect* on other threads when <see cref="IsLoaded"/>.
+/// You can update values from other threads with <see cref="CreateUpload(Action{Material})"/>
 /// </remarks>
 public class Material {
 	public readonly Shader Shader;
@@ -23,22 +26,29 @@ public class Material {
 
 	static Regex nameIsNotMaterialUniformRegex = new( "^(m|g)[A-Z_]", RegexOptions.Compiled );
 
-	public bool IsLoaded => uniforms != null;
+	public bool IsLoaded { get; private set; }
+
+	/// <returns>Whether default material uniforms should be created</returns>
+	protected virtual bool PerformCustomLoad ( Dictionary<string, IMaterialUniform> uniforms )
+		=> true;
 
 	Dictionary<string, IMaterialUniform> uniforms = null!;
 	IMaterialUniform[] uniformArray = null!;
 	void createUniforms () {
-		var uniforms = new Dictionary<string, IMaterialUniform>();
-		foreach ( var (name, uniform) in Shader.AllUniforms ) {
-			if ( nameIsNotMaterialUniformRegex.IsMatch( name ) )
-				continue;
+		uniforms = new Dictionary<string, IMaterialUniform>();
+		if ( PerformCustomLoad( uniforms ) ) {
+			foreach ( var (name, uniform) in Shader.AllUniforms ) {
+				if ( nameIsNotMaterialUniformRegex.IsMatch( name ) )
+					continue;
 
-			var mat = uniform.CreateMaterialUniform();
-			uniforms.Add( name, mat );
+				var mat = uniform.CreateMaterialUniform();
+				if ( mat != null )
+					uniforms.Add( name, mat );
+			}
 		}
-
-		this.uniformArray = uniforms.Values.ToArray();
-		this.uniforms = uniforms;
+		
+		uniformArray = uniforms.Values.ToArray();
+		IsLoaded = true;
 	}
 
 	public IEnumerable<KeyValuePair<string, IMaterialUniform>> AllUniforms
