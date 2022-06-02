@@ -7,9 +7,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "osu.Framework.XR", "osu.Fra
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "osu.Framework.XR.Tests", "osu.Framework.XR.Tests\osu.Framework.XR.Tests.csproj", "{94948CDC-B7EB-46BC-8797-CE7C7473B6DC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Framework.XRv2", "osu.Framework.XRv2\osu.Framework.XRv2.csproj", "{0E0D0C2E-AA73-4C6E-8F7E-629D08E2993C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "osu.Framework.XRv2", "osu.Framework.XRv2\osu.Framework.XRv2.csproj", "{0E0D0C2E-AA73-4C6E-8F7E-629D08E2993C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Framework.XR.Testsv2", "osu.Framework.XR.Testsv2\osu.Framework.XR.Testsv2.csproj", "{2B778960-D33A-44F0-8347-461912ED9072}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "osu.Framework.XR.Testsv2", "osu.Framework.XR.Testsv2\osu.Framework.XR.Testsv2.csproj", "{2B778960-D33A-44F0-8347-461912ED9072}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6536075D-1EDA-4137-B3BB-28732473898D}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
