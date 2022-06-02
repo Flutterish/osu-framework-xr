@@ -92,6 +92,13 @@ public class CompositeDrawable3D : Drawable3D {
 		}
 	}
 
+	protected override void InvalidateMatrix () {
+		base.InvalidateMatrix();
+		foreach ( var i in children ) {
+			i.TryInvalidateMatrix();
+		}
+	}
+
 	public delegate void HierarchyModifiedHandler ( Drawable3D child, CompositeDrawable3D? parent );
 	public event HierarchyModifiedHandler? ChildAdded;
 	public event HierarchyModifiedHandler? ChildRemoved;

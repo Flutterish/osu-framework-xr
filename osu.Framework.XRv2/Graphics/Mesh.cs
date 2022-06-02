@@ -9,7 +9,7 @@ namespace osu.Framework.XR.Graphics;
 /// <remarks>
 /// Note that drawing a mesh requires a linked <see cref="IAttributeArray"/> to be bound
 /// </remarks>
-public class Mesh {
+public class Mesh : IDisposable {
 	public IReadOnlyList<IVertexBuffer> VertexBuffers => vertexBuffers;
 	readonly IVertexBuffer[] vertexBuffers;
 	public readonly IElementBuffer? ElementBuffer;
@@ -136,4 +136,10 @@ public class Mesh {
 	/// </remarks>
 	public IUpload CreateUnsafeElementBufferUpload ( BufferUsageHint usage = BufferUsageHint.StaticDraw )
 		=> ElementBuffer!.CreateUnsafeUpload( usage );
+
+	public void Dispose () {
+		ElementBuffer?.Dispose();
+		foreach ( var i in vertexBuffers )
+			i.Dispose();
+	}
 }

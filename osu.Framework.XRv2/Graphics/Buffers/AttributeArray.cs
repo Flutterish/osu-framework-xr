@@ -13,7 +13,7 @@ namespace osu.Framework.XR.Graphics.Buffers;
 /// shader uniforms, for example to render the same mesh in multiple places or with different textures,
 /// or even different animation progresses
 /// </remarks>
-public interface IAttributeArray {
+public interface IAttributeArray : IDisposable {
 	/// <summary>
 	/// Binds the <see cref="IAttributeArray"/>. 
 	/// All <see cref="IVertexBuffer"/> link calls will be linked to this attribute array.
@@ -24,7 +24,7 @@ public interface IAttributeArray {
 }
 
 /// <inheritdoc cref="IAttributeArray"/>
-public class AttributeArray : IAttributeArray, IDisposable {
+public class AttributeArray : IAttributeArray {
 	public GlHandle Handle { get; private set; }
 	
 	public void Bind () {

@@ -14,7 +14,7 @@ namespace osu.Framework.XR.Graphics.Buffers;
 /// Multiple vertice buffers can be used to draw a single object (so long they are the same length) 
 /// and they can be shared across different meshes
 /// </remarks>
-public interface IVertexBuffer {
+public interface IVertexBuffer : IDisposable {
 	/// <inheritdoc cref="IVertex.Stride"/>
 	int Stride { get; }
 	/// <inheritdoc cref="IVertex.Link(Shader, int[])"/>
@@ -41,7 +41,7 @@ public interface IVertexBuffer {
 }
 
 /// <inheritdoc cref="IVertexBuffer"/>
-public class VertexBuffer<Tvertex> : IVertexBuffer, IDisposable where Tvertex : struct, IVertex<Tvertex> {
+public class VertexBuffer<Tvertex> : IVertexBuffer where Tvertex : struct, IVertex<Tvertex> {
 	public readonly List<Tvertex> Data = new();
 	public GlHandle Handle { get; private set; }
 

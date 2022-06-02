@@ -15,7 +15,7 @@ namespace osu.Framework.XR.Graphics.Buffers;
 /// but the same vertice buffers and possibly a different material.
 /// Note that drawing with an element buffer requires a linked attribute array to be bound
 /// </remarks>
-public interface IElementBuffer {
+public interface IElementBuffer : IDisposable {
 	/// <summary>
 	/// Uploads the data to the element buffer. The created upload will *copy*
 	/// the current data and send it to the draw thread to make sure it is not modified while it is being uploaded.
@@ -55,7 +55,7 @@ public interface IElementBuffer {
 }
 
 /// <inheritdoc cref="IElementBuffer"/>
-public class ElementBuffer<Tindex> : IElementBuffer, IDisposable where Tindex : unmanaged {
+public class ElementBuffer<Tindex> : IElementBuffer where Tindex : unmanaged {
 	public readonly List<Tindex> Indices = new();
 	public readonly PrimitiveType PrimitiveType;
 	public static readonly DrawElementsType ElementType;

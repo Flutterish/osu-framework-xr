@@ -1,16 +1,19 @@
-﻿using osu.Framework.Graphics.Textures;
+﻿using osu.Framework.Allocation;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
 using osu.Framework.XR.Graphics.Buffers;
 using osu.Framework.XR.Graphics.Materials;
 using osu.Framework.XR.Graphics.Vertices;
+using osuTK;
 using osuTK.Graphics;
+using System;
 
 namespace osu.Framework.XR.Graphics;
 
-public class Model : Drawable3D { // TODO dispose things
+public class SusieCube : Drawable3D {
 	AttributeArray VAO = new();
 	Mesh mesh;
-	public Model () {
+	public SusieCube () {
 		ElementBuffer<uint> EBO = new();
 		EBO.Indices.AddRange( new uint[] {
 			0,  1,  2,  2,  3,  0,
@@ -66,14 +69,22 @@ public class Model : Drawable3D { // TODO dispose things
 	Texture texture = null!;
 
 	protected override DrawNode3D? CreateDrawNode3D ()
-		=> new ModelDrawNode( this );
+		=> new SusieCubeDrawNode( this );
 
-	class ModelDrawNode : DrawNode3D {
-		new protected Model Source => (Model)base.Source;
+	protected override void Dispose ( bool isDisposing ) {
+		if ( !IsDisposed ) {
+			VAO.Dispose();
+			mesh.Dispose();
+		}
+		base.Dispose( isDisposing );
+	}
+
+	class SusieCubeDrawNode : DrawNode3D {
+		new protected SusieCube Source => (SusieCube)base.Source;
 
 		AttributeArray VAO;
 		Mesh mesh;
-		public ModelDrawNode ( Model source ) : base( source ) {
+		public SusieCubeDrawNode ( SusieCube source ) : base( source ) {
 			mesh = source.mesh;
 			VAO = source.VAO;
 		}
@@ -96,7 +107,7 @@ public class Model : Drawable3D { // TODO dispose things
 
 			material.Bind();
 			material.Shader.SetUniform( "mMatrix", ref matrix );
-			material.Shader.SetUniform( "gProj", ((BasicDrawContext)ctx!).ProjectionMatrix );
+			material.Shader.SetUniform( "gProj", ( (BasicDrawContext)ctx! ).ProjectionMatrix );
 			mesh.Draw();
 		}
 	}

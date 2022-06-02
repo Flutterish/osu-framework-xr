@@ -12,9 +12,7 @@ public partial class Drawable3D {
 			return;
 
 		field = value;
-		localMatrix.Invalidate();
-		matrix.Invalidate();
-		Invalidate( Invalidation.DrawNode | Invalidation.DrawInfo );
+		TryInvalidateMatrix();
 	}
 
 	[MethodImpl( MethodImplOptions.AggressiveInlining )]
@@ -23,7 +21,15 @@ public partial class Drawable3D {
 			return;
 
 		field = value;
-		localMatrix.Invalidate();
+		TryInvalidateMatrix();
+	}
+
+	public void TryInvalidateMatrix () {
+		if ( localMatrixCache.Invalidate() ) {
+			InvalidateMatrix();
+		}
+	}
+	protected virtual void InvalidateMatrix () {
 		matrix.Invalidate();
 		Invalidate( Invalidation.DrawNode | Invalidation.DrawInfo );
 	}
@@ -72,7 +78,7 @@ public partial class Drawable3D {
 				return;
 
 			rotation = value;
-			localMatrix.Invalidate();
+			localMatrixCache.Invalidate();
 			matrix.Invalidate();
 			Invalidate( Invalidation.DrawNode | Invalidation.DrawInfo );
 		}
@@ -99,19 +105,32 @@ public partial class Drawable3D {
 	protected override bool OnInvalidate ( Invalidation invalidation, InvalidationSource source )
 		=> (invalidation & Invalidation.DrawInfo) != 0;
 
-	Cached<Matrix4> localMatrix = new();
+	Cached localMatrixCache = new();
 	Cached<Matrix4> matrix = new();
 
+	Matrix4 localMatrix;
 	public Matrix4 LocalMatrix {
 		get {
-			if ( !localMatrix.IsValid ) { // TODO combine into one operation
-				localMatrix.Value = Matrix4.CreateTranslation( offset )
-					* Matrix4.CreateScale( scale )
-					* Matrix4.CreateFromQuaternion( rotation )
-					* Matrix4.CreateTranslation( position );
+			if ( !localMatrixCache.IsValid ) { // TODO combine into one operation
+				localMatrix = Matrix4.CreateTranslation( offset );
+				Matrix4 temp;
+				if ( scale != Vector3.One ) {
+					temp = Matrix4.CreateScale( scale );
+					Matrix4.Mult( ref localMatrix, ref temp, out localMatrix );
+				}
+				if ( rotation != Quaternion.Identity ) {
+					temp = Matrix4.CreateFromQuaternion( rotation );
+					Matrix4.Mult( ref localMatrix, ref temp, out localMatrix );
+				}
+				if ( position != Vector3.Zero ) {
+					temp = Matrix4.CreateTranslation( position );
+					Matrix4.Mult( ref localMatrix, ref temp, out localMatrix );
+				}
+
+				localMatrixCache.Validate();
 			}
 
-			return localMatrix.Value;
+			return localMatrix;
 		}
 	}
 
