@@ -66,7 +66,7 @@ public class SampleTestScene : TestScene {
 		if ( keyboard.Keys.IsPressed( osuTK.Input.Key.ControlLeft ) )
 			dir += camera.Down;
 
-		if ( dir != Vector3.Zero )
+		if ( dir.Length > 0.1f )
 			camera.Position += dir.Normalized() * (float)Time.Elapsed / 300;
 	}
 }

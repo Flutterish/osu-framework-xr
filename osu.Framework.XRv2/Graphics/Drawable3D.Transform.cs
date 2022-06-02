@@ -41,7 +41,7 @@ public partial class Drawable3D {
 		get => position.Y;
 		set => trySet( ref position.Y, ref value );
 	}
-	new public float Z {
+	public float Z {
 		get => position.Z;
 		set => trySet( ref position.Z, ref value );
 	}
