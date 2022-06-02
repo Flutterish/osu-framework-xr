@@ -46,12 +46,16 @@ public partial class Drawable3D : CompositeDrawable {
 
 	DrawNode3D?[] subtreeNodes = new DrawNode3D?[3];
 	public DrawNode3D? GetDrawNodeAtSubtree ( int subtreeIndex ) {
-		return subtreeNodes[subtreeIndex] ??= CreateDrawNode3D();
+		return subtreeNodes[subtreeIndex] ??= CreateDrawNode3D( subtreeIndex );
 	}
 
 	[EditorBrowsable( EditorBrowsableState.Never )]
 	protected sealed override DrawNode? CreateDrawNode ()
 		=> throw new InvalidOperationException( "Cannot create a 2D draw node for a 3D drawable. This probably means the drawable is located outside of a scene" );
+
+	/// <inheritdoc cref="DrawNode3D"/>
+	protected virtual DrawNode3D? CreateDrawNode3D ( int subtreeIndex )
+		=> CreateDrawNode3D();
 
 	/// <inheritdoc cref="DrawNode3D"/>
 	protected virtual DrawNode3D? CreateDrawNode3D ()
@@ -71,7 +75,7 @@ public enum InvalidRenderStage { None = -1 }
 /// Big data, such as meshes or GPU buffers should be updated with a scheduled <see cref="Allocation.IUpload"/>
 /// </remarks>
 public abstract class DrawNode3D {
-	protected Drawable3D Source { get; }
+	public Drawable3D Source { get; }
 	public long InvalidationID { get; private set; }
 
 	public DrawNode3D ( Drawable3D source ) {
