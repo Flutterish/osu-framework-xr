@@ -5,7 +5,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>osu.Framework.XR</RootNamespace>
-	<EnablePreviewFeatures>True</EnablePreviewFeatures>
 	<AssemblyName>osu.Framework.XR</AssemblyName>
   </PropertyGroup>
 	

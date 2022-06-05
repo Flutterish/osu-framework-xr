@@ -44,16 +44,17 @@ public abstract class BatchDrawable<Tdrawable, Tnode> : Container3D<Tdrawable> w
 			SubtreeIndex = subtreeIndex;
 		}
 
-		protected readonly List<Tnode> Children = new();
+		List<Tnode> children = new();
+		protected ReadOnlySpan<Tnode> Children => children.AsSpan();
 		protected override void UpdateState () {
 			if ( subtreeUpdateID != Source.subtreeUpdateID ) {
 				subtreeUpdateID = Source.subtreeUpdateID;
-				Children.Clear();
+				children.Clear();
 				foreach ( var i in Source.Children ) {
 					var node = i.GetDrawNodeAtSubtree( SubtreeIndex );
 					if ( node is Tnode n ) {
 						node.UpdateNode();
-						Children.Add( n );
+						children.Add( n );
 					}
 				}
 			}

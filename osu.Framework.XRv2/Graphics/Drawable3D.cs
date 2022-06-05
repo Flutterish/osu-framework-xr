@@ -10,7 +10,7 @@ public partial class Drawable3D : CompositeDrawable {
 	CompositeDrawable3D? parent;
 	new public CompositeDrawable3D? Parent { 
 		get => parent; 
-		[Friend<CompositeDrawable3D>] internal set {
+		[Friend(typeof( CompositeDrawable3D ) )] internal set {
 			parent = value;
 			matrix.Invalidate();
 		}

@@ -4,6 +4,7 @@ using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
+using osu.Framework.XR.Collections;
 using osu.Framework.XR.Graphics.Containers;
 using osu.Framework.XR.Graphics.Materials;
 
@@ -14,7 +15,7 @@ public partial class Scene : CompositeDrawable {
 	public readonly Container3D Root = new();
 	Queue<(Drawable3D drawable, bool added, Enum stage)> drawableQueue = new();
 	Queue<(Drawable3D drawable, bool added, Enum stage)> uploadableQueue = new();
-	HashSet<Drawable3D> drawables = new();
+	HashList<Drawable3D> drawables = new();
 
 	Camera? camera;
 	public Camera Camera {

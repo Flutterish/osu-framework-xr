@@ -4,7 +4,7 @@ using osu.Framework.XR.Graphics;
 using osu.Framework.XR.Graphics.Materials;
 using osu.Framework.XR.Graphics.Rendering;
 using osuTK;
-using System.Collections.Generic;
+using System;
 
 namespace osu.Framework.XR.Tests.Models;
 
@@ -32,19 +32,19 @@ public class TestingScene : Scene {
 		protected override void Draw ( int subtreeIndex, Matrix4 projectionMatrix ) {
 			var ctx = new BasicDrawContext( projectionMatrix );
 
-			foreach ( var (stage, set) in RenderStages ) {
+			foreach ( var stage in RenderStages ) {
 				if ( stage is TestingRenderStage.SusieCubeBatch ) {
-					DrawCubes( subtreeIndex, projectionMatrix, set );
+					DrawCubes( subtreeIndex, projectionMatrix, GetRenderStage( stage ) );
 				}
 				else {
-					foreach ( var i in set ) {
+					foreach ( var i in GetRenderStage( stage ) ) {
 						i.GetDrawNodeAtSubtree( subtreeIndex )?.Draw( ctx );
 					}
 				}
 			}
 		}
 
-		void DrawCubes ( int subtreeIndex, Matrix4 projectionMatrix, HashSet<Drawable3D> cubes ) {
+		void DrawCubes ( int subtreeIndex, Matrix4 projectionMatrix, ReadOnlySpan<Drawable3D> cubes ) {
 			var VAO = BatchedSusieCube.VAO;
 			var mesh = BatchedSusieCube.Mesh;
 			var material = Source.susieCubeMaterial;
