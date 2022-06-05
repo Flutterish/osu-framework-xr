@@ -65,7 +65,7 @@ public partial class Scene : CompositeDrawable {
 		base.UpdateAfterChildren();
 
 		using ( var write = tripleBuffer.Get( UsageType.Write ) ) {
-			foreach ( var i in drawables ) {
+			foreach ( var i in drawables.AsSpan() ) {
 				var node = i.GetDrawNodeAtSubtree( write.Index );
 				if ( node != null && i.InvalidationID != node.InvalidationID )
 					node.UpdateNode();

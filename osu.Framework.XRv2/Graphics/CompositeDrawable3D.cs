@@ -92,6 +92,15 @@ public class CompositeDrawable3D : Drawable3D {
 		}
 	}
 
+	/// <summary>
+	/// Whether or not to invoke <see cref="UpdateChildrenLife"/>. 
+	/// <see cref="Drawable3D"/>s do not manage lifetime by default, so this this is <see langword="false"/> by default
+	/// </summary>
+	protected virtual bool ShouldUpdateChildrenLife => false;
+	protected override bool UpdateChildrenLife () {
+		return ShouldUpdateChildrenLife ? base.UpdateChildrenLife() : false;
+	}
+
 	protected override void InvalidateMatrix () {
 		base.InvalidateMatrix();
 		foreach ( var i in children ) {
