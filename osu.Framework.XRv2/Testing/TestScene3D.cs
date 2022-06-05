@@ -11,6 +11,7 @@ public abstract class TestScene3D : TestScene {
 	public TestScene3D () {
 		Add( Scene = CreateScene() );
 		Scene.RelativeSizeAxes = Framework.Graphics.Axes.Both;
+		Scene.Camera.Z = -10;
 	}
 
 	protected virtual Scene CreateScene ()

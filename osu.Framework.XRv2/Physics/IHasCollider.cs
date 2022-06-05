@@ -1,8 +1,9 @@
-﻿using osu.Framework.XR.Graphics.Meshes;
+﻿using osu.Framework.XR.Graphics;
+using osu.Framework.XR.Graphics.Meshes;
 
 namespace osu.Framework.XR.Physics;
 
-public interface IHasCollider {
+public interface IHasCollider : IHasMatrix {
 	ITriangleMesh Mesh { get; }
 	bool IsColliderEnabled { get; }
 	/// <summary>

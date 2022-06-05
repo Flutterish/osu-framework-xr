@@ -13,17 +13,34 @@ public class BasicMesh : Mesh, ITriangleMesh {
 
 	public BasicMesh () : base( new ElementBuffer<uint>(), new VertexBuffer<TexturedVertex>() ) { }
 
-	public IEnumerable<(uint indexA, uint indexB, uint indexC)> TriangleIndices {
-		get {
-			var indices = ElementBuffer.Indices;
-			for ( int i = 0; i < indices.Count; i += 3 ) {
-				yield return ( indices[i], indices[i + 1], indices[i + 2] );
-			}
-		}
-	}
-
+	public int TriangleCount => Indices.Count / 3;
 	public Vector3 GetTriangleVertex ( uint index )
 		=> VertexBuffer.Data[(int)index].Position;
+	public (uint indexA, uint indexB, uint indexC) GetTriangleIndices ( int index )
+		=> ( Indices[index * 3], Indices[index * 3 + 1], Indices[index * 3 + 2]);
+
+	public void RecalculateBoundingBox () {
+		Vector3 min = new( float.PositiveInfinity );
+		Vector3 max = new( float.NegativeInfinity );
+		foreach ( var vert in Vertices ) {
+			var v = vert.Position;
+			if ( v.X > max.X )
+				max.X = v.X;
+			if ( v.X < min.X )
+				min.X = v.X;
+			if ( v.Y > max.Y )
+				max.Y = v.Y;
+			if ( v.Y < min.Y )
+				min.Y = v.Y;
+			if ( v.Z > max.Z )
+				max.Z = v.Z;
+			if ( v.Z < min.Z )
+				min.Z = v.Z;
+		}
+
+		BoundingBox = new() { Min = min, Size = max - min };
+	}
+	public AABox BoundingBox { get; set; } = new() { Min = new( float.NegativeInfinity ), Size = new( float.PositiveInfinity ) };
 
 	public void Clear () {
 		ElementBuffer.Indices.Clear();
@@ -115,4 +132,37 @@ public class BasicMesh : Mesh, ITriangleMesh {
 			(lastVerticeA, lastVerticeB) = (a, b);
 		}
 	}
+
+	static BasicMesh () {
+		UnitCube = new();
+		UnitCube.Indices.AddRange( new uint[] {
+			0,  1,  2,  2,  3,  0,
+			4,  5,  6,  6,  7,  4,
+			8,  9,  10, 10, 4,  8,
+			11, 2,  12, 12, 13, 11,
+			10, 14, 5,  5,  4,  10,
+			3,  2,  11, 11, 15, 3
+		} );
+		UnitCube.Vertices.AddRange( new TexturedVertex[] {
+			new() { Position = new( -1, -1, -1 ), UV = new( 0, 0 ) },
+			new() { Position = new(  1, -1, -1 ), UV = new( 1, 0 ) },
+			new() { Position = new(  1,  1, -1 ), UV = new( 1, 1 ) },
+			new() { Position = new( -1,  1, -1 ), UV = new( 0, 1 ) },
+			new() { Position = new( -1, -1,  1 ), UV = new( 0, 0 ) },
+			new() { Position = new(  1, -1,  1 ), UV = new( 1, 0 ) },
+			new() { Position = new(  1,  1,  1 ), UV = new( 1, 1 ) },
+			new() { Position = new( -1,  1,  1 ), UV = new( 0, 1 ) },
+			new() { Position = new( -1,  1,  1 ), UV = new( 1, 0 ) },
+			new() { Position = new( -1,  1, -1 ), UV = new( 1, 1 ) },
+			new() { Position = new( -1, -1, -1 ), UV = new( 0, 1 ) },
+			new() { Position = new(  1,  1,  1 ), UV = new( 1, 0 ) },
+			new() { Position = new(  1, -1, -1 ), UV = new( 0, 1 ) },
+			new() { Position = new(  1, -1,  1 ), UV = new( 0, 0 ) },
+			new() { Position = new(  1, -1, -1 ), UV = new( 1, 1 ) },
+			new() { Position = new( -1,  1,  1 ), UV = new( 0, 0 ) }
+		} );
+		UnitCube.CreateFullUnsafeUpload().Enqueue();
+	}
+
+	public static readonly BasicMesh UnitCube;
 }

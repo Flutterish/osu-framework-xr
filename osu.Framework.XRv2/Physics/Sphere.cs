@@ -1,4 +1,5 @@
-﻿using osu.Framework.XR.Maths;
+﻿using osu.Framework.XR.Graphics.Meshes;
+using osu.Framework.XR.Maths;
 
 namespace osu.Framework.XR.Physics;
 
@@ -68,85 +69,55 @@ public static class Sphere {
 		}
 	}
 
-	//public static bool TryHit ( Vector3 origin, double radius, Mesh mesh, Transform transform, out SphereHit hit ) {
-	//	var aabb = transform.Matrix * mesh.BoundingBox;
-	//	if ( ( aabb.Min + aabb.Size / 2 - origin ).Length > aabb.Size.Length + radius ) {
-	//		hit = default;
-	//		return false;
-	//	}
+	public static bool TryHit ( Vector3 origin, double radius, ITriangleMesh mesh, Matrix4 transform, out SphereHit hit ) {
+		var aabb = mesh.BoundingBox * transform;
+		if ( ( aabb.Min + aabb.Size / 2 - origin ).Length > aabb.Size.Length + radius ) {
+			hit = default;
+			return false;
+		}
 
-	//	SphereHit? closest = null;
-	//	for ( int i = 0; i < mesh.Tris.Count; i++ ) {
-	//		var face = mesh.Faces[i];
-	//		face.A = ( transform.Matrix * new Vector4( face.A, 1 ) ).Xyz;
-	//		face.B = ( transform.Matrix * new Vector4( face.B, 1 ) ).Xyz;
-	//		face.C = ( transform.Matrix * new Vector4( face.C, 1 ) ).Xyz;
-	//		if ( TryHit( origin, radius, face, out hit ) && ( closest is null || closest.Value.Distance > hit.Distance ) ) {
-	//			closest = new SphereHit(
-	//				distance: hit.Distance,
-	//				origin: hit.Origin,
-	//				radius: hit.Radius,
-	//				point: hit.Point,
-	//				trisIndex: i
-	//			);
-	//		}
-	//	}
+		SphereHit? closest = null;
+		var tris = mesh.TriangleCount;
+		for ( int i = 0; i < tris; i++ ) {
+			var face = mesh.GetTriangleFace( i );
+			face.A = transform.Apply( face.A );
+			face.B = transform.Apply( face.B );
+			face.C = transform.Apply( face.C );
+			if ( TryHit( origin, radius, face, out hit ) && ( closest is null || closest.Value.Distance > hit.Distance ) ) {
+				closest = new SphereHit(
+					distance: hit.Distance,
+					origin: hit.Origin,
+					radius: hit.Radius,
+					point: hit.Point,
+					trisIndex: i
+				);
+			}
+		}
 
-	//	if ( closest is null ) {
-	//		hit = default;
-	//		return false;
-	//	}
-	//	else {
-	//		hit = closest.Value;
-	//		return true;
-	//	}
-	//}
+		if ( closest is null ) {
+			hit = default;
+			return false;
+		}
+		else {
+			hit = closest.Value;
+			return true;
+		}
+	}
 
-	//public static bool TryHit ( Vector3 origin, double radius, Mesh mesh, Transform transform, ReadonlyIndexer<int, Face> indexer, out SphereHit hit ) {
-	//	var aabb = transform.Matrix * mesh.BoundingBox;
-	//	if ( ( aabb.Min + aabb.Size / 2 - origin ).Length > aabb.Size.Length + radius ) {
-	//		hit = default;
-	//		return false;
-	//	}
-
-	//	SphereHit? closest = null;
-	//	for ( int i = 0; i < mesh.Tris.Count; i++ ) {
-	//		var face = indexer[i];
-	//		if ( TryHit( origin, radius, face, out hit ) && ( closest is null || closest.Value.Distance > hit.Distance ) ) {
-	//			closest = new SphereHit(
-	//				distance: hit.Distance,
-	//				origin: hit.Origin,
-	//				radius: hit.Radius,
-	//				point: hit.Point,
-	//				trisIndex: i
-	//			);
-	//		}
-	//	}
-
-	//	if ( closest is null ) {
-	//		hit = default;
-	//		return false;
-	//	}
-	//	else {
-	//		hit = closest.Value;
-	//		return true;
-	//	}
-	//}
-
-	//public static bool TryHit ( Vector3 origin, double radius, Model target, out SphereHit hit ) {
-	//	if ( TryHit( origin, radius, target.Mesh, target.Transform, target.Faces, out hit ) ) {
-	//		hit = new SphereHit(
-	//			distance: hit.Distance,
-	//			origin: hit.Origin,
-	//			radius: hit.Radius,
-	//			point: hit.Point,
-	//			trisIndex: hit.TrisIndex,
-	//			collider: target as IHasCollider
-	//		);
-	//		return true;
-	//	}
-	//	return false;
-	//}
+	public static bool TryHit ( Vector3 origin, double radius, IHasCollider target, out SphereHit hit ) {
+		if ( TryHit( origin, radius, target.Mesh, target.Matrix, out hit ) ) {
+			hit = new SphereHit(
+				distance: hit.Distance,
+				origin: hit.Origin,
+				radius: hit.Radius,
+				point: hit.Point,
+				trisIndex: hit.TrisIndex,
+				collider: target
+			);
+			return true;
+		}
+		return false;
+	}
 }
 
 public readonly struct SphereHit {

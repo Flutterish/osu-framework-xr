@@ -1,4 +1,5 @@
-﻿using osu.Framework.XR.Maths;
+﻿using osu.Framework.XR.Graphics.Meshes;
+using osu.Framework.XR.Maths;
 
 namespace osu.Framework.XR.Physics;
 
@@ -117,161 +118,121 @@ public static class Raycast {
 	/// <summary>
 	/// Checks if a ray intersects an axis aligned box.
 	/// </summary>
-	//public static bool Intersects ( Vector3 origin, Vector3 direction, AABox box, bool includeBehind = false ) {
-	//	if ( direction.X == 0 ) {
-	//		if ( origin.X < box.Min.X || origin.X > box.Max.X ) return false;
-	//	}
-	//	else {
-	//		var tA = ( box.Min.X - origin.X ) / direction.X;
-	//		var tB = ( box.Max.X - origin.X ) / direction.X;
+	public static bool Intersects ( Vector3 origin, Vector3 direction, AABox box, bool includeBehind = false ) {
+		if ( direction.X == 0 ) {
+			if ( origin.X < box.Min.X || origin.X > box.Max.X ) return false;
+		}
+		else {
+			var tA = ( box.Min.X - origin.X ) / direction.X;
+			var tB = ( box.Max.X - origin.X ) / direction.X;
 
-	//		var aPoint = origin + direction * tA;
-	//		var bPoint = origin + direction * tB;
+			var aPoint = origin + direction * tA;
+			var bPoint = origin + direction * tB;
 
-	//		if ( aPoint.Y < box.Min.Y && bPoint.Y < box.Min.Y || aPoint.Y > box.Max.Y && bPoint.Y > box.Max.Y ) return false;
-	//		if ( aPoint.Z < box.Min.Z && bPoint.Z < box.Min.Z || aPoint.Z > box.Max.Z && bPoint.Z > box.Max.Z ) return false;
-	//	}
-	//	if ( direction.Y == 0 ) {
-	//		if ( origin.Y < box.Min.Y || origin.Y > box.Max.Y ) return false;
-	//	}
-	//	else {
-	//		var tA = ( box.Min.Y - origin.Y ) / direction.Y;
-	//		var tB = ( box.Max.Y - origin.Y ) / direction.Y;
+			if ( aPoint.Y < box.Min.Y && bPoint.Y < box.Min.Y || aPoint.Y > box.Max.Y && bPoint.Y > box.Max.Y ) return false;
+			if ( aPoint.Z < box.Min.Z && bPoint.Z < box.Min.Z || aPoint.Z > box.Max.Z && bPoint.Z > box.Max.Z ) return false;
+		}
+		if ( direction.Y == 0 ) {
+			if ( origin.Y < box.Min.Y || origin.Y > box.Max.Y ) return false;
+		}
+		else {
+			var tA = ( box.Min.Y - origin.Y ) / direction.Y;
+			var tB = ( box.Max.Y - origin.Y ) / direction.Y;
 
-	//		var aPoint = origin + direction * tA;
-	//		var bPoint = origin + direction * tB;
+			var aPoint = origin + direction * tA;
+			var bPoint = origin + direction * tB;
 
-	//		if ( aPoint.X < box.Min.X && bPoint.X < box.Min.X || aPoint.X > box.Max.X && bPoint.X > box.Max.X ) return false;
-	//		if ( aPoint.Z < box.Min.Z && bPoint.Z < box.Min.Z || aPoint.Z > box.Max.Z && bPoint.Z > box.Max.Z ) return false;
-	//	}
-	//	if ( direction.Z == 0 ) {
-	//		if ( origin.Z < box.Min.Z || origin.Z > box.Max.Z ) return false;
-	//	}
-	//	else {
-	//		var tA = ( box.Min.Z - origin.Z ) / direction.Z;
-	//		var tB = ( box.Max.Z - origin.Z ) / direction.Z;
+			if ( aPoint.X < box.Min.X && bPoint.X < box.Min.X || aPoint.X > box.Max.X && bPoint.X > box.Max.X ) return false;
+			if ( aPoint.Z < box.Min.Z && bPoint.Z < box.Min.Z || aPoint.Z > box.Max.Z && bPoint.Z > box.Max.Z ) return false;
+		}
+		if ( direction.Z == 0 ) {
+			if ( origin.Z < box.Min.Z || origin.Z > box.Max.Z ) return false;
+		}
+		else {
+			var tA = ( box.Min.Z - origin.Z ) / direction.Z;
+			var tB = ( box.Max.Z - origin.Z ) / direction.Z;
 
-	//		var aPoint = origin + direction * tA;
-	//		var bPoint = origin + direction * tB;
+			var aPoint = origin + direction * tA;
+			var bPoint = origin + direction * tB;
 
-	//		if ( aPoint.Y < box.Min.Y && bPoint.Y < box.Min.Y || aPoint.Y > box.Max.Y && bPoint.Y > box.Max.Y ) return false;
-	//		if ( aPoint.X < box.Min.X && bPoint.X < box.Min.X || aPoint.X > box.Max.X && bPoint.X > box.Max.X ) return false;
-	//	}
+			if ( aPoint.Y < box.Min.Y && bPoint.Y < box.Min.Y || aPoint.Y > box.Max.Y && bPoint.Y > box.Max.Y ) return false;
+			if ( aPoint.X < box.Min.X && bPoint.X < box.Min.X || aPoint.X > box.Max.X && bPoint.X > box.Max.X ) return false;
+		}
 
-	//	return true;
-	//}
-
-	/// <summary>
-	/// Intersect a ray and a Mesh.
-	/// <paramref name="direction"/> must be a normal vector.
-	/// </summary>
-	//public static bool TryHitPrenormalized ( Vector3 origin, Vector3 direction, Mesh mesh, Transform transform, out RaycastHit hit, bool includeBehind = false ) {
-	//	if ( mesh.Tris.Count > 6 ) {
-	//		if ( !Intersects( origin, direction, transform.Matrix * mesh.BoundingBox, includeBehind ) ) {
-	//			hit = default;
-	//			return false;
-	//		}
-	//	}
-	//	RaycastHit? closest = null;
-
-	//	for ( int i = 0; i < mesh.Tris.Count; i++ ) {
-	//		var face = mesh.Faces[i];
-	//		face.A = ( transform.Matrix * new Vector4( face.A, 1 ) ).Xyz;
-	//		face.B = ( transform.Matrix * new Vector4( face.B, 1 ) ).Xyz;
-	//		face.C = ( transform.Matrix * new Vector4( face.C, 1 ) ).Xyz;
-	//		if ( TryHitPrenormalized( origin, direction, face, out hit, includeBehind ) && ( closest is null || Math.Abs( closest.Value.Distance ) > Math.Abs( hit.Distance ) ) ) {
-	//			closest = new RaycastHit(
-	//				hit.Point,
-	//				hit.Origin,
-	//				hit.Normal,
-	//				hit.Direction,
-	//				hit.Distance,
-	//				i
-	//			);
-	//		}
-	//	}
-
-	//	if ( closest is null ) {
-	//		hit = default;
-	//		return false;
-	//	}
-	//	else {
-	//		hit = closest.Value;
-	//		return true;
-	//	}
-	//}
-	/// <summary>
-	/// Intersect a ray and a Mesh.
-	/// </summary>
-	//public static bool TryHit ( Vector3 origin, Vector3 direction, Mesh mesh, Transform transform, out RaycastHit hit, bool includeBehind = false )
-	//	=> TryHitPrenormalized( origin, direction.Normalized(), mesh, transform, out hit, includeBehind );
+		return true;
+	}
 
 	/// <summary>
 	/// Intersect a ray and a Mesh.
 	/// <paramref name="direction"/> must be a normal vector.
 	/// </summary>
-	//public static bool TryHitPrenormalized ( Vector3 origin, Vector3 direction, Mesh mesh, Transform transform, ReadonlyIndexer<int, Face> indexer, out RaycastHit hit, bool includeBehind = false ) {
-	//	if ( mesh.Tris.Count > 6 ) {
-	//		if ( !Intersects( origin, direction, transform.Matrix * mesh.BoundingBox, includeBehind ) ) {
-	//			hit = default;
-	//			return false;
-	//		}
-	//	}
-	//	RaycastHit? closest = null;
+	public static bool TryHitPrenormalized ( Vector3 origin, Vector3 direction, ITriangleMesh mesh, Matrix4 transform, out RaycastHit hit, bool includeBehind = false ) {
+		var tris = mesh.TriangleCount;
+		if ( tris > 6 ) {
+			if ( !Intersects( origin, direction, mesh.BoundingBox * transform, includeBehind ) ) {
+				hit = default;
+				return false;
+			}
+		}
+		RaycastHit? closest = null;
 
-	//	for ( int i = 0; i < mesh.Tris.Count; i++ ) {
-	//		var face = indexer[i];
-	//		if ( TryHitPrenormalized( origin, direction, face, out hit, includeBehind ) && ( closest is null || Math.Abs( closest.Value.Distance ) > Math.Abs( hit.Distance ) ) ) {
-	//			closest = new RaycastHit(
-	//				hit.Point,
-	//				hit.Origin,
-	//				hit.Normal,
-	//				hit.Direction,
-	//				hit.Distance,
-	//				i
-	//			);
-	//		}
-	//	}
+		for ( int i = 0; i < tris; i++ ) {
+			var face = mesh.GetTriangleFace( i );
+			face.A = transform.Apply( face.A );
+			face.B = transform.Apply( face.B );
+			face.C = transform.Apply( face.C );
+			if ( TryHitPrenormalized( origin, direction, face, out hit, includeBehind ) && ( closest is null || Math.Abs( closest.Value.Distance ) > Math.Abs( hit.Distance ) ) ) {
+				closest = new RaycastHit(
+					hit.Point,
+					hit.Origin,
+					hit.Normal,
+					hit.Direction,
+					hit.Distance,
+					i
+				);
+			}
+		}
 
-	//	if ( closest is null ) {
-	//		hit = default;
-	//		return false;
-	//	}
-	//	else {
-	//		hit = closest.Value;
-	//		return true;
-	//	}
-	//}
+		if ( closest is null ) {
+			hit = default;
+			return false;
+		}
+		else {
+			hit = closest.Value;
+			return true;
+		}
+	}
 	/// <summary>
 	/// Intersect a ray and a Mesh.
 	/// </summary>
-	//public static bool TryHit ( Vector3 origin, Vector3 direction, Mesh mesh, Transform transform, ReadonlyIndexer<int, Face> indexer, out RaycastHit hit, bool includeBehind = false )
-	//	=> TryHitPrenormalized( origin, direction.Normalized(), mesh, transform, indexer, out hit, includeBehind );
+	public static bool TryHit ( Vector3 origin, Vector3 direction, ITriangleMesh mesh, Matrix4 transform, out RaycastHit hit, bool includeBehind = false )
+		=> TryHitPrenormalized( origin, direction.Normalized(), mesh, transform, out hit, includeBehind );
+	// TODO optimize mesh physics by caching transformed vertices
 
 	/// <summary>
 	/// Intersect a ray and a Mesh.
 	/// <paramref name="direction"/> must be a normal vector.
 	/// </summary>
-	//public static bool TryHitPrenormalized ( Vector3 origin, Vector3 direction, Model target, out RaycastHit hit, bool includeBehind = false ) {
-	//	var ok = TryHitPrenormalized( origin, direction, target.Mesh, target.Transform, target.Faces, out hit, includeBehind );
-	//	if ( ok ) {
-	//		hit = new RaycastHit(
-	//			hit.Point,
-	//			hit.Origin,
-	//			hit.Normal,
-	//			hit.Direction,
-	//			hit.Distance,
-	//			hit.TrisIndex,
-	//			target as IHasCollider
-	//		);
-	//	}
-	//	return ok;
-	//}
-	// <summary>
+	public static bool TryHitPrenormalized ( Vector3 origin, Vector3 direction, IHasCollider target, out RaycastHit hit, bool includeBehind = false ) {
+		var ok = TryHitPrenormalized( origin, direction, target.Mesh, target.Matrix, out hit, includeBehind );
+		if ( ok ) {
+			hit = new RaycastHit(
+				hit.Point,
+				hit.Origin,
+				hit.Normal,
+				hit.Direction,
+				hit.Distance,
+				hit.TrisIndex,
+				target
+			);
+		}
+		return ok;
+	}
+	/// <summary>
 	/// Intersect a ray and a Mesh.
 	/// </summary>
-	//public static bool TryHit ( Vector3 origin, Vector3 direction, Model target, out RaycastHit hit, bool includeBehind = false )
-	//	=> TryHitPrenormalized( origin, direction.Normalized(), target, out hit, includeBehind );
+	public static bool TryHit ( Vector3 origin, Vector3 direction, IHasCollider target, out RaycastHit hit, bool includeBehind = false )
+		=> TryHitPrenormalized( origin, direction.Normalized(), target, out hit, includeBehind );
 
 	/// <summary>
 	/// The closest point to a line [from;to]

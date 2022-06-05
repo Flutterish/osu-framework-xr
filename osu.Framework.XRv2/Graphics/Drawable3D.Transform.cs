@@ -5,7 +5,11 @@ using System.Runtime.CompilerServices;
 
 namespace osu.Framework.XR.Graphics;
 
-public partial class Drawable3D {
+public interface IHasMatrix {
+	Matrix4 Matrix { get; }
+}
+
+public partial class Drawable3D : IHasMatrix {
 	[MethodImpl( MethodImplOptions.AggressiveInlining )]
 	void trySet ( ref float field, ref float value ) {
 		if ( field == value )

@@ -9,7 +9,24 @@ namespace osu.Framework.XR.Graphics;
 
 public class BasicModel : Drawable3D {
 	AttributeArray VAO = new();
-	public readonly BasicMesh Mesh = new();
+	BasicMesh? mesh;
+	bool ownMesh = false;
+	public BasicMesh Mesh {
+		get {
+			if ( mesh is null ) {
+				mesh = new();
+				ownMesh = true;
+			}
+			return mesh;
+		}
+		set {
+			if ( ownMesh )
+				mesh!.Dispose();
+
+			mesh = value;
+			ownMesh = false;
+		}
+	}
 
 	Material? material;
 	public Material Material {
@@ -45,7 +62,8 @@ public class BasicModel : Drawable3D {
 
 	protected override void Dispose ( bool isDisposing ) {
 		if ( !IsDisposed ) {
-			Mesh.Dispose();
+			if ( ownMesh )
+				mesh!.Dispose();
 			VAO.Dispose();
 		}
 
