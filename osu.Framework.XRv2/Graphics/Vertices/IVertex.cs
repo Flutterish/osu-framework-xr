@@ -1,6 +1,5 @@
 ﻿using System.Runtime.InteropServices;
 using osu.Framework.XR.Graphics.Buffers;
-using osu.Framework.XR.Graphics.Shaders;
 
 namespace osu.Framework.XR.Graphics.Vertices;
 
@@ -14,7 +13,7 @@ public interface IVertex {
 	/// Tells the currently bound <see cref="IAttributeArray"/> how the data of the <see cref="IVertexBuffer"/> should be interpreted
 	/// </summary>
 	/// <param name="attribs">An array of attrib positions the array buffer uses</param>
-	void Link ( Shader shader, int[] attribs );
+	void Link ( Span<int> attribs );
 }
 
 public interface IVertex<Tself> : IVertex where Tself : struct, IVertex<Tself> {

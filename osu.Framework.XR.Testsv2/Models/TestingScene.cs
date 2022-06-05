@@ -52,7 +52,7 @@ public class TestingScene : Scene {
 				VAO.Bind();
 
 				mesh.ElementBuffer!.Bind();
-				mesh.VertexBuffers[0].Link( material.Shader, new int[] { material.Shader.GetAttrib( "aPos" ), material.Shader.GetAttrib( "aUv" ) } );
+				mesh.VertexBuffers[0].Link( material.Shader, stackalloc int[] { material.Shader.GetAttrib( "aPos" ), material.Shader.GetAttrib( "aUv" ) } );
 			}
 			else VAO.Bind();
 

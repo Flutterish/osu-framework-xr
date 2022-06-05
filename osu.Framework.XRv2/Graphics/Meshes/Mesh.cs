@@ -1,7 +1,7 @@
 ﻿using osu.Framework.XR.Allocation;
 using osu.Framework.XR.Graphics.Buffers;
 
-namespace osu.Framework.XR.Graphics;
+namespace osu.Framework.XR.Graphics.Meshes;
 
 /// <summary>
 /// Geometry data defined by one or more vertice buffers and an optional element buffer.
@@ -16,7 +16,7 @@ public class Mesh : IDisposable {
 
 	public Mesh ( IElementBuffer? elementBuffer, params IVertexBuffer[] vertexBuffers ) {
 		ElementBuffer = elementBuffer;
-		this.vertexBuffers = new IVertexBuffer[ vertexBuffers.Length ];
+		this.vertexBuffers = new IVertexBuffer[vertexBuffers.Length];
 		Array.Copy( vertexBuffers, this.vertexBuffers, vertexBuffers.Length );
 	}
 

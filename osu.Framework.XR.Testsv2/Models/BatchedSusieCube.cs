@@ -1,5 +1,6 @@
 ﻿using osu.Framework.Utils;
 using osu.Framework.XR.Graphics.Buffers;
+using osu.Framework.XR.Graphics.Meshes;
 using osu.Framework.XR.Graphics.Shaders;
 using osu.Framework.XR.Graphics.Vertices;
 using osu.Framework.XR.Tests.Models;

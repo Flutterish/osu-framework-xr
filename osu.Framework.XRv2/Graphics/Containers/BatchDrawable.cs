@@ -67,11 +67,8 @@ public abstract class BatchDrawable<Tdrawable, Tnode> : Container3D<Tdrawable> w
 		}
 
 		public sealed override void Draw ( object? ctx = null ) {
-			if ( VAO.Handle == 0 ) {
-				VAO.Bind();
+			if ( VAO.Bind() )
 				Initialize();
-			}
-			else VAO.Bind();
 
 			DrawBatch( ctx );
 		}

@@ -10,6 +10,12 @@ using osu.Framework.XR.Graphics.Materials;
 
 namespace osu.Framework.XR.Graphics.Rendering;
 
+/// <summary>
+/// A 3D scene.
+/// </summary>
+/// <remarks>
+/// Resources used by the scene drawables should be created in <see cref="CreateChildDependencies(IReadOnlyDependencyContainer)"/>
+/// </remarks>
 [Cached]
 public partial class Scene : CompositeDrawable {
 	public readonly Container3D Root = new();

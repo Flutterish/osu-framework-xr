@@ -1,6 +1,4 @@
-﻿using osu.Framework.XR.Graphics.Shaders;
-
-namespace osu.Framework.XR.Graphics.Vertices;
+﻿namespace osu.Framework.XR.Graphics.Vertices;
 
 public struct UvVertex : IVertex<UvVertex> {
 	public float U;
@@ -17,7 +15,7 @@ public struct UvVertex : IVertex<UvVertex> {
 	}
 
 	public int Stride => 2 * sizeof( float );
-	public void Link ( Shader shader, int[] attribs ) {
+	public void Link ( Span<int> attribs ) {
 		GL.VertexAttribPointer( attribs[0], 2, VertexAttribPointerType.Float, false, Stride, 0 );
 		GL.EnableVertexAttribArray( attribs[0] );
 	}

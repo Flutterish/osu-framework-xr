@@ -17,8 +17,8 @@ namespace osu.Framework.XR.Graphics.Buffers;
 public interface IVertexBuffer : IDisposable {
 	/// <inheritdoc cref="IVertex.Stride"/>
 	int Stride { get; }
-	/// <inheritdoc cref="IVertex.Link(Shader, int[])"/>
-	void Link ( Shader shader, int[] attribs );
+	/// <inheritdoc cref="IVertex.Link(Span{int})"/>
+	void Link ( Shader shader, Span<int> attribs );
 
 	/// <summary>
 	/// Uploads the data to the vertex buffer. The created upload will *copy*
@@ -49,12 +49,12 @@ public class VertexBuffer<Tvertex> : IVertexBuffer where Tvertex : struct, IVert
 
 	public int Stride => default(Tvertex).Stride;
 
-	public void Link ( Shader shader, int[] attribs ) {
+	public void Link ( Shader shader, Span<int> attribs ) {
 		if ( Handle == 0 )
 			Handle = GL.GenBuffer();
 
 		GL.BindBuffer( BufferTarget.ArrayBuffer, Handle );
-		default( Tvertex ).Link( shader, attribs );
+		default( Tvertex ).Link( attribs );
 	}
 
 	public IUpload CreateUpload ( BufferUsageHint usage = BufferUsageHint.StaticDraw ) {

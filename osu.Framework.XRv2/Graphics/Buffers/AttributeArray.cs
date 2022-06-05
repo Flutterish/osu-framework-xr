@@ -20,19 +20,22 @@ public interface IAttributeArray : IDisposable {
 	/// The next bound <see cref="IElementBuffer"/> will be linked to this attibute array (and any subsequent will replace it).
 	/// When binding this attribute array again, the linked buffers will be automatically bound too
 	/// </summary>
-	void Bind ();
+	/// <returns>Whether the <see cref="IAttributeArray"/> requires initialisation</returns>
+	bool Bind ();
 }
 
 /// <inheritdoc cref="IAttributeArray"/>
 public class AttributeArray : IAttributeArray {
 	public GlHandle Handle { get; private set; }
 	
-	public void Bind () {
+	public bool Bind () {
 		if ( Handle == 0 ) {
-			Handle = GL.GenVertexArray();
+			GL.BindVertexArray( Handle = GL.GenVertexArray() );
+			return true;
 		}
 
 		GL.BindVertexArray( Handle );
+		return false;
 	}
 
 	public void Dispose () {

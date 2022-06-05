@@ -3,6 +3,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
 using osu.Framework.XR.Graphics.Buffers;
 using osu.Framework.XR.Graphics.Materials;
+using osu.Framework.XR.Graphics.Meshes;
 using osu.Framework.XR.Graphics.Vertices;
 using osuTK;
 using osuTK.Graphics;
@@ -97,13 +98,10 @@ public class SusieCube : Drawable3D {
 		}
 
 		public override void Draw ( object? ctx = null ) {
-			if ( VAO.Handle == 0 ) {
-				VAO.Bind();
-
+			if ( VAO.Bind() ) {
 				mesh.ElementBuffer!.Bind();
-				mesh.VertexBuffers[0].Link( material.Shader, new int[] { material.Shader.GetAttrib( "aPos" ), material.Shader.GetAttrib( "aUv" ) } );
+				mesh.VertexBuffers[0].Link( material.Shader, stackalloc int[] { material.Shader.GetAttrib( "aPos" ), material.Shader.GetAttrib( "aUv" ) } );
 			}
-			else VAO.Bind();
 
 			material.Bind();
 			material.Shader.SetUniform( "mMatrix", ref matrix );

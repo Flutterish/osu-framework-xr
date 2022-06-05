@@ -63,7 +63,7 @@ namespace osu.Framework.XR.Allocation {
             => self.AsSpan();
 
         public void Dispose () {
-            backing?.Return( rented );
+            backing.Return( rented );
         }
     }
 }
