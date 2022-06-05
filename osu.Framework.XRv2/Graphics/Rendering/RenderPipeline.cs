@@ -97,6 +97,8 @@ partial class Scene {
 			Shaders.Shader.Unbind();
 			Material.Unbind();
 			GL.BindVertexArray( 0 );
+			GLWrapper.BindBuffer( osuTK.Graphics.ES30.BufferTarget.ElementArrayBuffer, 0 );
+			GLWrapper.BindBuffer( osuTK.Graphics.ES30.BufferTarget.ArrayBuffer, 0 );
 			GLWrapper.PopDepthInfo();
 			GLWrapper.PopScissorState();
 			GLWrapper.PopViewport();

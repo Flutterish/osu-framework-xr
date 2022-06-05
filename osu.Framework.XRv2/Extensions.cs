@@ -39,4 +39,13 @@ public static class Extensions {
 			MathF.Atan2( -2 * ( q.X * q.Y - q.W * q.Z ), wSquare + xSquare - ySquare - zSquare )
 		);
 	}
+
+	public static double NextDouble ( this Random random, double from, double to )
+			=> from + random.NextDouble() * ( to - from );
+
+	public static float NextSingle ( this Random random, float from, float to )
+		=> from + random.NextSingle() * ( to - from );
+
+	public static float NextSingle ( this Random random )
+		=> (float)random.NextDouble();
 }

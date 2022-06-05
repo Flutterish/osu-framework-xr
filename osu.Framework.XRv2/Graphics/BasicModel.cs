@@ -3,14 +3,13 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.XR.Graphics.Buffers;
 using osu.Framework.XR.Graphics.Materials;
 using osu.Framework.XR.Graphics.Meshes;
-using osu.Framework.XR.Graphics.Vertices;
 using osuTK.Graphics;
 
 namespace osu.Framework.XR.Graphics;
 
 public class BasicModel : Drawable3D {
 	AttributeArray VAO = new();
-	public readonly Mesh Mesh = new( new ElementBuffer<uint>(), new VertexBuffer<TexturedVertex>() );
+	public readonly BasicMesh Mesh = new();
 
 	Material? material;
 	public Material Material {
@@ -33,9 +32,9 @@ public class BasicModel : Drawable3D {
 		}
 	}
 
-	Color4? colour;
+	Color4? colour = Color4.White;
 	new public Color4 Colour {
-		get => colour ?? material?.Get<Color4>( "tint" ) ?? Color4.White;
+		get => colour ?? (material?.IsLoaded == true ? material.Get<Color4>( "tint" ) : Color4.White);
 		set {
 			if ( Colour == value )
 				return;
