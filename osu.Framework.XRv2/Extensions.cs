@@ -40,6 +40,23 @@ public static class Extensions {
 		);
 	}
 
+	public static float Dot ( this Vector3 a, Vector3 b )
+		=> Vector3.Dot( a, b );
+
+	public static Vector3 Cross ( this Vector3 a, Vector3 b )
+		=> Vector3.Cross( a, b );
+
+	/// <summary>
+	/// Returns some normal orthogonal vector
+	/// </summary>
+	public static Vector3 AnyOrthogonal ( this Vector3 vector ) {
+		var cross = vector.Cross( Vector3.UnitX );
+		if ( ( cross - vector ).LengthSquared < 0.0000001 )
+			cross = vector.Cross( Vector3.UnitZ );
+
+		return cross.Normalized();
+	}
+
 	public static double NextDouble ( this Random random, double from, double to )
 			=> from + random.NextDouble() * ( to - from );
 

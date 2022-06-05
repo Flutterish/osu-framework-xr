@@ -84,4 +84,35 @@ public class BasicMesh : Mesh, ITriangleMesh {
 			origin - width / 2 * up + direction * length
 		) );
 	}
+
+	public void AddCircularArc ( Vector3 normal, Vector3 forward, float angle, float innerRadius, float outerRadius, int? steps = null, Vector3? origin = null ) {
+		forward.Normalize();
+		normal.Normalize();
+
+		origin ??= Vector3.Zero;
+		steps ??= (int)( angle / MathF.PI * 128 );
+		if ( steps < 1 ) steps = 1;
+		var deltaAngle = angle / steps.Value;
+
+		(uint a, uint b) addVertices ( float angle ) {
+			var direction = Quaternion.FromAxisAngle( normal, angle ).Apply( forward );
+			var inner = innerRadius * direction + origin.Value;
+			var outer = outerRadius * direction + origin.Value;
+
+			Vertices.Add( new() { Position = inner } );
+			Vertices.Add( new() { Position = outer } );
+
+			return ((uint)Vertices.Count - 2, (uint)Vertices.Count - 1);
+		}
+
+		var (lastVerticeA, lastVerticeB) = addVertices( 0 );
+		for ( int i = 1; i <= steps; i++ ) {
+			var (a, b) = addVertices( deltaAngle * i );
+
+			AddFace( lastVerticeA, lastVerticeB, b );
+			AddFace( a, b, lastVerticeA );
+
+			(lastVerticeA, lastVerticeB) = (a, b);
+		}
+	}
 }

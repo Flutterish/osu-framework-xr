@@ -1,4 +1,6 @@
-﻿namespace osu.Framework.XR.Physics;
+﻿using osu.Framework.XR.Maths;
+
+namespace osu.Framework.XR.Physics;
 
 public static class Raycast {
 	/// <summary>
@@ -92,25 +94,25 @@ public static class Raycast {
 	/// Intersect a ray and a triangle.
 	/// <paramref name="direction"/> must be a normal vector.
 	/// </summary>
-	//public static bool TryHitPrenormalized ( Vector3 origin, Vector3 direction, Face face, out RaycastHit hit, bool includeBehind = false ) {
-	//	var normal = Vector3.Cross( face.B - face.A, face.C - face.A );
-	//	// we want the normal to be pointing towards the hit origin
-	//	if ( Vector3.Dot( normal, direction ) > 0 ) {
-	//		normal *= -1;
-	//	}
+	public static bool TryHitPrenormalized ( Vector3 origin, Vector3 direction, Face face, out RaycastHit hit, bool includeBehind = false ) {
+		var normal = Vector3.Cross( face.B - face.A, face.C - face.A );
+		// we want the normal to be pointing towards the hit origin
+		if ( Vector3.Dot( normal, direction ) > 0 ) {
+			normal *= -1;
+		}
 
-	//	if ( TryHitPrenormalized( origin, direction, face.A, normal.Normalized(), out hit, includeBehind ) ) {
-	//		return Triangles.IsPointInside( hit.Point, face );
-	//	}
+		if ( TryHitPrenormalized( origin, direction, face.A, normal.Normalized(), out hit, includeBehind ) ) {
+			return Triangles.IsPointInside( hit.Point, face );
+		}
 
-	//	hit = default;
-	//	return false;
-	//}
+		hit = default;
+		return false;
+	}
 	/// <summary>
 	/// Intersect a ray and a triangle.
 	/// </summary>
-	//public static bool TryHit ( Vector3 origin, Vector3 direction, Face face, out RaycastHit hit, bool includeBehind = false )
-	//	=> TryHitPrenormalized( origin, direction.Normalized(), face, out hit, includeBehind );
+	public static bool TryHit ( Vector3 origin, Vector3 direction, Face face, out RaycastHit hit, bool includeBehind = false )
+		=> TryHitPrenormalized( origin, direction.Normalized(), face, out hit, includeBehind );
 
 	/// <summary>
 	/// Checks if a ray intersects an axis aligned box.
