@@ -1,10 +1,9 @@
 ﻿using osu.Framework.Utils;
 using osu.Framework.XR.Graphics;
 using osu.Framework.XR.Graphics.Rendering;
-using osu.Framework.XR.Testing;
 
 namespace osu.Framework.XR.Tests.Models;
-public class TestSceneBatchedCubes10k : TestScene3D {
+public class TestSceneBatchedCubes10k : BasicTestScene {
 	public TestSceneBatchedCubes10k () {
 		for ( int i = 0; i < 10000; i++ ) {
 			Scene.Add( new BatchedSusieCube {

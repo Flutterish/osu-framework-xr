@@ -10,6 +10,7 @@ namespace osu.Framework.XR.Graphics.Meshes;
 /// Note that drawing a mesh requires a linked <see cref="IAttributeArray"/> to be bound
 /// </remarks>
 public class Mesh : IDisposable {
+
 	public IReadOnlyList<IVertexBuffer> VertexBuffers => vertexBuffers;
 	readonly IVertexBuffer[] vertexBuffers;
 	public readonly IElementBuffer? ElementBuffer;

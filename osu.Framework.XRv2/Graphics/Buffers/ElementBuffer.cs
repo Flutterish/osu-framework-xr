@@ -85,6 +85,7 @@ public class ElementBuffer<Tindex> : IElementBuffer where Tindex : unmanaged {
 		GL.BindBuffer( BufferTarget.ElementArrayBuffer, Handle );
 	}
 
+	ulong uploadID;
 	public IUpload CreateUpload ( BufferUsageHint usage = BufferUsageHint.StaticDraw ) {
 		return new Upload( this, usage );
 	}
@@ -115,14 +116,21 @@ public class ElementBuffer<Tindex> : IElementBuffer where Tindex : unmanaged {
 		RentedArray<Tindex> data;
 		BufferUsageHint usage;
 		ElementBuffer<Tindex> source;
+		ulong id;
 
 		public Upload ( ElementBuffer<Tindex> source, BufferUsageHint usage ) {
+			id = ++source.uploadID;
 			data = MemoryPool<Tindex>.Shared.Rent( source.Indices );
 			this.source = source;
 			this.usage = usage;
 		}
 
 		void IUpload.Upload () {
+			if ( id != source.uploadID ) {
+				data.Dispose();
+				return;
+			}
+
 			if ( source.Handle == 0 )
 				source.Handle = GL.GenBuffer();
 

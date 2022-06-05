@@ -84,22 +84,39 @@ public partial class Drawable3D {
 		}
 	}
 
-	Vector3 offset;
-	public Vector3 Offset {
-		get => offset;
-		set => trySet( ref offset, ref value );
+	public Vector3 EulerRotation {
+		get => rotation.ToEuler();
+		set => rotation = Quaternion.FromEulerAngles( value );
 	}
-	public float OffsetX {
-		get => offset.X;
-		set => trySet( ref offset.X, ref value );
+	public float EulerX {
+		get => EulerRotation.X;
+		set => rotation = Quaternion.FromEulerAngles( EulerRotation with { X = value } );
 	}
-	public float OffsetY {
-		get => offset.Y;
-		set => trySet( ref offset.Y, ref value );
+	public float EulerY {
+		get => EulerRotation.Y;
+		set => rotation = Quaternion.FromEulerAngles( EulerRotation with { Y = value } );
 	}
-	public float OffsetZ {
-		get => offset.Z;
-		set => trySet( ref offset.Z, ref value );
+	public float EulerZ {
+		get => EulerRotation.Z;
+		set => rotation = Quaternion.FromEulerAngles( EulerRotation with { Z = value } );
+	}
+
+	Vector3 origin;
+	new public Vector3 Origin {
+		get => origin;
+		set => trySet( ref origin, ref value );
+	}
+	public float OriginX {
+		get => origin.X;
+		set => trySet( ref origin.X, ref value );
+	}
+	public float OriginY {
+		get => origin.Y;
+		set => trySet( ref origin.Y, ref value );
+	}
+	public float OriginZ {
+		get => origin.Z;
+		set => trySet( ref origin.Z, ref value );
 	}
 
 	protected override bool OnInvalidate ( Invalidation invalidation, InvalidationSource source )
@@ -112,7 +129,7 @@ public partial class Drawable3D {
 	public Matrix4 LocalMatrix {
 		get {
 			if ( !localMatrixCache.IsValid ) { // TODO combine into one operation
-				localMatrix = Matrix4.CreateTranslation( offset );
+				localMatrix = Matrix4.CreateTranslation( -origin );
 				Matrix4 temp;
 				if ( scale != Vector3.One ) {
 					temp = Matrix4.CreateScale( scale );

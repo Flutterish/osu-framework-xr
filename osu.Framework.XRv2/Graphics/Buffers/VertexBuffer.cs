@@ -57,6 +57,7 @@ public class VertexBuffer<Tvertex> : IVertexBuffer where Tvertex : struct, IVert
 		default( Tvertex ).Link( attribs );
 	}
 
+	ulong uploadID;
 	public IUpload CreateUpload ( BufferUsageHint usage = BufferUsageHint.StaticDraw ) {
 		return new Upload( this, usage );
 	}
@@ -83,14 +84,21 @@ public class VertexBuffer<Tvertex> : IVertexBuffer where Tvertex : struct, IVert
 		RentedArray<Tvertex> data;
 		BufferUsageHint usage;
 		VertexBuffer<Tvertex> source;
+		ulong id;
 
 		public Upload ( VertexBuffer<Tvertex> source, BufferUsageHint usage ) {
+			id = ++source.uploadID;
 			data = MemoryPool<Tvertex>.Shared.Rent( source.Data );
 			this.usage = usage;
 			this.source = source;
 		}
 
 		void IUpload.Upload () {
+			if ( id != source.uploadID ) {
+				data.Dispose();
+				return;
+			}
+
 			if ( source.Handle == 0 )
 				source.Handle = GL.GenBuffer();
 

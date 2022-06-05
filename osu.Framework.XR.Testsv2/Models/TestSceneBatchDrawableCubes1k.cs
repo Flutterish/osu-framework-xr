@@ -1,11 +1,10 @@
 ﻿using osu.Framework.Utils;
 using osu.Framework.XR.Graphics;
 using osu.Framework.XR.Graphics.Rendering;
-using osu.Framework.XR.Testing;
 
 namespace osu.Framework.XR.Tests.Models;
 
-public class TestSceneBatchDrawableCubes1k : TestScene3D {
+public class TestSceneBatchDrawableCubes1k : BasicTestScene {
 	public TestSceneBatchDrawableCubes1k () {
 		var batch = new SusieCubeBatch();
 		Scene.Add( batch );

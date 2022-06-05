@@ -22,4 +22,8 @@
 	  <ProjectReference Include="..\osu.Framework.XRv2\osu.Framework.XRv2.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Physics\" />
+	</ItemGroup>
+
 </Project>
