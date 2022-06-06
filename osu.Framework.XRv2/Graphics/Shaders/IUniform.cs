@@ -1,4 +1,5 @@
-﻿using osu.Framework.Graphics.Primitives;
+﻿using osu.Framework.Graphics.OpenGL.Textures;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.XR.Graphics.Materials;
 using osuTK.Graphics;
@@ -105,7 +106,7 @@ public class Vector3Uniform : IUniform<Vector3> {
 	}
 }
 
-public class Vector4Uniform : IUniform<Vector4>, IUniform<RectangleF>, IUniform<Color4> {
+public class Vector4Uniform : IUniform<Vector4>, IUniform<Color4>, IUniform<RectangleF>, IUniform<RectangleI> {
 	IMaterialUniform IUniform.CreateMaterialUniform ()
 		=> new Vector4MaterialUniform( this );
 
@@ -116,12 +117,16 @@ public class Vector4Uniform : IUniform<Vector4>, IUniform<RectangleF>, IUniform<
 		get => value; 
 		set => UpdateValue( ref value );
 	}
-	RectangleF IUniform<RectangleF>.Value { 
-		get => new( value.X, value.Y, value.Z, value.W ); 
-		set => UpdateValue( ref value );
-	}
 	Color4 IUniform<Color4>.Value {
 		get => new( value.X, value.Y, value.Z, value.W );
+		set => UpdateValue( ref value );
+	}
+	RectangleF IUniform<RectangleF>.Value {
+		get => new( value.X, value.Y, value.Z, value.W );
+		set => UpdateValue( ref value );
+	}
+	RectangleI IUniform<RectangleI>.Value {
+		get => new( (int)value.X, (int)value.Y, (int)value.Z, (int)value.W );
 		set => UpdateValue( ref value );
 	}
 
@@ -132,14 +137,16 @@ public class Vector4Uniform : IUniform<Vector4>, IUniform<RectangleF>, IUniform<
 		this.value = value;
 		GL.Uniform4( Location, ref value );
 	}
-
+	public void UpdateValue ( ref Color4 value ) {
+		var v = new Vector4( value.R, value.G, value.B, value.A );
+		UpdateValue( ref v );
+	}
 	public void UpdateValue ( ref RectangleF value ) {
 		var v = new Vector4( value.X, value.Y, value.Width, value.Height );
 		UpdateValue( ref v );
 	}
-
-	public void UpdateValue ( ref Color4 value ) {
-		var v = new Vector4( value.R, value.G, value.B, value.A );
+	public void UpdateValue ( ref RectangleI value ) {
+		var v = new Vector4( value.X, value.Y, value.Width, value.Height );
 		UpdateValue( ref v );
 	}
 }
@@ -164,22 +171,41 @@ public class Matrix4Uniform : IUniform<Matrix4> {
 	}
 }
 
-public class Sampler2DUniform : IUniform<Texture?> {
+public class Sampler2DUniform : IUniform<Texture?>, IUniform<TextureGL?> {
+	IMaterialUniform IUniform.CreateMaterialUniform ()
+		=> new Sampler2DMaterialUniform( this );
+
 	public TextureUnit TextureUnit { get; init; }
 	public int Location { get; init; }
 	Texture? value;
-	public Texture? Value {
+	TextureGL? glvalue;
+	Texture? IUniform<Texture?>.Value {
 		get => value;
+		set => UpdateValue( ref value );
+	}
+	TextureGL? IUniform<TextureGL?>.Value {
+		get => glvalue;
 		set => UpdateValue( ref value );
 	}
 
 	public void UpdateValue ( ref Texture? value ) {
 		this.value = value;
+		this.glvalue = value?.TextureGL;
 		if ( value is null ) {
 			GL.ActiveTexture( TextureUnit );
 			GL.BindTexture( TextureTarget.Texture2D, 0 );
 		}
 		else
 			value.TextureGL.Bind( (osuTK.Graphics.ES30.TextureUnit)TextureUnit );
+	}
+	public void UpdateValue ( ref TextureGL? value ) {
+		this.value = null;
+		this.glvalue = value;
+		if ( value is null ) {
+			GL.ActiveTexture( TextureUnit );
+			GL.BindTexture( TextureTarget.Texture2D, 0 );
+		}
+		else
+			value.Bind( (osuTK.Graphics.ES30.TextureUnit)TextureUnit );
 	}
 }

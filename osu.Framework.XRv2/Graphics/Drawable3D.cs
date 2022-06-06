@@ -1,5 +1,7 @@
 ﻿using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.OpenGL;
+using osu.Framework.XR.Graphics.Materials;
 using System.ComponentModel;
 
 namespace osu.Framework.XR.Graphics;
@@ -101,4 +103,17 @@ public abstract class DrawNode3D {
 	/// </summary>
 	/// <param name="ctx">An optional context to be passed by the render pipeline</param>
 	public abstract void Draw ( object? ctx = null );
+
+	/// <summary>
+	/// Ensures the 2D draw state is valid, and resets the 3D state
+	/// </summary>
+	public static void SwitchTo2DContext () {
+		Shaders.Shader.Unbind();
+		Material.Unbind();
+		GL.BindVertexArray( 0 );
+		GLWrapper.BindBuffer( osuTK.Graphics.ES30.BufferTarget.ElementArrayBuffer, 0 );
+		GLWrapper.BindBuffer( osuTK.Graphics.ES30.BufferTarget.ArrayBuffer, 0 );
+		GLWrapper.UseProgram( 0 );
+		GLWrapper.UseProgram( null );
+	}
 }

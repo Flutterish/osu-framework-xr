@@ -5,8 +5,6 @@ VisualStudioVersion = 17.2.32210.308
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "osu.Framework.XR", "osu.Framework.XR\osu.Framework.XR.csproj", "{0E416829-B762-420F-A34F-07E6D4E63247}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "osu.Framework.XR.Tests", "osu.Framework.XR.Tests\osu.Framework.XR.Tests.csproj", "{94948CDC-B7EB-46BC-8797-CE7C7473B6DC}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "osu.Framework.XRv2", "osu.Framework.XRv2\osu.Framework.XRv2.csproj", "{0E0D0C2E-AA73-4C6E-8F7E-629D08E2993C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "osu.Framework.XR.Testsv2", "osu.Framework.XR.Testsv2\osu.Framework.XR.Testsv2.csproj", "{2B778960-D33A-44F0-8347-461912ED9072}"
@@ -28,10 +26,6 @@ Global
 		{0E416829-B762-420F-A34F-07E6D4E63247}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0E416829-B762-420F-A34F-07E6D4E63247}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0E416829-B762-420F-A34F-07E6D4E63247}.Release|Any CPU.Build.0 = Release|Any CPU
-		{94948CDC-B7EB-46BC-8797-CE7C7473B6DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{94948CDC-B7EB-46BC-8797-CE7C7473B6DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{94948CDC-B7EB-46BC-8797-CE7C7473B6DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{94948CDC-B7EB-46BC-8797-CE7C7473B6DC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0E0D0C2E-AA73-4C6E-8F7E-629D08E2993C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0E0D0C2E-AA73-4C6E-8F7E-629D08E2993C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0E0D0C2E-AA73-4C6E-8F7E-629D08E2993C}.Release|Any CPU.ActiveCfg = Release|Any CPU

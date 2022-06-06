@@ -20,7 +20,7 @@ public class MaterialStore {
 	}
 
 	public Material GetNew ( string material ) => GetNew<Material, Shader>( material );
-	public Tmaterial GetNew<Tmaterial, Tshader> ( string material ) where Tmaterial : Material where Tshader : Shader {
+	public Tmaterial GetNew<Tmaterial, Tshader> ( string material ) where Tmaterial : Material where Tshader : Shader { // TODO no
 
 		var shader = GetShader<Tshader>( material );
 		return (Tmaterial)Activator.CreateInstance( typeof(Tmaterial), new object[] { shader } )!;

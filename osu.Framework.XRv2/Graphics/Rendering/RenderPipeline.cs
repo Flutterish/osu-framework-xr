@@ -5,7 +5,6 @@ using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.XR.Collections;
-using osu.Framework.XR.Graphics.Materials;
 
 namespace osu.Framework.XR.Graphics.Rendering;
 
@@ -85,23 +84,27 @@ partial class Scene {
 
 		public void Draw ( FrameBuffer frameBuffer, Matrix4 projectionMatrix ) {
 			frameBuffer.Bind();
+			GLWrapper.PushMaskingInfo( new MaskingInfo {
+				ScreenSpaceAABB = new( 0, 0, (int)frameBuffer.Size.X, (int)frameBuffer.Size.Y ),
+				MaskingRect = new( 0, 0, size.X, size.Y ),
+				ToMaskingSpace = Matrix3.Identity,
+				BlendRange = 1,
+				AlphaExponent = 1
+			}, true );
 			GLWrapper.PushViewport( new( 0, 0, (int)frameBuffer.Size.X, (int)frameBuffer.Size.Y ) );
-			GLWrapper.PushScissorState( false );
 			GLWrapper.PushDepthInfo( new( function: osuTK.Graphics.ES30.DepthFunction.Less ) );
+			GLWrapper.PushScissorState( false );
 			GLWrapper.Clear( new( depth: 1 ) );
 
 			using ( var read = Source.tripleBuffer.Get( UsageType.Read ) ) {
 				Draw( read.Index, projectionMatrix );
 			}
 
-			Shaders.Shader.Unbind();
-			Material.Unbind();
-			GL.BindVertexArray( 0 );
-			GLWrapper.BindBuffer( osuTK.Graphics.ES30.BufferTarget.ElementArrayBuffer, 0 );
-			GLWrapper.BindBuffer( osuTK.Graphics.ES30.BufferTarget.ArrayBuffer, 0 );
-			GLWrapper.PopDepthInfo();
+			DrawNode3D.SwitchTo2DContext();
 			GLWrapper.PopScissorState();
+			GLWrapper.PopDepthInfo();
 			GLWrapper.PopViewport();
+			GLWrapper.PopMaskingInfo();
 			frameBuffer.Unbind();
 		}
 
@@ -113,6 +116,11 @@ partial class Scene {
 					i.GetDrawNodeAtSubtree( subtreeIndex )?.Draw( ctx );
 				}
 			}
+		}
+
+		protected override void Dispose ( bool isDisposing ) {
+			frameBuffer.Dispose();
+			base.Dispose( isDisposing );
 		}
 
 		public List<DrawNode>? Children { get; set; }
