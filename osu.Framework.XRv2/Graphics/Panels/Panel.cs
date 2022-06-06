@@ -34,12 +34,12 @@ public partial class Panel : Drawable3D {
 	Vector2 lastContentDrawSize;
 	public Vector2 ContentDrawSize => Content.DrawSize;
 
-	public readonly Container Content;
-	public Panel () {
-		AddInternal( Content = new RootContainer() );
-	}
 	[Cached( type: typeof( ISafeArea ) )]
-	protected class RootContainer : Container, ISafeArea, IDrawable {
+	public readonly RootContainer Content;
+	public Panel () {
+		AddInternal( Content = new() );
+	}
+	public class RootContainer : Container, ISafeArea, IDrawable {
 		// this ensures that the panel is the "root node" for cases like buffered containers which clip their size to the root node
 		CompositeDrawable? IDrawable.Parent => null;
 
@@ -58,7 +58,7 @@ public partial class Panel : Drawable3D {
 	}
 
 	protected readonly BasicMesh Mesh = new();
-	protected Cached MeshCache = new();
+	protected readonly Cached MeshCache = new();
 	protected Material Material { get; private set; } = null!;
 	[BackgroundDependencyLoader]
 	private void load ( MaterialStore materials ) {

@@ -8,6 +8,7 @@ using osuTK.Graphics;
 using System.Reflection;
 
 namespace osu.Framework.XR.Graphics.Panels;
+
 public partial class Panel {
 	TripleBuffer<Drawable> tripleBuffer = new();
 	DrawNode[] contentDrawNodes = new DrawNode[3];
