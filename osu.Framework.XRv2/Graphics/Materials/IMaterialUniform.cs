@@ -61,8 +61,8 @@ public class Sampler2DMaterialUniform : IMaterialUniform<Texture?>, IMaterialUni
 
 	Texture? texture;
 	TextureGL? texturegl;
-	Texture? IMaterialUniform<Texture?>.Value { 
-		get => texture; 
+	Texture? IMaterialUniform<Texture?>.Value {
+		get => texture;
 		set {
 			texture = value;
 			texturegl = value?.TextureGL;

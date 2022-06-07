@@ -1,5 +1,5 @@
-﻿using System.Runtime.InteropServices;
-using osu.Framework.XR.Graphics.Buffers;
+﻿using osu.Framework.XR.Graphics.Buffers;
+using System.Runtime.InteropServices;
 
 namespace osu.Framework.XR.Graphics.Vertices;
 

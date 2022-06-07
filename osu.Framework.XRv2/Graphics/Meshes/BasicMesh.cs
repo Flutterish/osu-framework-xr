@@ -17,7 +17,7 @@ public class BasicMesh : Mesh, ITriangleMesh {
 	public Vector3 GetTriangleVertex ( uint index )
 		=> VertexBuffer.Data[(int)index].Position;
 	public (uint indexA, uint indexB, uint indexC) GetTriangleIndices ( int index )
-		=> ( Indices[index * 3], Indices[index * 3 + 1], Indices[index * 3 + 2]);
+		=> (Indices[index * 3], Indices[index * 3 + 1], Indices[index * 3 + 2]);
 
 	public void RecalculateBoundingBox () {
 		Vector3 min = new( float.PositiveInfinity );
@@ -51,9 +51,9 @@ public class BasicMesh : Mesh, ITriangleMesh {
 		Vertices.Add( a );
 		Vertices.Add( b );
 		Vertices.Add( c );
-		Indices.Add( (uint)(VertexBuffer.Data.Count - 3) );
-		Indices.Add( (uint)(VertexBuffer.Data.Count - 2) );
-		Indices.Add( (uint)(VertexBuffer.Data.Count - 1) );
+		Indices.Add( (uint)( VertexBuffer.Data.Count - 3 ) );
+		Indices.Add( (uint)( VertexBuffer.Data.Count - 2 ) );
+		Indices.Add( (uint)( VertexBuffer.Data.Count - 1 ) );
 	}
 	public void AddFace ( uint a, uint b, uint c ) {
 		Indices.Add( a );
@@ -65,13 +65,13 @@ public class BasicMesh : Mesh, ITriangleMesh {
 		uint offset = (uint)VertexBuffer.Data.Count;
 		normal.Normalize();
 
-		Vertices.Add( new() { Position = origin, UV = new(0.5f) } );
+		Vertices.Add( new() { Position = origin, UV = new( 0.5f ) } );
 		Vertices.Add( new() { Position = origin + forward, UV = new( 1, 0.5f ) } );
 		for ( int i = 1; i < segments; i++ ) {
 			var angle = (float)i / segments * MathF.PI * 2;
-			Vertices.Add( new() { 
+			Vertices.Add( new() {
 				Position = origin + Quaternion.FromAxisAngle( normal, angle ).Apply( forward ),
-				UV = new Vector2(0.5f + MathF.Cos(angle) / 2, 0.5f + MathF.Sin( angle ) / 2 )
+				UV = new Vector2( 0.5f + MathF.Cos( angle ) / 2, 0.5f + MathF.Sin( angle ) / 2 )
 			} );
 			AddFace( offset, offset + (uint)i, offset + (uint)i + 1 );
 		}

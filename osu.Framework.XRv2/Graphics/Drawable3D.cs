@@ -10,9 +10,10 @@ namespace osu.Framework.XR.Graphics;
 // perhaps in the future, as Component will be the base class of Drawable, we could inherit from that
 public partial class Drawable3D : CompositeDrawable {
 	CompositeDrawable3D? parent;
-	new public CompositeDrawable3D? Parent { 
-		get => parent; 
-		[Friend(typeof( CompositeDrawable3D ) )] internal set {
+	new public CompositeDrawable3D? Parent {
+		get => parent;
+		[Friend( typeof( CompositeDrawable3D ) )]
+		internal set {
 			parent = value;
 			matrix.Invalidate();
 		}

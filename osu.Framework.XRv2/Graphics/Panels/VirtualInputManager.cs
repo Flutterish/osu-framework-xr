@@ -6,22 +6,46 @@ namespace osu.Framework.XR.Graphics.Panels;
 public class VirtualInputManager : CustomInputManager {
 	protected readonly VirtualMouseHandler Mouse;
 	protected readonly VirtualKeyboardHandler Keyboard;
-	// TODO touch handlers
+	protected readonly VirtualTouchHandler Touch;
 	public VirtualInputManager () {
 		AddHandler( Mouse = new() );
 		AddHandler( Keyboard = new() );
+		AddHandler( Touch = new() );
 	}
 
-	public void ReleaseAllInput () {
-		foreach ( var i in pressedButtons )
-			Mouse.EmulateMouseUp( i );
+	bool hasFocus = false;
+	new public bool HasFocus {
+		get => hasFocus;
+		set {
+			hasFocus = value;
+			if ( !hasFocus )
+				ReleaseAllInput();
+		}
+	}
+	public override bool HandleHoverEvents => HasFocus;
 
-		pressedButtons.Clear();
+	public virtual void ReleaseAllInput () {
+		ReleaseKeyboardInput();
+		ReleaseMouseInput();
+		ReleaseTouchInput();
+	}
 
+	public void ReleaseKeyboardInput () {
 		foreach ( var i in pressedKeys )
 			Keyboard.EmulateKeyUp( i );
 
 		pressedKeys.Clear();
+	}
+
+	public void ReleaseMouseInput () {
+		foreach ( var i in pressedButtons )
+			Mouse.EmulateMouseUp( i );
+
+		pressedButtons.Clear();
+	}
+
+	public void ReleaseTouchInput () {
+		Touch.ReleaseAllSources();
 	}
 
 	public void MoveMouse ( Vector2 position )
@@ -70,4 +94,13 @@ public class VirtualInputManager : CustomInputManager {
 		pressedKeys.Remove( key );
 		Keyboard.EmulateKeyUp( key );
 	}
+
+	public void TouchDown ( object source, Vector2 position )
+		=> Touch.EmulateTouchDown( source, position );
+
+	public void TouchUp ( object source )
+		=> Touch.EmulateTouchUp( source );
+
+	public void TouchMove ( object source, Vector2 position )
+		=> Touch.EmulateTouchMove( source, position );
 }

@@ -1,3 +1,3 @@
 ﻿namespace osu.Framework.XR.Graphics;
 
-public record BasicDrawContext( Matrix4 ProjectionMatrix );
+public record BasicDrawContext ( Matrix4 ProjectionMatrix );

@@ -32,9 +32,9 @@ public class Camera : Drawable3D {
 	/// </summary>
 	public Vector3 DirectionOf ( Vector2 pos, float width, float height ) {
 		var mat = GetProjectionMatrix( width, height ).Inverted();
-		var vec = new Vector4( 
-			pos.X / width * 2 - 1, 
-			-(pos.Y / height * 2) + 1,
+		var vec = new Vector4(
+			pos.X / width * 2 - 1,
+			-( pos.Y / height * 2 ) + 1,
 		1, 1 ) * mat;
 		return vec.Xyz.Normalized();
 	}

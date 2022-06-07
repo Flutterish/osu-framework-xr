@@ -110,7 +110,7 @@ partial class Scene {
 
 		protected virtual void Draw ( int subtreeIndex, Matrix4 projectionMatrix ) {
 			var ctx = new BasicDrawContext( projectionMatrix );
-			
+
 			foreach ( var stage in RenderStages ) {
 				foreach ( var i in GetRenderStage( stage ) ) {
 					i.GetDrawNodeAtSubtree( subtreeIndex )?.Draw( ctx );

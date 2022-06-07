@@ -124,7 +124,7 @@ public partial class Drawable3D : IHasMatrix {
 	}
 
 	protected override bool OnInvalidate ( Invalidation invalidation, InvalidationSource source )
-		=> (invalidation & Invalidation.DrawInfo) != 0;
+		=> ( invalidation & Invalidation.DrawInfo ) != 0;
 
 	Cached localMatrixCache = new();
 	Cached<Matrix4> matrix = new();

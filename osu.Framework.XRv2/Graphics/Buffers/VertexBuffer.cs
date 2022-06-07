@@ -47,7 +47,7 @@ public class VertexBuffer<Tvertex> : IVertexBuffer where Tvertex : struct, IVert
 
 	public int Count { get; private set; }
 
-	public int Stride => default(Tvertex).Stride;
+	public int Stride => default( Tvertex ).Stride;
 
 	public void Link ( Shader shader, Span<int> attribs ) {
 		if ( Handle == 0 )
@@ -103,7 +103,7 @@ public class VertexBuffer<Tvertex> : IVertexBuffer where Tvertex : struct, IVert
 				source.Handle = GL.GenBuffer();
 
 			GL.BindBuffer( BufferTarget.ArrayBuffer, source.Handle );
-			default(Tvertex).Upload( data, usage );
+			default( Tvertex ).Upload( data, usage );
 			source.Count = data.Length;
 			data.Dispose();
 		}
@@ -123,7 +123,7 @@ public class VertexBuffer<Tvertex> : IVertexBuffer where Tvertex : struct, IVert
 				source.Handle = GL.GenBuffer();
 
 			GL.BindBuffer( BufferTarget.ArrayBuffer, source.Handle );
-			default(Tvertex).Upload( CollectionsMarshal.AsSpan( source.Data ), usage );
+			default( Tvertex ).Upload( CollectionsMarshal.AsSpan( source.Data ), usage );
 			source.Count = source.Data.Count;
 		}
 	}

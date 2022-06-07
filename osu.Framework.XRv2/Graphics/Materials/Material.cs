@@ -46,7 +46,7 @@ public class Material {
 					uniforms.Add( name, mat );
 			}
 		}
-		
+
 		uniformArray = uniforms.Values.ToArray();
 		IsLoaded = true;
 	}
@@ -58,7 +58,7 @@ public class Material {
 	/// Retreives a material uniform. If the material is bound and a value is updated through
 	/// this uniform, it will not be immediately updated - you need to call <see cref="IMaterialUniform.Apply"/>
 	/// </summary>
-	public IMaterialUniform<T> GetUniform<T> ( string name ) 
+	public IMaterialUniform<T> GetUniform<T> ( string name )
 		=> (IMaterialUniform<T>)uniforms[name];
 
 	public void Set<T> ( string name, T value ) {

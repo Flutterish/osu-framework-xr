@@ -27,7 +27,7 @@ public interface IAttributeArray : IDisposable {
 /// <inheritdoc cref="IAttributeArray"/>
 public class AttributeArray : IAttributeArray {
 	public GlHandle Handle { get; private set; }
-	
+
 	public bool Bind () {
 		if ( Handle == 0 ) {
 			GL.BindVertexArray( Handle = GL.GenVertexArray() );
@@ -48,7 +48,7 @@ public class AttributeArray : IAttributeArray {
 
 	~AttributeArray () {
 		if ( DebugUtils.IsDebugBuild )
-			throw new InvalidOperationException( $"An {nameof(AttributeArray)} has not been disposed correctly" );
+			throw new InvalidOperationException( $"An {nameof( AttributeArray )} has not been disposed correctly" );
 		Dispose();
 	}
 }

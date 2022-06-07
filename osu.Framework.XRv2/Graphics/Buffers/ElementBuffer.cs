@@ -70,7 +70,7 @@ public class ElementBuffer<Tindex> : IElementBuffer where Tindex : unmanaged {
 			byte => DrawElementsType.UnsignedByte,
 			ushort => DrawElementsType.UnsignedShort,
 			uint => DrawElementsType.UnsignedInt,
-			_ => throw new NotSupportedException( $"An element buffer might only contain Byte, UInt16 or UInt32 indices, but {typeof(Tindex).ReadableName()} was specified" )
+			_ => throw new NotSupportedException( $"An element buffer might only contain Byte, UInt16 or UInt32 indices, but {typeof( Tindex ).ReadableName()} was specified" )
 		};
 	}
 

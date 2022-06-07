@@ -48,7 +48,7 @@ public class HashList<T> : IEnumerable<T> where T : notnull {
 			var old = data[index];
 			indices.Remove( old );
 			indices.Add( value, index );
-			data[index] = value; 
+			data[index] = value;
 		}
 	}
 

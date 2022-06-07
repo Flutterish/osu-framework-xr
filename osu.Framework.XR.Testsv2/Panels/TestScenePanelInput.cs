@@ -16,11 +16,14 @@ using System;
 namespace osu.Framework.XR.Tests.Panels;
 
 public class TestScenePanelInput : BasicTestScene, IRequireHighFrequencyMousePosition {
+	bool useTouch;
 	protected readonly Panel Panel;
 	public TestScenePanelInput () {
 		Scene.Add( Panel = new Panel {
 			ContentAutoSizeAxes = Axes.Both
 		} );
+
+		Panel.Content.HasFocus = true;
 
 		BasicDropdown<FillDirection> dropdown;
 		Panel.Content.Add( new Box { Size = new( 500 ), Colour = Color4.Gray } );
@@ -35,6 +38,12 @@ public class TestScenePanelInput : BasicTestScene, IRequireHighFrequencyMousePos
 		Panel.Content.Add( new CursorContainer { RelativeSizeAxes = Axes.Both } );
 		foreach ( var i in Enum.GetValues<FillDirection>() )
 			dropdown.AddDropdownItem( i );
+
+		AddToggleStep( "Use Touch", v => {
+			Panel.Content.ReleaseAllInput();
+			useTouch = v;
+			touchDown = false;
+		} );
 	}
 
 	bool tryHit ( Vector2 e, out Vector2 pos ) {
@@ -47,10 +56,14 @@ public class TestScenePanelInput : BasicTestScene, IRequireHighFrequencyMousePos
 		return false;
 	}
 
+	bool touchDown = false;
 	protected override bool OnMouseMove ( MouseMoveEvent e ) {
 		e.Target = Scene;
 		if ( tryHit( e.MousePosition, out var pos ) ) {
-			Panel.Content.MoveMouse( pos );
+			if ( useTouch && touchDown )
+				Panel.Content.TouchMove( this, pos );
+			else if ( !useTouch )
+				Panel.Content.MoveMouse( pos );
 
 			return true;
 		}
@@ -69,8 +82,15 @@ public class TestScenePanelInput : BasicTestScene, IRequireHighFrequencyMousePos
 	protected override bool OnMouseDown ( MouseDownEvent e ) {
 		e.Target = Scene;
 		if ( tryHit( e.MouseDownPosition, out var pos ) ) {
-			Panel.Content.MoveMouse( pos );
-			Panel.Content.Press( e.Button );
+			if ( useTouch ) {
+				touchDown = true;
+				Panel.Content.TouchDown( this, pos );
+			}
+			else {
+				Panel.Content.MoveMouse( pos );
+				Panel.Content.Press( e.Button );
+			}
+			
 			return true;
 		}
 		else {
@@ -81,7 +101,12 @@ public class TestScenePanelInput : BasicTestScene, IRequireHighFrequencyMousePos
 	}
 
 	protected override void OnMouseUp ( MouseUpEvent e ) {
-		Panel.Content.Release( e.Button );
+		if ( useTouch ) {
+			touchDown = false;
+			Panel.Content.TouchUp( this );
+		}
+		else
+			Panel.Content.Release( e.Button );
 
 		if ( !tryHit( e.MouseDownPosition, out _ ) ) {
 			Panel.Content.ReleaseAllInput();

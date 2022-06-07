@@ -17,7 +17,7 @@ public class CompositeDrawable3D : Drawable3D {
 		=> throw new InvalidOperationException( "Cannot add a 2D drawable into a 3D container" );
 	protected virtual void AddInternal ( Drawable3D child ) {
 		if ( child.Parent != null )
-			throw new InvalidOperationException( $"Cannot add a {nameof(Drawable3D)} into multiple containers" );
+			throw new InvalidOperationException( $"Cannot add a {nameof( Drawable3D )} into multiple containers" );
 
 		child.Parent = this;
 		children.Add( child );

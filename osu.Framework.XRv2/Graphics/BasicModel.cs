@@ -51,7 +51,7 @@ public class BasicModel : Drawable3D {
 
 	Color4? colour = Color4.White;
 	new public Color4 Colour {
-		get => colour ?? (material?.IsLoaded == true ? material.Get<Color4>( "tint" ) : Color4.White);
+		get => colour ?? ( material?.IsLoaded == true ? material.Get<Color4>( "tint" ) : Color4.White );
 		set {
 			if ( Colour == value )
 				return;

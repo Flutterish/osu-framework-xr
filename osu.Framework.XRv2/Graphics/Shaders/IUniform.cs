@@ -113,8 +113,8 @@ public class Vector4Uniform : IUniform<Vector4>, IUniform<Color4>, IUniform<Rect
 	public int Location { get; init; }
 	Vector4 value;
 
-	Vector4 IUniform<Vector4>.Value { 
-		get => value; 
+	Vector4 IUniform<Vector4>.Value {
+		get => value;
 		set => UpdateValue( ref value );
 	}
 	Color4 IUniform<Color4>.Value {

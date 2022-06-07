@@ -97,7 +97,7 @@ public partial class Panel : Drawable3D {
 	}
 
 	public Vector2 ContentPositionAt ( int trisIndex, Vector3 position ) {
-		var face = (Mesh as ITriangleMesh).GetTriangleFace( trisIndex );
+		var face = ( Mesh as ITriangleMesh ).GetTriangleFace( trisIndex );
 		var barycentric = Triangles.BarycentricFast( face, position );
 		var tris = Mesh.GetTriangleIndices( trisIndex );
 		var textureCoord =

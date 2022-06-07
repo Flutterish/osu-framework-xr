@@ -55,7 +55,7 @@ public class HashListBenchmark {
 
 	[Benchmark]
 	public void ListSpanFor () {
-		var span = CollectionsMarshal.AsSpan(list);
+		var span = CollectionsMarshal.AsSpan( list );
 		for ( int i = 0; i < span.Length; i++ ) { var k = span[i]; }
 	}
 
