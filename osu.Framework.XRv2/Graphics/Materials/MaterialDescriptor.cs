@@ -1,4 +1,6 @@
-﻿namespace osu.Framework.XR.Graphics.Materials;
+﻿using osu.Framework.XR.Graphics.Meshes;
+
+namespace osu.Framework.XR.Graphics.Materials;
 
 /// <summary>
 /// A descriptor for materials. This includes vertex attributes and uniforms.
@@ -28,6 +30,8 @@ public class MaterialDescriptor {
 		OnBind = action;
 		return this;
 	}
+
+	public readonly Dictionary<MeshDescriptor, (int[] indices, int[] attribs)> LinkCache = new();
 }
 
 public interface IDescriptorUniform {

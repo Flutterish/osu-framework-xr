@@ -122,13 +122,11 @@ public abstract class DrawNode3D {
 	}
 
 	static List<int> attribLengths = new();
-	static Dictionary<(Shader, MeshDescriptor, MaterialDescriptor), (int[] indices, int[] attribs)> linkCache = new();
 	/// <summary>
 	/// Links the currently bound <see cref="IAttributeArray"/> with the mesh and material data
 	/// </summary>
 	public static void LinkAttributeArray ( Shader shader, Mesh mesh, MeshDescriptor meshDescriptor, MaterialDescriptor materialDescriptor ) {
-		var key = (shader, meshDescriptor, materialDescriptor);
-		if ( !linkCache.TryGetValue( key, out var values ) ) {
+		if ( !materialDescriptor.LinkCache.TryGetValue( meshDescriptor, out var values ) ) {
 			attribLengths.Clear();
 			int attribCount = 0;
 			foreach ( var i in meshDescriptor.AttributesByType.Values ) {
@@ -161,7 +159,7 @@ public abstract class DrawNode3D {
 				}
 			}
 			values = (attribIndices, attribs);
-			linkCache.Add( key, values );
+			materialDescriptor.LinkCache[meshDescriptor] = values;
 		}
 
 		var indices = values.indices;
