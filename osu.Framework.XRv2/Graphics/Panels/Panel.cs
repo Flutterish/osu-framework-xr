@@ -37,8 +37,10 @@ public partial class Panel : Drawable3D {
 	[Cached( type: typeof( ISafeArea ) )]
 	public readonly RootContainer Content;
 	public Panel () {
-		AddInternal( Content = new() );
+		AddInternal( Content = CreateRootContainer() );
 	}
+	protected virtual RootContainer CreateRootContainer ()
+		=> new();
 	public class RootContainer : VirtualInputManager, ISafeArea, IDrawable {
 		// this ensures that the panel is the "root node" for cases like buffered containers which clip their size to the root node
 		CompositeDrawable? IDrawable.Parent => null;
