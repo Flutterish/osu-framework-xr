@@ -122,45 +122,53 @@ public abstract class DrawNode3D {
 	}
 
 	static List<int> attribLengths = new();
+	static Dictionary<(Shader, MeshDescriptor, MaterialDescriptor), (int[] indices, int[] attribs)> linkCache = new();
 	/// <summary>
 	/// Links the currently bound <see cref="IAttributeArray"/> with the mesh and material data
 	/// </summary>
 	public static void LinkAttributeArray ( Shader shader, Mesh mesh, MeshDescriptor meshDescriptor, MaterialDescriptor materialDescriptor ) {
-		attribLengths.Clear();
-		int attribCount = 0;
-		foreach ( var i in meshDescriptor.AttributesByType.Values ) {
-			attribCount += i.Count;
-			foreach ( var (buffer, index) in i ) {
-				while ( attribLengths.Count <= buffer )
-					attribLengths.Add( 0 );
+		var key = (shader, meshDescriptor, materialDescriptor);
+		if ( !linkCache.TryGetValue( key, out var values ) ) {
+			attribLengths.Clear();
+			int attribCount = 0;
+			foreach ( var i in meshDescriptor.AttributesByType.Values ) {
+				attribCount += i.Count;
+				foreach ( var (buffer, index) in i ) {
+					while ( attribLengths.Count <= buffer )
+						attribLengths.Add( 0 );
 
-				attribLengths[buffer]++;
-			}
-		}
-		Span<int> attribIndices = stackalloc int[attribLengths.Count];
-		int offset = 0;
-		int k = 0;
-		foreach ( var i in attribLengths ) {
-			attribIndices[k++] = offset;
-			offset += i;
-		}
-		Span<int> attribs = stackalloc int[attribCount];
-		foreach ( var (type, locations) in meshDescriptor.AttributesByType ) {
-			var names = materialDescriptor.GetAttributeNames( type );
-			for ( int i = 0; i < locations.Count; i++ ) {
-				var (buffer, index) = locations[i];
-				if ( names?[i] is string name ) {
-					attribs[attribIndices[buffer] + index] = shader.GetAttrib( name );
-				}
-				else {
-					attribs[attribIndices[buffer] + index] = -1;
+					attribLengths[buffer]++;
 				}
 			}
+			int[] attribIndices = new int[attribLengths.Count];
+			int offset = 0;
+			int k = 0;
+			foreach ( var i in attribLengths ) {
+				attribIndices[k++] = offset;
+				offset += i;
+			}
+			int[] attribs = new int[attribCount];
+			foreach ( var (type, locations) in meshDescriptor.AttributesByType ) {
+				var names = materialDescriptor.GetAttributeNames( type );
+				for ( int i = 0; i < locations.Count; i++ ) {
+					var (buffer, index) = locations[i];
+					if ( names?[i] is string name ) {
+						attribs[attribIndices[buffer] + index] = shader.GetAttrib( name );
+					}
+					else {
+						attribs[attribIndices[buffer] + index] = -1;
+					}
+				}
+			}
+			values = (attribIndices, attribs);
+			linkCache.Add( key, values );
 		}
 
+		var indices = values.indices;
+		var attributes = values.attribs.AsSpan();
 		mesh.ElementBuffer?.Bind();
-		for ( int i = 0; i < attribIndices.Length; i++ ) {
-			mesh.VertexBuffers[i].Link( shader, attribs.Slice( attribIndices[i], attribLengths[i] ) ); // TODO cache this
+		for ( int i = 0; i < indices.Length; i++ ) {
+			mesh.VertexBuffers[i].Link( shader, attributes.Slice( indices[i], attribLengths[i] ) );
 		}
 	}
 
