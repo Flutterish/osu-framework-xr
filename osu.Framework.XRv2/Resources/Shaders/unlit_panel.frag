@@ -17,5 +17,5 @@ lowp vec4 toSRGB( lowp vec4 colour )
 
 void main()
 {
-    FragColor = toSRGB( texture( tex, vec2( uv.x, 1.0 - uv.y /* once again, o!f and openGL disagree where up is */ ) ) );
+    FragColor = toSRGB( texture( tex, uv ) );
 } 

@@ -7,8 +7,8 @@ public interface ITriangleMesh : IMesh {
 	(uint indexA, uint indexB, uint indexC) GetTriangleIndices ( int index );
 	Vector3 GetTriangleVertex ( uint index );
 
-	public Face GetTriangleFace ( int triaangleIndex ) {
-		var (a, b, c) = GetTriangleIndices( triaangleIndex );
+	public Face GetTriangleFace ( int triangleIndex ) {
+		var (a, b, c) = GetTriangleIndices( triangleIndex );
 		return new(
 			GetTriangleVertex( a ),
 			GetTriangleVertex( b ),

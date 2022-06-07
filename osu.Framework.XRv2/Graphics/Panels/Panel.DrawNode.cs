@@ -21,8 +21,7 @@ public partial class Panel {
 		base.UpdateAfterChildren();
 
 		using ( var buffer = tripleBuffer.Get( UsageType.Write ) ) {
-			var node = contentDrawNodes[buffer.Index] ??= GenerateDrawNodeSubtree( Content, (ulong)buffer.FrameId, buffer.Index, false );
-			node.ApplyState();
+			var node = contentDrawNodes[buffer.Index] = GenerateDrawNodeSubtree( Content, (ulong)buffer.FrameId, buffer.Index, false );
 		}
 	}
 

@@ -39,7 +39,7 @@ public partial class Panel : Drawable3D {
 	public Panel () {
 		AddInternal( Content = new() );
 	}
-	public class RootContainer : Container, ISafeArea, IDrawable {
+	public class RootContainer : VirtualInputManager, ISafeArea, IDrawable {
 		// this ensures that the panel is the "root node" for cases like buffered containers which clip their size to the root node
 		CompositeDrawable? IDrawable.Parent => null;
 
@@ -55,9 +55,13 @@ public partial class Panel : Drawable3D {
 		EdgeEffectParameters IContainer.EdgeEffect { get => EdgeEffect; set => EdgeEffect = value; }
 		Vector2 IContainer.RelativeChildSize { get => RelativeChildSize; set => RelativeChildSize = value; }
 		Vector2 IContainer.RelativeChildOffset { get => RelativeChildOffset; set => RelativeChildOffset = value; }
+
+		public RootContainer () {
+			RelativeSizeAxes = Axes.None;
+		}
 	}
 
-	protected readonly BasicMesh Mesh = new();
+	public readonly BasicMesh Mesh = new();
 	protected readonly Cached MeshCache = new();
 	protected Material Material { get; private set; } = null!;
 	[BackgroundDependencyLoader]
@@ -88,6 +92,17 @@ public partial class Panel : Drawable3D {
 			BL = new Vector3( -1, -1, 0 ),
 			BR = new Vector3( 1, -1, 0 )
 		} );
+	}
+
+	public Vector2 ContentPositionAt ( int trisIndex, Vector3 position ) {
+		var face = (Mesh as ITriangleMesh).GetTriangleFace( trisIndex );
+		var barycentric = Triangles.BarycentricFast( face, position );
+		var tris = Mesh.GetTriangleIndices( trisIndex );
+		var textureCoord =
+			  Mesh.VertexBuffer.Data[(int)tris.indexA].UV * barycentric.X
+			+ Mesh.VertexBuffer.Data[(int)tris.indexB].UV * barycentric.Y
+			+ Mesh.VertexBuffer.Data[(int)tris.indexC].UV * barycentric.Z;
+		return new Vector2( Content.DrawWidth * textureCoord.X, Content.DrawHeight * ( 1 - textureCoord.Y ) );
 	}
 
 	protected override void Dispose ( bool isDisposing ) {
