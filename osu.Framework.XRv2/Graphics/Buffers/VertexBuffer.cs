@@ -71,6 +71,7 @@ public class VertexBuffer<Tvertex> : IVertexBuffer where Tvertex : struct, IVert
 			GL.DeleteBuffer( Handle );
 			v.Handle = 0;
 		} );
+		uploadID++;
 		GC.SuppressFinalize( this );
 	}
 

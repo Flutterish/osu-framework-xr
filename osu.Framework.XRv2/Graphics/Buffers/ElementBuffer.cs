@@ -103,6 +103,7 @@ public class ElementBuffer<Tindex> : IElementBuffer where Tindex : unmanaged {
 			GL.DeleteBuffer( Handle );
 			v.Handle = 0;
 		} );
+		uploadID++;
 		GC.SuppressFinalize( this );
 	}
 

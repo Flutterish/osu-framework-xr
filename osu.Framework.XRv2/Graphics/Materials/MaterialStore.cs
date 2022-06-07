@@ -9,6 +9,11 @@ public class MaterialStore {
 		this.resourceStore = resourceStore;
 	}
 
+	Dictionary<string, MaterialDescriptor> descriptors = new();
+	public void AddDescriptor ( string name, MaterialDescriptor descriptor ) {
+		descriptors[name] = descriptor;
+	}
+
 	Dictionary<(string material, string name), Material> sharedMaterials = new();
 	public Material GetShared ( string material, string sharedName ) => GetShared<Material, Shader>( material, sharedName );
 	public Tmaterial GetShared<Tmaterial, Tshader> ( string material, string sharedName ) where Tmaterial : Material where Tshader : Shader {
@@ -22,7 +27,8 @@ public class MaterialStore {
 	public Material GetNew ( string material ) => GetNew<Material, Shader>( material );
 	public Tmaterial GetNew<Tmaterial, Tshader> ( string material ) where Tmaterial : Material where Tshader : Shader { // TODO no
 		var shader = GetShader<Tshader>( material );
-		return (Tmaterial)Activator.CreateInstance( typeof( Tmaterial ), new object[] { shader } )!;
+		var descriptor = descriptors.GetValueOrDefault( material );
+		return (Tmaterial)Activator.CreateInstance( typeof( Tmaterial ), new object?[] { shader, descriptor, this } )!;
 	}
 
 	Dictionary<string, Shader> cachedShaders = new();

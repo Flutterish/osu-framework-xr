@@ -7,6 +7,8 @@ using osu.Framework.Platform;
 using osu.Framework.XR.Collections;
 using osu.Framework.XR.Graphics.Containers;
 using osu.Framework.XR.Graphics.Materials;
+using osu.Framework.XR.Graphics.Meshes;
+using osuTK.Graphics;
 
 namespace osu.Framework.XR.Graphics.Rendering;
 
@@ -103,6 +105,17 @@ public partial class Scene : CompositeDrawable {
 			osuTK.Graphics.ES30.All.Nearest,
 			manualMipmaps: false,
 			scaleAdjust: 1
+		);
+		materials.AddDescriptor( "unlit", new MaterialDescriptor()
+			.SetAttribute( "aPos", MeshDescriptor.Position )
+			.SetAttribute( "aUv", MeshDescriptor.UV )
+			.SetUniform( "tex", Texture.WhitePixel )
+			.SetUniform( "subImage", Texture.WhitePixel.GetTextureRect() )
+			.SetUniform( "tint", Color4.White )
+		);
+		materials.AddDescriptor( "unlit_panel", new MaterialDescriptor()
+			.SetAttribute( "aPos", MeshDescriptor.Position )
+			.SetAttribute( "aUv", MeshDescriptor.UV )
 		);
 		deps.Cache( materials );
 		deps.Cache( textures );

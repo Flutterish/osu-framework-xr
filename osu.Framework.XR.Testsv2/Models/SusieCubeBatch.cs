@@ -32,8 +32,7 @@ public class SusieCubeBatch : BatchDrawable<BatchDrawableSusieCube, BatchDrawabl
 			var mesh = BatchedSusieCube.Mesh;
 			var material = Source.material;
 
-			mesh.ElementBuffer!.Bind();
-			mesh.VertexBuffers[0].Link( material.Shader, stackalloc int[] { material.Shader.GetAttrib( "aPos" ), material.Shader.GetAttrib( "aUv" ) } );
+			LinkAttributeArray( mesh, material );
 		}
 
 		protected override void DrawBatch ( object? ctx = null ) {

@@ -83,8 +83,7 @@ public partial class Panel {
 			FrameBuffer.Unbind();
 
 			if ( VAO.Bind() ) {
-				Mesh.ElementBuffer!.Bind();
-				Mesh.VertexBuffers[0].Link( Material.Shader, new int[] { Material.Shader.GetAttrib( "aPos" ), Material.Shader.GetAttrib( "aUv" ) } );
+				LinkAttributeArray( Mesh, Material );
 			}
 
 			Material.Bind();

@@ -21,7 +21,8 @@ public interface IAttributeArray : IDisposable {
 	/// When binding this attribute array again, the linked buffers will be automatically bound too
 	/// </summary>
 	/// <returns>Whether the <see cref="IAttributeArray"/> requires initialisation</returns>
-	bool Bind ();
+	bool Bind (); 
+	// TODO method to clear all attributes
 }
 
 /// <inheritdoc cref="IAttributeArray"/>

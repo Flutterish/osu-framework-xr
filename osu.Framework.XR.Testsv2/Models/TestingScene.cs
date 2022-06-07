@@ -51,8 +51,7 @@ public class TestingScene : Scene {
 			if ( VAO.Handle == 0 ) {
 				VAO.Bind();
 
-				mesh.ElementBuffer!.Bind();
-				mesh.VertexBuffers[0].Link( material.Shader, stackalloc int[] { material.Shader.GetAttrib( "aPos" ), material.Shader.GetAttrib( "aUv" ) } );
+				DrawNode3D.LinkAttributeArray( mesh, material );
 			}
 			else VAO.Bind();
 

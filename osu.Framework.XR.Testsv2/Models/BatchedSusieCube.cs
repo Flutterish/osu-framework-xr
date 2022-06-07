@@ -45,6 +45,7 @@ public class BatchedSusieCube : Drawable3D {
 		} );
 
 		Mesh = new( EBO, VBO );
+		Mesh.Descriptor = BasicMesh.Descriptor;
 		Mesh.CreateFullUnsafeUpload().Enqueue();
 	}
 

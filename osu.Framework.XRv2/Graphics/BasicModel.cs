@@ -1,5 +1,4 @@
 ﻿using osu.Framework.Graphics;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.XR.Graphics.Buffers;
 using osu.Framework.XR.Graphics.Materials;
 using osu.Framework.XR.Graphics.Meshes;
@@ -39,14 +38,7 @@ public class BasicModel : Drawable3D {
 
 	[BackgroundDependencyLoader]
 	private void load ( MaterialStore materials ) {
-		if ( material is null ) {
-			material = materials.GetNew( "unlit" );
-			material.CreateUpload( m => {
-				m.Set( "tex", Texture.WhitePixel );
-				m.Set( "tint", Colour );
-				m.Set( "subImage", Texture.WhitePixel.GetTextureRect() );
-			} ).Enqueue();
-		}
+		material ??= materials.GetNew( "unlit" );
 	}
 
 	Color4? colour = Color4.White;
@@ -94,8 +86,7 @@ public class BasicModel : Drawable3D {
 
 		public override void Draw ( object? ctx = null ) {
 			if ( VAO.Bind() ) { // TODO check if mesh/material changed and update them
-				mesh.ElementBuffer!.Bind();
-				mesh.VertexBuffers[0].Link( material.Shader, stackalloc int[] { material.Shader.GetAttrib( "aPos" ), material.Shader.GetAttrib( "aUv" ) } );
+				LinkAttributeArray( mesh, material );
 			}
 
 			material.Bind();

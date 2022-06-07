@@ -17,9 +17,14 @@ namespace osu.Framework.XR.Graphics.Materials;
 /// </remarks>
 public class Material {
 	public readonly Shader Shader;
+	public readonly MaterialStore? SourceStore;
+	public readonly MaterialDescriptor? Descriptor;
 
-	public Material ( Shader shader ) {
+	public Material ( Shader shader, MaterialDescriptor? descriptor = null, MaterialStore? store = null ) {
 		Shader = shader;
+		SourceStore = store;
+		Descriptor = descriptor;
+
 		IUpload upload = new DelegateUpload<Material>( this, static m => m.createUniforms() );
 		upload.Enqueue();
 	}
@@ -44,6 +49,13 @@ public class Material {
 				var mat = uniform.CreateMaterialUniform();
 				if ( mat != null )
 					uniforms.Add( name, mat );
+			}
+
+			if ( Descriptor != null ) {
+				foreach ( var (name, uniform) in Descriptor.Uniforms ) {
+					if ( uniforms.TryGetValue( name, out var mat ) )
+						uniform.ApplyDefault( mat );
+				}
 			}
 		}
 

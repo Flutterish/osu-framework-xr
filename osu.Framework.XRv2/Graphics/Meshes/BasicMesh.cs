@@ -11,7 +11,12 @@ public class BasicMesh : Mesh, ITriangleMesh {
 	public VertexBuffer<TexturedVertex> VertexBuffer => (VertexBuffer<TexturedVertex>)VertexBuffers[0];
 	public List<TexturedVertex> Vertices => VertexBuffer.Data;
 
-	public BasicMesh () : base( new ElementBuffer<uint>(), new VertexBuffer<TexturedVertex>() ) { }
+	new public static MeshDescriptor Descriptor = new MeshDescriptor()
+		.SetAttribute( 0, 0, MeshDescriptor.Position )
+		.SetAttribute( 0, 1, MeshDescriptor.UV );
+	public BasicMesh () : base( new ElementBuffer<uint>(), new VertexBuffer<TexturedVertex>() ) {
+		base.Descriptor = Descriptor;
+	}
 
 	public int TriangleCount => Indices.Count / 3;
 	public Vector3 GetTriangleVertex ( uint index )

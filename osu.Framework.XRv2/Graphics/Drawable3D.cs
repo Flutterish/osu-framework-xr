@@ -1,7 +1,10 @@
 ﻿using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.OpenGL;
+using osu.Framework.XR.Graphics.Buffers;
 using osu.Framework.XR.Graphics.Materials;
+using osu.Framework.XR.Graphics.Meshes;
+using osu.Framework.XR.Graphics.Shaders;
 using System.ComponentModel;
 
 namespace osu.Framework.XR.Graphics;
@@ -104,6 +107,62 @@ public abstract class DrawNode3D {
 	/// </summary>
 	/// <param name="ctx">An optional context to be passed by the render pipeline</param>
 	public abstract void Draw ( object? ctx = null );
+
+	/// <summary>
+	/// Links the currently bound <see cref="IAttributeArray"/> with the mesh and material data.
+	/// This overload will throw if descriptors are not available
+	/// </summary>
+	public static void LinkAttributeArray ( Mesh mesh, Material material ) {
+		if ( mesh.Descriptor is not MeshDescriptor meshDescriptor )
+			throw new InvalidOperationException( "Tried to automatically link a mesh with no descriptor" );
+		if ( material.Descriptor is not MaterialDescriptor materialDescriptor )
+			throw new InvalidOperationException( "Tried to automatically link a material with no descriptor" );
+
+		LinkAttributeArray( material.Shader, mesh, meshDescriptor, materialDescriptor );
+	}
+
+	static List<int> attribLengths = new();
+	/// <summary>
+	/// Links the currently bound <see cref="IAttributeArray"/> with the mesh and material data
+	/// </summary>
+	public static void LinkAttributeArray ( Shader shader, Mesh mesh, MeshDescriptor meshDescriptor, MaterialDescriptor materialDescriptor ) {
+		attribLengths.Clear();
+		int attribCount = 0;
+		foreach ( var i in meshDescriptor.AttributesByType.Values ) {
+			attribCount += i.Count;
+			foreach ( var (buffer, index) in i ) {
+				while ( attribLengths.Count <= buffer )
+					attribLengths.Add( 0 );
+
+				attribLengths[buffer]++;
+			}
+		}
+		Span<int> attribIndices = stackalloc int[attribLengths.Count];
+		int offset = 0;
+		int k = 0;
+		foreach ( var i in attribLengths ) {
+			attribIndices[k++] = offset;
+			offset += i;
+		}
+		Span<int> attribs = stackalloc int[attribCount];
+		foreach ( var (type, locations) in meshDescriptor.AttributesByType ) {
+			var names = materialDescriptor.GetAttributeNames( type );
+			for ( int i = 0; i < locations.Count; i++ ) {
+				var (buffer, index) = locations[i];
+				if ( names?[i] is string name ) {
+					attribs[attribIndices[buffer] + index] = shader.GetAttrib( name );
+				}
+				else {
+					attribs[attribIndices[buffer] + index] = -1;
+				}
+			}
+		}
+
+		mesh.ElementBuffer?.Bind();
+		for ( int i = 0; i < attribIndices.Length; i++ ) {
+			mesh.VertexBuffers[i].Link( shader, attribs.Slice( attribIndices[i], attribLengths[i] ) ); // TODO cache this
+		}
+	}
 
 	/// <summary>
 	/// Ensures the 2D draw state is valid, and resets the 3D state

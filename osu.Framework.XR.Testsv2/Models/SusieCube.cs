@@ -46,6 +46,7 @@ public class SusieCube : Drawable3D {
 		} );
 
 		mesh = new( EBO, VBO );
+		mesh.Descriptor = BasicMesh.Descriptor;
 		mesh.CreateFullUnsafeUpload().Enqueue();
 
 		Z = 5;
@@ -99,8 +100,7 @@ public class SusieCube : Drawable3D {
 
 		public override void Draw ( object? ctx = null ) {
 			if ( VAO.Bind() ) {
-				mesh.ElementBuffer!.Bind();
-				mesh.VertexBuffers[0].Link( material.Shader, stackalloc int[] { material.Shader.GetAttrib( "aPos" ), material.Shader.GetAttrib( "aUv" ) } );
+				LinkAttributeArray( mesh, material );
 			}
 
 			material.Bind();
