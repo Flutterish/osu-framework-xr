@@ -89,7 +89,6 @@ public partial class Panel {
 			Material.Bind();
 			Material.Set( "tex", FrameBuffer.Texture );
 			Material.Shader.SetUniform( "mMatrix", ref Matrix );
-			Material.Shader.SetUniform( "gProj", ( (BasicDrawContext)ctx! ).ProjectionMatrix ); // TODO extract this
 			Mesh.Draw();
 		}
 	}

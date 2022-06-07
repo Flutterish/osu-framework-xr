@@ -95,7 +95,6 @@ public class BasicModel : Drawable3D {
 				tint = null;
 			}
 			material.Shader.SetUniform( "mMatrix", ref matrix );
-			material.Shader.SetUniform( "gProj", ( (BasicDrawContext)ctx! ).ProjectionMatrix ); // TODO extract this
 			mesh.Draw();
 		}
 	}

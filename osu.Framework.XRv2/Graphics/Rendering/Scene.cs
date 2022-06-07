@@ -95,10 +95,11 @@ public partial class Scene : CompositeDrawable {
 	}
 	IShader blitShader = null!;
 
+	protected MaterialStore MaterialStore { get; private set; } = null!;
 	protected override IReadOnlyDependencyContainer CreateChildDependencies ( IReadOnlyDependencyContainer parent ) {
 		var deps = new DependencyContainer( parent );
 		var store = parent.Get<Game>().Resources;
-		var materials = new MaterialStore( new NamespacedResourceStore<byte[]>( store, "Resources/Shaders" ) );
+		var materials = MaterialStore = new MaterialStore( new NamespacedResourceStore<byte[]>( store, "Resources/Shaders" ) );
 		var textures = new TextureStore(
 			parent.Get<GameHost>().CreateTextureLoaderStore( new NamespacedResourceStore<byte[]>( store, "Resources/Textures" ) ),
 			useAtlas: true,
@@ -112,10 +113,16 @@ public partial class Scene : CompositeDrawable {
 			.SetUniform( "tex", Texture.WhitePixel )
 			.SetUniform( "subImage", Texture.WhitePixel.GetTextureRect() )
 			.SetUniform( "tint", Color4.White )
+			.SetOnBind( (m, store) => {
+				m.Shader.SetUniform( "gProj", store.GetGlobalProperty<Matrix4>( "gProj" ) );
+			} )
 		);
 		materials.AddDescriptor( "unlit_panel", new MaterialDescriptor()
 			.SetAttribute( "aPos", MeshDescriptor.Position )
 			.SetAttribute( "aUv", MeshDescriptor.UV )
+			.SetOnBind( ( m, store ) => {
+				m.Shader.SetUniform( "gProj", store.GetGlobalProperty<Matrix4>( "gProj" ) );
+			} )
 		);
 		deps.Cache( materials );
 		deps.Cache( textures );

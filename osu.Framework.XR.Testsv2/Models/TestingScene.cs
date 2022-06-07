@@ -30,15 +30,13 @@ public class TestingScene : Scene {
 		public TestingRenderPiepline ( TestingScene source ) : base( source ) { }
 
 		protected override void Draw ( int subtreeIndex, Matrix4 projectionMatrix ) {
-			var ctx = new BasicDrawContext( projectionMatrix );
-
 			foreach ( var stage in RenderStages ) {
 				if ( stage is TestingRenderStage.SusieCubeBatch ) {
 					DrawCubes( subtreeIndex, projectionMatrix, GetRenderStage( stage ) );
 				}
 				else {
 					foreach ( var i in GetRenderStage( stage ) ) {
-						i.GetDrawNodeAtSubtree( subtreeIndex )?.Draw( ctx );
+						i.GetDrawNodeAtSubtree( subtreeIndex )?.Draw();
 					}
 				}
 			}

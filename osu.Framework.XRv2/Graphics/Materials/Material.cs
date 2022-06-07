@@ -95,6 +95,9 @@ public class Material {
 		foreach ( var i in uniformArray ) {
 			i.Apply();
 		}
+
+		if ( SourceStore != null )
+			Descriptor?.OnBind?.Invoke( this, SourceStore );
 	}
 
 	public static void Unbind () {

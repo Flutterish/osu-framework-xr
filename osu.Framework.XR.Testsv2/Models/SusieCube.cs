@@ -105,7 +105,6 @@ public class SusieCube : Drawable3D {
 
 			material.Bind();
 			material.Shader.SetUniform( "mMatrix", ref matrix );
-			material.Shader.SetUniform( "gProj", ( (BasicDrawContext)ctx! ).ProjectionMatrix );
 			mesh.Draw();
 		}
 	}

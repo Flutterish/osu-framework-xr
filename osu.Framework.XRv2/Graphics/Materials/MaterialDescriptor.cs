@@ -22,6 +22,12 @@ public class MaterialDescriptor {
 		uniforms.Add( name, new DescriptorUniform<T>( name, defaultValue ) );
 		return this;
 	}
+
+	public Action<Material, MaterialStore>? OnBind { get; private set; }
+	public MaterialDescriptor SetOnBind ( Action<Material, MaterialStore>? action ) {
+		OnBind = action;
+		return this;
+	}
 }
 
 public interface IDescriptorUniform {

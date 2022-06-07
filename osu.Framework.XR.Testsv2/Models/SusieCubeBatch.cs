@@ -36,14 +36,12 @@ public class SusieCubeBatch : BatchDrawable<BatchDrawableSusieCube, BatchDrawabl
 		}
 
 		protected override void DrawBatch ( object? ctx = null ) {
-			var projectionMatrix = ( (BasicDrawContext)ctx! ).ProjectionMatrix;
 			var mesh = BatchedSusieCube.Mesh;
 			var material = Source.material;
 			var mMatrix = material.Shader.GetUniform<Matrix4>( "mMatrix" );
 			var tint = material.Shader.GetUniform<Color4>( "tint" );
 
 			material.Bind();
-			material.Shader.SetUniform( "gProj", ref projectionMatrix );
 			foreach ( var i in Children ) {
 				mMatrix.UpdateValue( ref i.matrix );
 				tint.UpdateValue( ref i.color );

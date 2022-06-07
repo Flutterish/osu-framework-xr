@@ -14,6 +14,13 @@ public class MaterialStore {
 		descriptors[name] = descriptor;
 	}
 
+	Dictionary<string, object?> globalProperties = new();
+	public void SetGlobalProperty<T> ( string name, T value ) {
+		globalProperties[name] = value;
+	}
+	public T GetGlobalProperty<T> ( string name )
+		=> (T)globalProperties[name]!;
+
 	Dictionary<(string material, string name), Material> sharedMaterials = new();
 	public Material GetShared ( string material, string sharedName ) => GetShared<Material, Shader>( material, sharedName );
 	public Tmaterial GetShared<Tmaterial, Tshader> ( string material, string sharedName ) where Tmaterial : Material where Tshader : Shader {
@@ -25,7 +32,7 @@ public class MaterialStore {
 	}
 
 	public Material GetNew ( string material ) => GetNew<Material, Shader>( material );
-	public Tmaterial GetNew<Tmaterial, Tshader> ( string material ) where Tmaterial : Material where Tshader : Shader { // TODO no
+	public Tmaterial GetNew<Tmaterial, Tshader> ( string material ) where Tmaterial : Material where Tshader : Shader {
 		var shader = GetShader<Tshader>( material );
 		var descriptor = descriptors.GetValueOrDefault( material );
 		return (Tmaterial)Activator.CreateInstance( typeof( Tmaterial ), new object?[] { shader, descriptor, this } )!;

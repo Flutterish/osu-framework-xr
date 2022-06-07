@@ -5,11 +5,14 @@ using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.XR.Collections;
+using osu.Framework.XR.Graphics.Materials;
 
 namespace osu.Framework.XR.Graphics.Rendering;
 
 partial class Scene {
 	public class RenderPiepline : DrawNode, ICompositeDrawNode {
+		protected MaterialStore MaterialStore => Source.MaterialStore;
+
 		Dictionary<Enum, HashList<Drawable3D>> renderStages = new();
 		protected IEnumerable<Enum> RenderStages => renderStages.Keys;
 		protected ReadOnlySpan<Drawable3D> GetRenderStage ( Enum stage ) => renderStages[stage].AsSpan();
@@ -96,6 +99,7 @@ partial class Scene {
 			GLWrapper.PushScissorState( false );
 			GLWrapper.Clear( new( depth: 1 ) );
 
+			MaterialStore.SetGlobalProperty( "gProj", projectionMatrix );
 			using ( var read = Source.tripleBuffer.Get( UsageType.Read ) ) {
 				Draw( read.Index, projectionMatrix );
 			}
@@ -109,11 +113,9 @@ partial class Scene {
 		}
 
 		protected virtual void Draw ( int subtreeIndex, Matrix4 projectionMatrix ) {
-			var ctx = new BasicDrawContext( projectionMatrix );
-
 			foreach ( var stage in RenderStages ) {
 				foreach ( var i in GetRenderStage( stage ) ) {
-					i.GetDrawNodeAtSubtree( subtreeIndex )?.Draw( ctx );
+					i.GetDrawNodeAtSubtree( subtreeIndex )?.Draw();
 				}
 			}
 		}
