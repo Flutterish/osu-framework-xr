@@ -137,5 +137,5 @@ public partial class Scene : CompositeDrawable {
 		=> singleDrawNode ??= CreateRenderPipeline();
 
 	protected virtual RenderPiepline CreateRenderPipeline ()
-		=> new( this );
+		=> new BasicRenderPiepline( this );
 }

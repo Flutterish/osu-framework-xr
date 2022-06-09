@@ -121,13 +121,12 @@ public abstract class DrawNode3D {
 		LinkAttributeArray( material.Shader, mesh, meshDescriptor, materialDescriptor );
 	}
 
-	static List<int> attribLengths = new();
 	/// <summary>
 	/// Links the currently bound <see cref="IAttributeArray"/> with the mesh and material data
 	/// </summary>
 	public static void LinkAttributeArray ( Shader shader, Mesh mesh, MeshDescriptor meshDescriptor, MaterialDescriptor materialDescriptor ) {
 		if ( !materialDescriptor.LinkCache.TryGetValue( meshDescriptor, out var values ) ) {
-			attribLengths.Clear();
+			List<int> attribLengths = new();
 			int attribCount = 0;
 			foreach ( var i in meshDescriptor.AttributesByType.Values ) {
 				attribCount += i.Count;
@@ -166,7 +165,8 @@ public abstract class DrawNode3D {
 		var attributes = values.attribs.AsSpan();
 		mesh.ElementBuffer?.Bind();
 		for ( int i = 0; i < indices.Length; i++ ) {
-			mesh.VertexBuffers[i].Link( shader, attributes.Slice( indices[i], attribLengths[i] ) );
+			var index = indices[i];
+			mesh.VertexBuffers[i].Link( shader, attributes.Slice( index, (indices.Length > i + 1 ? indices[i + 1] : attributes.Length) - index ) );
 		}
 	}
 

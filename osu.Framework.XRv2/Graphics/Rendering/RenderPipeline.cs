@@ -4,39 +4,15 @@ using osu.Framework.Graphics.OpenGL.Buffers;
 using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shaders;
-using osu.Framework.XR.Collections;
 using osu.Framework.XR.Graphics.Materials;
 
 namespace osu.Framework.XR.Graphics.Rendering;
 
 partial class Scene {
-	public class RenderPiepline : DrawNode, ICompositeDrawNode {
+	public abstract class RenderPiepline : DrawNode, ICompositeDrawNode {
 		protected MaterialStore MaterialStore => Source.MaterialStore;
-
-		Dictionary<Enum, HashList<Drawable3D>> renderStages = new();
-		protected IEnumerable<Enum> RenderStages => renderStages.Keys;
-		protected ReadOnlySpan<Drawable3D> GetRenderStage ( Enum stage ) => renderStages[stage].AsSpan();
-		protected bool TryGetRenderStage ( Enum stage, out ReadOnlySpan<Drawable3D> drawables ) {
-			if ( renderStages.TryGetValue( stage, out var hashList ) ) {
-				drawables = hashList.AsSpan();
-				return true;
-			}
-			drawables = default;
-			return false;
-		}
-
-		protected virtual void AddDrawable ( Drawable3D drawable, Enum stage ) {
-			if ( !renderStages.TryGetValue( stage, out var set ) )
-				renderStages.Add( stage, set = new() );
-
-			set.Add( drawable );
-		}
-		protected virtual void RemoveDrawable ( Drawable3D drawable, Enum stage ) {
-			if ( !renderStages.TryGetValue( stage, out var set ) )
-				renderStages.Add( stage, set = new() );
-
-			set.Remove( drawable );
-		}
+		protected abstract void AddDrawable ( Drawable3D drawable, Enum stage );
+		protected abstract void RemoveDrawable ( Drawable3D drawable, Enum stage );
 
 		new protected Scene Source => (Scene)base.Source;
 
@@ -112,13 +88,7 @@ partial class Scene {
 			frameBuffer.Unbind();
 		}
 
-		protected virtual void Draw ( int subtreeIndex, Matrix4 projectionMatrix ) {
-			foreach ( var stage in RenderStages ) {
-				foreach ( var i in GetRenderStage( stage ) ) {
-					i.GetDrawNodeAtSubtree( subtreeIndex )?.Draw();
-				}
-			}
-		}
+		protected abstract void Draw ( int subtreeIndex, Matrix4 projectionMatrix );
 
 		protected override void Dispose ( bool isDisposing ) {
 			frameBuffer.Dispose();

@@ -25,7 +25,7 @@ public class TestingScene : Scene {
 		return new TestingRenderPiepline( this );
 	}
 
-	class TestingRenderPiepline : RenderPiepline {
+	class TestingRenderPiepline : BasicRenderPiepline {
 		new protected TestingScene Source => (TestingScene)base.Source;
 		public TestingRenderPiepline ( TestingScene source ) : base( source ) { }
 
