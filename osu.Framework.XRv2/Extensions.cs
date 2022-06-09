@@ -65,4 +65,14 @@ public static class Extensions {
 
 	public static float NextSingle ( this Random random )
 		=> (float)random.NextDouble();
+
+	public static IEnumerable<string> SplitLines ( this string text ) {
+		using StringReader reader = new( text );
+		while ( reader.ReadLine() is string str ) {
+			yield return str;
+		}
+	}
+
+	public static T At<T> ( this IList<T> self, int index, T @default = default! )
+		=> self.Count > index ? self[index] : @default;
 }

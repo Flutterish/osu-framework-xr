@@ -1,5 +1,6 @@
 ﻿using osu.Framework.XR.Allocation;
 using osu.Framework.XR.Graphics.Shaders;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
 namespace osu.Framework.XR.Graphics.Materials;
@@ -66,6 +67,18 @@ public class Material {
 	public IEnumerable<KeyValuePair<string, IMaterialUniform>> AllUniforms
 		=> uniforms;
 
+	public bool HasUniform<T> ( string name )
+		=> uniforms.TryGetValue( name, out var uniform ) ? uniform is IMaterialUniform<T> : false;
+
+	public bool TryGetUniform<T> ( string name, [NotNullWhen(true)] out IMaterialUniform<T>? uniform ) {
+		if ( uniforms.TryGetValue( name, out var u ) && u is IMaterialUniform<T> mat ) {
+			uniform = mat;
+			return true;
+		}
+		uniform = null;
+		return false;
+	}
+
 	/// <summary>
 	/// Retreives a material uniform. If the material is bound and a value is updated through
 	/// this uniform, it will not be immediately updated - you need to call <see cref="IMaterialUniform.Apply"/>
@@ -73,12 +86,33 @@ public class Material {
 	public IMaterialUniform<T> GetUniform<T> ( string name )
 		=> (IMaterialUniform<T>)uniforms[name];
 
+	public bool TrySet<T> ( string name, T value ) {
+		if ( TryGetUniform<T>( name, out var mat ) ) {
+			mat.Value = value;
+
+			if ( boundMaterial == this )
+				mat.Apply();
+
+			return true;
+		}
+		return false;
+	}
+
 	public void Set<T> ( string name, T value ) {
 		var mat = GetUniform<T>( name );
 		mat.Value = value;
 
 		if ( boundMaterial == this )
 			mat.Apply();
+	}
+
+	public bool TryGet<T> ( string name, out T value ) {
+		if ( TryGetUniform<T>( name, out var uniform ) ) {
+			value = uniform.Value;
+			return true;
+		}
+		value = default!;
+		return false;
 	}
 
 	public T Get<T> ( string name )

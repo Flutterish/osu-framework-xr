@@ -91,7 +91,7 @@ public class BasicModel : Drawable3D {
 
 			material.Bind();
 			if ( tint is Color4 color ) {
-				material.Set( "tint", color );
+				material.TrySet( "tint", color );
 				tint = null;
 			}
 			material.Shader.SetUniform( "mMatrix", ref matrix );

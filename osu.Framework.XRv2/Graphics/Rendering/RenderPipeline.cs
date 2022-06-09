@@ -54,7 +54,7 @@ partial class Scene {
 
 			screenSpaceDrawQuad = Source.ScreenSpaceDrawQuad;
 			blitShader = Source.blitShader;
-			size = Source.DrawSize;
+			size = Source.ScreenSpaceDrawQuad.Size;
 			projectionMatrix = Source.Camera.GetProjectionMatrix( size.X, size.Y );
 		}
 
