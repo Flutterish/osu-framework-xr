@@ -20,13 +20,12 @@ public static class Raycast {
 		var dot = Vector3.Dot( direction, planeNormal );
 		if ( dot == 0 ) {
 			if ( Vector3.Dot( origin - pointOnPlane, planeNormal ) == 0 ) {
-				hit = new RaycastHit(
-					origin,
-					origin,
-					planeNormal,
-					direction,
-					0
-				);
+				hit = new RaycastHit {
+					Point = origin,
+					Origin = origin,
+					Normal = planeNormal,
+					Direction = direction
+				};
 				return true;
 			}
 			else {
@@ -37,13 +36,13 @@ public static class Raycast {
 		else {
 			var distance = Vector3.Dot( pointOnPlane - origin, planeNormal ) / dot;
 
-			hit = new RaycastHit(
-				origin + direction * distance,
-				origin,
-				planeNormal,
-				direction,
-				distance
-			);
+			hit = new RaycastHit {
+				Point = origin + direction * distance,
+				Origin = origin,
+				Normal = planeNormal,
+				Direction = direction,
+				Distance = distance
+			};
 			return distance >= 0 || includeBehind;
 		}
 	}
@@ -182,14 +181,7 @@ public static class Raycast {
 			face.B = transform.Apply( face.B );
 			face.C = transform.Apply( face.C );
 			if ( TryHitPrenormalized( origin, direction, face, out hit, includeBehind ) && ( closest is null || Math.Abs( closest.Value.Distance ) > Math.Abs( hit.Distance ) ) ) {
-				closest = new RaycastHit(
-					hit.Point,
-					hit.Origin,
-					hit.Normal,
-					hit.Direction,
-					hit.Distance,
-					i
-				);
+				closest = hit with { TrisIndex = i };
 			}
 		}
 
@@ -216,15 +208,7 @@ public static class Raycast {
 	public static bool TryHitPrenormalized ( Vector3 origin, Vector3 direction, IHasCollider target, out RaycastHit hit, bool includeBehind = false ) {
 		var ok = TryHitPrenormalized( origin, direction, target.Mesh, target.Matrix, out hit, includeBehind );
 		if ( ok ) {
-			hit = new RaycastHit(
-				hit.Point,
-				hit.Origin,
-				hit.Normal,
-				hit.Direction,
-				hit.Distance,
-				hit.TrisIndex,
-				target
-			);
+			hit = hit with { Collider = target };
 		}
 		return ok;
 	}
@@ -259,40 +243,30 @@ public static class Raycast {
 		/// <summary>
 		/// The point that was hit.
 		/// </summary>
-		public readonly Vector3 Point;
+		public Vector3 Point { get; init; }
 		/// <summary>
 		/// From where the raycast originated.
 		/// </summary>
-		public readonly Vector3 Origin;
+		public Vector3 Origin { get; init; }
 		/// <summary>
 		/// The normal of the hit surface.
 		/// </summary>
-		public readonly Vector3 Normal;
+		public Vector3 Normal { get; init; }
 		/// <summary>
 		/// The direction of the raycast.
 		/// </summary>
-		public readonly Vector3 Direction;
+		public Vector3 Direction { get; init; }
 		/// <summary>
 		/// Distance from the origin to the hit point. Might be negative if the hit happened in opposite direction.
 		/// </summary>
-		public readonly double Distance;
+		public double Distance { get; init; }
 		/// <summary>
 		/// The triangle of the mesh that was hit, if any.
 		/// </summary>
-		public readonly int TrisIndex;
+		public int TrisIndex { get; init; }
 		/// <summary>
 		/// The hit collider, if any.
 		/// </summary>
-		public readonly IHasCollider? Collider;
-
-		public RaycastHit ( Vector3 point, Vector3 origin, Vector3 normal, Vector3 direction, double distance, int trisIndex = -1, IHasCollider? collider = null ) {
-			Point = point;
-			Origin = origin;
-			Normal = normal;
-			Direction = direction;
-			Distance = distance;
-			TrisIndex = trisIndex;
-			Collider = collider;
-		}
+		public IHasCollider? Collider { get; init; }
 	}
 }

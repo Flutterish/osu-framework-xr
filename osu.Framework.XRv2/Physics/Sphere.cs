@@ -13,12 +13,12 @@ public static class Sphere {
 
 		if ( Triangles.IsPointInside( rh.Point, face ) ) {
 			if ( Math.Abs( rh.Distance ) <= radius ) {
-				hit = new SphereHit(
-					distance: Math.Abs( rh.Distance ),
-					origin: origin,
-					radius: radius,
-					point: rh.Point
-				);
+				hit = new SphereHit {
+					Distance = Math.Abs( rh.Distance ),
+					Origin = origin,
+					Radius = radius,
+					Point = rh.Point
+				};
 				return true;
 			}
 			else {
@@ -40,30 +40,30 @@ public static class Sphere {
 				return false;
 			}
 			else if ( al < bl && al < cl ) {
-				hit = new SphereHit(
-					distance: al,
-					origin: origin,
-					radius: radius,
-					point: A
-				);
+				hit = new SphereHit {
+					Distance = al,
+					Origin = origin,
+					Radius = radius,
+					Point = A
+				};
 				return true;
 			}
 			else if ( bl < cl ) {
-				hit = new SphereHit(
-					distance: bl,
-					origin: origin,
-					radius: radius,
-					point: B
-				);
+				hit = new SphereHit {
+					Distance = bl,
+					Origin = origin,
+					Radius = radius,
+					Point = B
+				};
 				return true;
 			}
 			else {
-				hit = new SphereHit(
-					distance: cl,
-					origin: origin,
-					radius: radius,
-					point: C
-				);
+				hit = new SphereHit {
+					Distance = cl,
+					Origin = origin,
+					Radius = radius,
+					Point = C
+				};
 				return true;
 			}
 		}
@@ -84,13 +84,7 @@ public static class Sphere {
 			face.B = transform.Apply( face.B );
 			face.C = transform.Apply( face.C );
 			if ( TryHit( origin, radius, face, out hit ) && ( closest is null || closest.Value.Distance > hit.Distance ) ) {
-				closest = new SphereHit(
-					distance: hit.Distance,
-					origin: hit.Origin,
-					radius: hit.Radius,
-					point: hit.Point,
-					trisIndex: i
-				);
+				closest = hit with { TrisIndex = i };
 			}
 		}
 
@@ -106,14 +100,7 @@ public static class Sphere {
 
 	public static bool TryHit ( Vector3 origin, double radius, IHasCollider target, out SphereHit hit ) {
 		if ( TryHit( origin, radius, target.Mesh, target.Matrix, out hit ) ) {
-			hit = new SphereHit(
-				distance: hit.Distance,
-				origin: hit.Origin,
-				radius: hit.Radius,
-				point: hit.Point,
-				trisIndex: hit.TrisIndex,
-				collider: target
-			);
+			hit = hit with { Collider = target };
 			return true;
 		}
 		return false;
@@ -121,19 +108,10 @@ public static class Sphere {
 }
 
 public readonly struct SphereHit {
-	public readonly double Distance;
-	public readonly Vector3 Origin;
-	public readonly double Radius;
-	public readonly Vector3 Point;
-	public readonly int TrisIndex;
-	public readonly IHasCollider? Collider;
-
-	public SphereHit ( double distance, Vector3 origin, double radius, Vector3 point, int trisIndex = -1, IHasCollider? collider = null ) {
-		Distance = distance;
-		Origin = origin;
-		Radius = radius;
-		Point = point;
-		TrisIndex = trisIndex;
-		Collider = collider;
-	}
+	public double Distance { get; init; }
+	public Vector3 Origin { get; init; }
+	public double Radius { get; init; }
+	public Vector3 Point { get; init; }
+	public int TrisIndex { get; init; }
+	public IHasCollider? Collider { get; init; }
 }

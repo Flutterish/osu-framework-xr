@@ -132,7 +132,7 @@ public partial class Drawable3D : IHasMatrix {
 	Matrix4 localMatrix;
 	public Matrix4 LocalMatrix {
 		get {
-			if ( !localMatrixCache.IsValid ) { // TODO combine into one operation
+			if ( !localMatrixCache.IsValid ) { // TODO combine into one operation (or just dont do the multiplication on known 0-cells)
 				localMatrix = Matrix4.CreateTranslation( -origin );
 				Matrix4 temp;
 				if ( scale != Vector3.One ) {

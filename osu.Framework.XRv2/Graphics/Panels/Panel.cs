@@ -36,7 +36,7 @@ public partial class Panel : Drawable3D {
 
 	[Cached( type: typeof( ISafeArea ) )]
 	public readonly RootContainer Content;
-	public Panel () {
+	public Panel () { // TODO penels should/could have a virtual game host in order to manipulate textinput, clipboard etc.
 		AddInternal( Content = CreateRootContainer() );
 	}
 	protected virtual RootContainer CreateRootContainer ()
