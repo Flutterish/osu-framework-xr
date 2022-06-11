@@ -75,4 +75,31 @@ public static class Extensions {
 
 	public static T At<T> ( this IList<T> self, int index, T @default = default! )
 		=> self.Count > index ? self[index] : @default;
+
+	public static Vector3 ToOsuTk ( this System.Numerics.Vector3 vec )
+		=> new( vec.X, vec.Y, vec.Z );
+	public static Quaternion ToOsuTk ( this System.Numerics.Quaternion quat )
+		=> new( quat.X, quat.Y, quat.Z, quat.W );
+	public static Matrix4 ToOsuTk ( this System.Numerics.Matrix4x4 mat ) {
+		var m = new Matrix4() {
+			M11 = mat.M11,
+			M12 = mat.M12,
+			M13 = mat.M13,
+			M14 = mat.M14,
+			M21 = mat.M21,
+			M22 = mat.M22,
+			M23 = mat.M23,
+			M24 = mat.M24,
+			M31 = mat.M31,
+			M32 = mat.M32,
+			M33 = mat.M33,
+			M34 = mat.M34,
+			M41 = mat.M41,
+			M42 = mat.M42,
+			M43 = mat.M43,
+			M44 = mat.M44
+		};
+		m.Transpose();
+		return m;
+	}
 }
