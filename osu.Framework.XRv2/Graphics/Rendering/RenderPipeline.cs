@@ -77,8 +77,10 @@ partial class Scene {
 				GLWrapper.Clear( new( depth: 1 ) );
 
 			MaterialStore.SetGlobalProperty( "gProj", projectionMatrix );
-			using ( var read = Source.tripleBuffer.Get( UsageType.Read ) ) {
-				Draw( read.Index, projectionMatrix );
+			using ( var read = Source.tripleBuffer.GetForRead() ) {
+				if ( read != null ) {
+					Draw( read.Index, projectionMatrix );
+				}
 			}
 
 			DrawNode3D.SwitchTo2DContext();

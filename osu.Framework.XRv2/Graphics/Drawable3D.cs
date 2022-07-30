@@ -170,6 +170,14 @@ public abstract class DrawNode3D {
 		}
 	}
 
+	static DrawNode3D () {
+		var shader = typeof( Framework.Graphics.Shaders.Shader );
+		var shaderpart = shader.Assembly.GetType( "osu.Framework.Graphics.Shaders.ShaderPart" )!;
+		var list = typeof( List<> ).MakeGenericType( shaderpart );
+		var constructor = shader.GetConstructor( System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance, new Type[] { typeof(string), list } )!;
+		dummyShader = (Framework.Graphics.Shaders.Shader)constructor.Invoke( new object[] { "", Activator.CreateInstance( list )! } );
+	}
+	private static Framework.Graphics.Shaders.Shader dummyShader;
 	/// <summary>
 	/// Ensures the 2D draw state is valid, and resets the 3D state
 	/// </summary>
@@ -179,7 +187,7 @@ public abstract class DrawNode3D {
 		GL.BindVertexArray( 0 );
 		GLWrapper.BindBuffer( osuTK.Graphics.ES30.BufferTarget.ElementArrayBuffer, 0 );
 		GLWrapper.BindBuffer( osuTK.Graphics.ES30.BufferTarget.ArrayBuffer, 0 );
-		GLWrapper.UseProgram( 0 );
+		GLWrapper.UseProgram( dummyShader );
 		GLWrapper.UseProgram( null );
 	}
 }

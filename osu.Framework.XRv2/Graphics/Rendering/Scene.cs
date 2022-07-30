@@ -72,7 +72,7 @@ public partial class Scene : CompositeDrawable {
 	protected override void UpdateAfterChildren () {
 		base.UpdateAfterChildren();
 
-		using ( var write = tripleBuffer.Get( UsageType.Write ) ) {
+		using ( var write = tripleBuffer.GetForWrite() ) {
 			foreach ( var i in drawables.AsSpan() ) {
 				var node = i.GetDrawNodeAtSubtree( write.Index );
 				if ( node != null && i.InvalidationID != node.InvalidationID )

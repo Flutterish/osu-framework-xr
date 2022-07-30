@@ -17,12 +17,15 @@ public partial class Panel {
 	static MethodInfo generateDrawNodeSubtree = typeof( Drawable ).GetMethod( "GenerateDrawNodeSubtree", BindingFlags.Instance | BindingFlags.NonPublic )!;
 	public static DrawNode GenerateDrawNodeSubtree ( Drawable drawable, ulong frameId, int treeIndex, bool forceNewDrawNode )
 		=> (DrawNode)generateDrawNodeSubtree.Invoke( drawable, new object[] { frameId, treeIndex, forceNewDrawNode } )!;
+
+	ulong frameId = 0;
 	protected override void UpdateAfterChildren () {
 		base.UpdateAfterChildren();
 
-		using ( var buffer = tripleBuffer.Get( UsageType.Write ) ) {
-			var node = contentDrawNodes[buffer.Index] = GenerateDrawNodeSubtree( Content, (ulong)buffer.FrameId, buffer.Index, false );
+		using ( var buffer = tripleBuffer.GetForWrite() ) {
+			var node = contentDrawNodes[buffer.Index] = GenerateDrawNodeSubtree( Content, frameId, buffer.Index, false );
 		}
+		frameId++;
 	}
 
 	PanelDrawNode? singleDrawNode;
@@ -70,9 +73,11 @@ public partial class Panel {
 			GLWrapper.PushScissorState( false );
 			GLWrapper.Clear( new( colour: Color4.Transparent ) );
 
-			using ( var buffer = Source.tripleBuffer.Get( UsageType.Read ) ) {
-				var node = Source.contentDrawNodes[buffer.Index];
-				node?.Draw( null );
+			using ( var buffer = Source.tripleBuffer.GetForRead() ) {
+				if ( buffer != null ) {
+					var node = Source.contentDrawNodes[buffer.Index];
+					node?.Draw( null );
+				}
 			}
 
 			GLWrapper.PopScissorState();
