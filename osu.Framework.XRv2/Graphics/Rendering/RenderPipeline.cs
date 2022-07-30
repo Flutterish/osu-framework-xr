@@ -61,7 +61,7 @@ partial class Scene {
 			), DrawColourInfo.Colour );
 		}
 
-		public void Draw ( FrameBuffer frameBuffer, Matrix4 projectionMatrix ) {
+		public void Draw ( FrameBuffer frameBuffer, Matrix4 projectionMatrix, bool clearFramebuffer = true ) {
 			frameBuffer.Bind();
 			GLWrapper.PushMaskingInfo( new MaskingInfo {
 				ScreenSpaceAABB = new( 0, 0, (int)frameBuffer.Size.X, (int)frameBuffer.Size.Y ),
@@ -73,7 +73,8 @@ partial class Scene {
 			GLWrapper.PushViewport( new( 0, 0, (int)frameBuffer.Size.X, (int)frameBuffer.Size.Y ) );
 			GLWrapper.PushDepthInfo( new( function: osuTK.Graphics.ES30.DepthFunction.Less ) );
 			GLWrapper.PushScissorState( false );
-			GLWrapper.Clear( new( depth: 1 ) );
+			if ( clearFramebuffer ) 
+				GLWrapper.Clear( new( depth: 1 ) );
 
 			MaterialStore.SetGlobalProperty( "gProj", projectionMatrix );
 			using ( var read = Source.tripleBuffer.Get( UsageType.Read ) ) {

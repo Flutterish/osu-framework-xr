@@ -174,7 +174,7 @@ public abstract class DrawNode3D {
 	/// Ensures the 2D draw state is valid, and resets the 3D state
 	/// </summary>
 	public static void SwitchTo2DContext () {
-		Shaders.Shader.Unbind();
+		Shader.Unbind();
 		Material.Unbind();
 		GL.BindVertexArray( 0 );
 		GLWrapper.BindBuffer( osuTK.Graphics.ES30.BufferTarget.ElementArrayBuffer, 0 );
