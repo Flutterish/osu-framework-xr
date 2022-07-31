@@ -15,4 +15,7 @@ public struct Quad3 {
 
 	public static Quad3 operator + ( Quad3 quad, Vector3 offset )
 		=> new Quad3( quad.TL + offset, quad.TR + offset, quad.BL + offset, quad.BR + offset );
+
+	public static Quad3 operator - ( Quad3 quad, Vector3 offset )
+		=> new Quad3( quad.TL - offset, quad.TR - offset, quad.BL - offset, quad.BR - offset );
 }

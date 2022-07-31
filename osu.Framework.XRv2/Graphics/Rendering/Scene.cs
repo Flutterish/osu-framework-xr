@@ -96,10 +96,17 @@ public partial class Scene : CompositeDrawable {
 	IShader blitShader = null!;
 
 	protected MaterialStore MaterialStore { get; private set; } = null!;
+	protected virtual ResourceStore<byte[]>? CreateMaterialStoreSource ( IReadOnlyDependencyContainer deps ) {
+		return null;
+	}
+
 	protected override IReadOnlyDependencyContainer CreateChildDependencies ( IReadOnlyDependencyContainer parent ) {
 		var deps = new DependencyContainer( parent );
 		var store = parent.Get<Game>().Resources;
-		var materials = MaterialStore = new MaterialStore( new NamespacedResourceStore<byte[]>( store, "Resources/Shaders" ) );
+		var materials = MaterialStore = new MaterialStore( new ResourceStore<byte[]>( new[] {
+			CreateMaterialStoreSource( deps ) ?? new NamespacedResourceStore<byte[]>( store, "Resources/Shaders" ),
+			new NamespacedResourceStore<byte[]>( new DllResourceStore( typeof(Scene).Assembly ), "Resources/Shaders" )
+		} ) );
 		var textures = new TextureStore(
 			parent.Get<GameHost>().CreateTextureLoaderStore( new NamespacedResourceStore<byte[]>( store, "Resources/Textures" ) ),
 			useAtlas: true,

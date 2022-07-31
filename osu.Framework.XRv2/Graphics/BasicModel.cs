@@ -36,9 +36,13 @@ public class BasicModel : Drawable3D {
 		}
 	}
 
+	protected virtual Material CreateDefaultMaterial ( MaterialStore materials ) {
+		return materials.GetNew( "unlit" );
+	}
+
 	[BackgroundDependencyLoader]
 	private void load ( MaterialStore materials ) {
-		material ??= materials.GetNew( "unlit" );
+		material ??= CreateDefaultMaterial( materials );
 	}
 
 	Color4? colour = Color4.White;
