@@ -4,9 +4,12 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.XR.Graphics.Materials;
 using osu.Framework.XR.Graphics.Meshes;
 using osu.Framework.XR.Maths;
+using osuTK.Graphics;
 
 namespace osu.Framework.XR.Graphics.Panels;
 
@@ -116,5 +119,31 @@ public partial class Panel : Drawable3D {
 		}
 
 		base.Dispose( isDisposing );
+	}
+
+	public void CreateUVTest ( int tilesX, int tilesY, int? seed = null ) {
+		Random rng = seed is int i ? new( i ) : new();
+
+		var tileWidth = ContentDrawSize.X / tilesX;
+		var tileHeight = ContentDrawSize.Y / tilesY;
+		var size = new Vector2( tileWidth, tileHeight );
+		for ( var x = 0; x < tilesX; x++ ) {
+			for ( var y = 0; y < tilesY; y++ ) {
+				var color = Color4.FromHsv( new( rng.NextSingle(), 1, 1, 1 ) );
+
+				Content.Add( new Box {
+					Size = size,
+					X = tileWidth * x,
+					Y = tileHeight * y,
+					Colour = color
+				} );
+				Content.Add( new SpriteText {
+					X = tileWidth * x + tileWidth / 2,
+					Y = tileHeight * y + tileHeight / 2,
+					Origin = Anchor.Centre,
+					Text = $"{x}:{y}"
+				} );
+			}
+		}
 	}
 }
