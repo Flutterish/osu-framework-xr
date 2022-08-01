@@ -79,6 +79,8 @@ public class BasicModel : Drawable3D {
 		Mesh mesh = null!;
 		Material material = null!;
 		Matrix4 matrix;
+		bool normalMatrixComputed;
+		Matrix3 normalMatrix;
 		Color4? tint;
 		protected override void UpdateState () {
 			mesh = Source.Mesh;
@@ -86,6 +88,7 @@ public class BasicModel : Drawable3D {
 			matrix = Source.Matrix;
 			tint = Source.colour;
 			Source.colour = null;
+			normalMatrixComputed = false;
 		}
 
 		public override void Draw ( object? ctx = null ) {
@@ -99,6 +102,16 @@ public class BasicModel : Drawable3D {
 				tint = null;
 			}
 			material.Shader.SetUniform( "mMatrix", ref matrix );
+			if ( material.Shader.TryGetUniform<Matrix3>( "mNormal", out var mNormal ) ) {
+				if ( !normalMatrixComputed ) {
+					var mat = matrix.Inverted();
+					mat.Transpose();
+					normalMatrix = new Matrix3( mat );
+					normalMatrixComputed = true;
+				}
+
+				mNormal.UpdateValue( ref normalMatrix );
+			}
 			mesh.Draw();
 		}
 	}

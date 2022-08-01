@@ -8,13 +8,14 @@ public class BasicMesh : Mesh, ITriangleMesh {
 	new public ElementBuffer<uint> ElementBuffer => (ElementBuffer<uint>)base.ElementBuffer!;
 	public List<uint> Indices => ElementBuffer.Indices;
 
-	public VertexBuffer<TexturedVertex> VertexBuffer => (VertexBuffer<TexturedVertex>)VertexBuffers[0];
-	public List<TexturedVertex> Vertices => VertexBuffer.Data;
+	public VertexBuffer<TexturedNormal> VertexBuffer => (VertexBuffer<TexturedNormal>)VertexBuffers[0];
+	public List<TexturedNormal> Vertices => VertexBuffer.Data;
 
 	new public static MeshDescriptor Descriptor = new MeshDescriptor()
 		.SetAttribute( 0, 0, MeshDescriptor.Position )
-		.SetAttribute( 0, 1, MeshDescriptor.UV );
-	public BasicMesh () : base( new ElementBuffer<uint>(), new VertexBuffer<TexturedVertex>() ) {
+		.SetAttribute( 0, 1, MeshDescriptor.UV )
+		.SetAttribute( 0, 2, MeshDescriptor.Normal );
+	public BasicMesh () : base( new ElementBuffer<uint>(), new VertexBuffer<TexturedNormal>() ) {
 		base.Descriptor = Descriptor;
 	}
 
@@ -52,7 +53,14 @@ public class BasicMesh : Mesh, ITriangleMesh {
 		VertexBuffer.Data.Clear();
 	}
 
-	public void AddTriangle ( TexturedVertex a, TexturedVertex b, TexturedVertex c ) {
+	public void AddTriangle ( TexturedNormal a, TexturedNormal b, TexturedNormal c, bool computeNormal = false ) {
+		if ( computeNormal ) {
+			var normal = Vector3.Cross( a.Position - b.Position, a.Position - c.Position ).Normalized();
+			a.Normal = normal;
+			b.Normal = normal;
+			c.Normal = normal;
+		}
+
 		Vertices.Add( a );
 		Vertices.Add( b );
 		Vertices.Add( c );
@@ -87,12 +95,13 @@ public class BasicMesh : Mesh, ITriangleMesh {
 		=> AddQuad( quad, new Vector2( 0, 1 ), new Vector2( 1, 1 ), new Vector2( 0, 0 ), new Vector2( 1, 0 ) );
 
 	public void AddQuad ( Quad3 quad, Vector2 TL, Vector2 TR, Vector2 BL, Vector2 BR ) {
+		var normal = Vector3.Cross( quad.TR - quad.TL, quad.TR - quad.BR ).Normalized();
 		int offset = Vertices.Count;
 
-		Vertices.Add( new() { Position = quad.TL, UV = TL } );
-		Vertices.Add( new() { Position = quad.TR, UV = TR } );
-		Vertices.Add( new() { Position = quad.BL, UV = BL } );
-		Vertices.Add( new() { Position = quad.BR, UV = BR } );
+		Vertices.Add( new() { Position = quad.TL, UV = TL, Normal = normal } );
+		Vertices.Add( new() { Position = quad.TR, UV = TR, Normal = normal } );
+		Vertices.Add( new() { Position = quad.BL, UV = BL, Normal = normal } );
+		Vertices.Add( new() { Position = quad.BR, UV = BR, Normal = normal } );
 
 		AddFace( (uint)offset, (uint)offset + 3, (uint)offset + 1 );
 		AddFace( (uint)offset, (uint)offset + 3, (uint)offset + 2 );
@@ -148,7 +157,7 @@ public class BasicMesh : Mesh, ITriangleMesh {
 			10, 14, 5,  5,  4,  10,
 			3,  2,  11, 11, 15, 3
 		} );
-		UnitCube.Vertices.AddRange( new TexturedVertex[] {
+		UnitCube.Vertices.AddRange( new TexturedNormal[] {
 			new() { Position = new( -1, -1, -1 ), UV = new( 0, 0 ) },
 			new() { Position = new(  1, -1, -1 ), UV = new( 1, 0 ) },
 			new() { Position = new(  1,  1, -1 ), UV = new( 1, 1 ) },

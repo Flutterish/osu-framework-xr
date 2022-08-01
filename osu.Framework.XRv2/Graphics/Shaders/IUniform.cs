@@ -151,6 +151,26 @@ public class Vector4Uniform : IUniform<Vector4>, IUniform<Color4>, IUniform<Rect
 	}
 }
 
+public class Matrix3Uniform : IUniform<Matrix3> {
+	IMaterialUniform IUniform.CreateMaterialUniform ()
+		=> new MaterialUniform<Matrix3>( this ) { Value = Matrix3.Identity };
+
+	public int Location { get; init; }
+	Matrix3 value;
+	public Matrix3 Value {
+		get => value;
+		set => UpdateValue( ref value );
+	}
+
+	public void UpdateValue ( ref Matrix3 value ) {
+		if ( this.value == value )
+			return;
+
+		this.value = value;
+		GL.UniformMatrix3( Location, true, ref value );
+	}
+}
+
 public class Matrix4Uniform : IUniform<Matrix4> {
 	IMaterialUniform IUniform.CreateMaterialUniform ()
 		=> new MaterialUniform<Matrix4>( this ) { Value = Matrix4.Identity };

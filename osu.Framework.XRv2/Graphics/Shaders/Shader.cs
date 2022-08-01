@@ -1,4 +1,5 @@
 ﻿using osu.Framework.XR.Allocation;
+using System.Diagnostics.CodeAnalysis;
 
 namespace osu.Framework.XR.Graphics.Shaders;
 
@@ -47,6 +48,16 @@ public class Shader {
 	public IUniform<T> GetUniform<T> ( string name )
 		=> (IUniform<T>)uniforms[name];
 
+	public bool TryGetUniform<T> ( string name, [NotNullWhen(true)] out IUniform<T>? uniform ) {
+		if ( uniforms.TryGetValue( name, out var u ) && u is IUniform<T> v ) {
+			uniform = v;
+			return true;
+		}
+
+		uniform = null;
+		return false;
+	}
+
 	public void SetUniform<T> ( string name, ref T value )
 		=> GetUniform<T>( name ).UpdateValue( ref value );
 
@@ -84,6 +95,7 @@ public class Shader {
 					ActiveUniformType.FloatVec2 => new Vector2Uniform { Location = location },
 					ActiveUniformType.FloatVec3 => new Vector3Uniform { Location = location },
 					ActiveUniformType.FloatVec4 => new Vector4Uniform { Location = location },
+					ActiveUniformType.FloatMat3 => new Matrix3Uniform { Location = location },
 					ActiveUniformType.FloatMat4 => new Matrix4Uniform { Location = location },
 					ActiveUniformType.Sampler2D => new Sampler2DUniform { Location = location, TextureUnit = unit++ },
 					_ => (IUniform?)null

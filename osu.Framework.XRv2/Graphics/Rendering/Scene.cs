@@ -124,6 +124,24 @@ public partial class Scene : CompositeDrawable {
 				m.Shader.SetUniform( "gProj", store.GetGlobalProperty<Matrix4>( "gProj" ) );
 			} )
 		);
+		materials.SetGlobalProperty( "lightPos", Vector3.Zero );
+		materials.AddDescriptor( "lit", new MaterialDescriptor()
+			.SetAttribute( "aPos", MeshDescriptor.Position )
+			.SetAttribute( "aUv", MeshDescriptor.UV )
+			.SetAttribute( "aNorm", MeshDescriptor.Normal )
+			.SetUniform( "tex", Texture.WhitePixel )
+			.SetUniform( "subImage", Texture.WhitePixel.GetTextureRect() )
+			.SetUniform( "tint", Color4.White )
+			.SetUniform( "lightColor", Vector3.One )
+			.SetUniform( "specularStr", 0.5f )
+			.SetUniform( "ambientStr", 0.1f )
+			.SetUniform( "specularExp", 32f )
+			.SetOnBind( ( m, store ) => {
+				m.Shader.SetUniform( "gProj", store.GetGlobalProperty<Matrix4>( "gProj" ) );
+				m.Shader.SetUniform( "viewPos", store.GetGlobalProperty<Vector3>( "viewPos" ) );
+				m.Shader.SetUniform( "lightPos", store.GetGlobalProperty<Vector3>( "lightPos" ) );
+			} )
+		);
 		materials.AddDescriptor( "unlit_panel", new MaterialDescriptor()
 			.SetAttribute( "aPos", MeshDescriptor.Position )
 			.SetAttribute( "aUv", MeshDescriptor.UV )
