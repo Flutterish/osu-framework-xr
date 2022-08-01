@@ -47,6 +47,7 @@ partial class Scene {
 			UploadScheduler.Execute();
 			DisposeScheduler.Execute();
 
+			MaterialStore.SetGlobalProperty( "viewPos", Source.Camera.Position ); // TODO do this better
 			frameBuffer.Size = size;
 			Draw( frameBuffer, projectionMatrix );
 
@@ -77,7 +78,6 @@ partial class Scene {
 				GLWrapper.Clear( new( depth: 1 ) );
 
 			MaterialStore.SetGlobalProperty( "gProj", projectionMatrix );
-			MaterialStore.SetGlobalProperty( "viewPos", -projectionMatrix.ExtractTranslation() );
 			using ( var read = Source.tripleBuffer.GetForRead() ) {
 				if ( read != null ) {
 					Draw( read.Index, projectionMatrix );

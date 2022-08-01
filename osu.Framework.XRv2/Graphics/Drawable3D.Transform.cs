@@ -90,19 +90,19 @@ public partial class Drawable3D : IHasMatrix {
 
 	public Vector3 EulerRotation {
 		get => rotation.ToEuler();
-		set => rotation = Quaternion.FromEulerAngles( value );
+		set => Rotation = Quaternion.FromEulerAngles( value );
 	}
 	public float EulerX {
 		get => EulerRotation.X;
-		set => rotation = Quaternion.FromEulerAngles( EulerRotation with { X = value } );
+		set => Rotation = Quaternion.FromEulerAngles( EulerRotation with { X = value } );
 	}
 	public float EulerY {
 		get => EulerRotation.Y;
-		set => rotation = Quaternion.FromEulerAngles( EulerRotation with { Y = value } );
+		set => Rotation = Quaternion.FromEulerAngles( EulerRotation with { Y = value } );
 	}
 	public float EulerZ {
 		get => EulerRotation.Z;
-		set => rotation = Quaternion.FromEulerAngles( EulerRotation with { Z = value } );
+		set => Rotation = Quaternion.FromEulerAngles( EulerRotation with { Z = value } );
 	}
 
 	Vector3 origin;

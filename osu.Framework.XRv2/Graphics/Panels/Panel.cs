@@ -46,6 +46,7 @@ public partial class Panel : Drawable3D {
 		CompositeDrawable? IDrawable.Parent => null;
 
 		public override DrawInfo DrawInfo => new( Matrix3.Identity, Matrix3.Identity );
+		public override DrawColourInfo DrawColourInfo => new DrawColourInfo( null, null );
 
 		public Quad ExpandRectangleToSpaceOfOtherDrawable ( IDrawable other ) {
 			return ToSpaceOfOtherDrawable( DrawRectangle, other );

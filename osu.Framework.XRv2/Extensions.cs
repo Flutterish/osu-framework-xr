@@ -102,4 +102,15 @@ public static class Extensions {
 		m.Transpose();
 		return m;
 	}
+
+	public static float Mod ( this float x, float y ) {
+		x = x % y;
+		if ( x < 0 )
+			return y + x;
+		return x;
+	}
+
+	public static float AngleDistance ( this float from, float to ) {
+		return ( to - from + MathF.PI ).Mod( MathF.Tau ) - MathF.PI;
+	}
 }

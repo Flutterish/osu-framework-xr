@@ -22,6 +22,8 @@ public class CompositeDrawable3D : Drawable3D {
 		child.Parent = this;
 		children.Add( child );
 		base.AddInternal( child );
+		if ( !ShouldUpdateChildrenLife )
+			MakeChildAlive( child );
 
 		ChildAdded?.Invoke( child, this );
 		subtreeAdded( this, this, child );
