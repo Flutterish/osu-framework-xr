@@ -13,6 +13,9 @@ public class MaterialStore {
 	public void AddDescriptor ( string name, MaterialDescriptor descriptor ) {
 		descriptors[name] = descriptor;
 	}
+	public MaterialDescriptor GetDescriptor ( string name ) {
+		return descriptors[name];
+	}
 
 	Dictionary<string, object?> globalProperties = new();
 	public void SetGlobalProperty<T> ( string name, T value ) {
