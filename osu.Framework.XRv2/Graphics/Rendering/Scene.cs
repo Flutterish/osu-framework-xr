@@ -95,7 +95,7 @@ public partial class Scene : CompositeDrawable {
 	}
 	IShader blitShader = null!;
 
-	protected MaterialStore MaterialStore { get; private set; } = null!;
+	public MaterialStore MaterialStore { get; private set; } = null!;
 	protected virtual ResourceStore<byte[]>? CreateMaterialStoreSource ( IReadOnlyDependencyContainer deps ) {
 		return null;
 	}

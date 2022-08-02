@@ -79,9 +79,7 @@ partial class Scene {
 
 			MaterialStore.SetGlobalProperty( "gProj", projectionMatrix );
 			using ( var read = Source.tripleBuffer.GetForRead() ) {
-				if ( read != null ) {
-					Draw( read.Index, projectionMatrix );
-				}
+				Draw( read.Index, projectionMatrix );
 			}
 
 			DrawNode3D.SwitchTo2DContext();

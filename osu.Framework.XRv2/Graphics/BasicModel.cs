@@ -45,7 +45,7 @@ public class BasicModel : Drawable3D {
 		material ??= CreateDefaultMaterial( materials );
 	}
 
-	Color4? colour = Color4.White;
+	Color4? colour = null;
 	new public Color4 Colour {
 		get => colour ?? ( material?.IsLoaded == true ? material.Get<Color4>( "tint" ) : Color4.White );
 		set {

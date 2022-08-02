@@ -74,10 +74,8 @@ public partial class Panel {
 			GLWrapper.Clear( new( colour: Color4.Transparent ) );
 
 			using ( var buffer = Source.tripleBuffer.GetForRead() ) {
-				if ( buffer != null ) {
-					var node = Source.contentDrawNodes[buffer.Index];
-					node?.Draw( null );
-				}
+				var node = Source.contentDrawNodes[buffer.Index];
+				node?.Draw( null );
 			}
 
 			GLWrapper.PopScissorState();

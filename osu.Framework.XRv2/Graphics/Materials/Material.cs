@@ -1,4 +1,6 @@
-﻿using osu.Framework.XR.Allocation;
+﻿using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.Textures;
+using osu.Framework.XR.Allocation;
 using osu.Framework.XR.Graphics.Shaders;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
@@ -101,6 +103,16 @@ public class Material {
 	public void Set<T> ( string name, T value ) {
 		var mat = GetUniform<T>( name );
 		mat.Value = value;
+
+		if ( boundMaterial == this )
+			mat.Apply();
+	}
+
+	public void SetTexture ( Texture value, string name, string subImage = "subImage" ) {
+		var mat = GetUniform<Texture>( name );
+		mat.Value = value;
+		var mat2 = GetUniform<RectangleF>( subImage );
+		mat2.Value = value.GetTextureRect();
 
 		if ( boundMaterial == this )
 			mat.Apply();

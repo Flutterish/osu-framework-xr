@@ -1,5 +1,4 @@
 ﻿using osu.Framework.XR.Graphics.Meshes;
-using System.Reflection;
 
 namespace osu.Framework.XR.Graphics.Materials;
 
