@@ -32,6 +32,7 @@ public partial class Scene : CompositeDrawable {
 	}
 
 	public Scene () {
+		onRenderStageChangedDelegate = onRenderStageChanged;
 		AddInternal( Root );
 		Root.SubtreeChildAdded += ( d, p ) => {
 			if ( d is IUnrenderable )
@@ -39,7 +40,7 @@ public partial class Scene : CompositeDrawable {
 
 			drawables.Add( d );
 			drawableQueue.Enqueue( (d, true, d.RenderStage) );
-			d.RenderStageChanged += onRenderStageChanged;
+			d.RenderStageChanged += onRenderStageChangedDelegate;
 		};
 		Root.SubtreeChildRemoved += ( d, p ) => {
 			if ( d is IUnrenderable )
@@ -47,10 +48,12 @@ public partial class Scene : CompositeDrawable {
 
 			drawables.Remove( d );
 			drawableQueue.Enqueue( (d, false, d.RenderStage) );
-			d.RenderStageChanged -= onRenderStageChanged;
+			d.RenderStageChanged -= onRenderStageChangedDelegate;
 		};
 	}
 
+	// cached delegate to avoid allocs
+	Drawable3D.RenderStageChangedHandler onRenderStageChangedDelegate;
 	private void onRenderStageChanged ( Drawable3D drawable, Enum from, Enum to ) {
 		drawableQueue.Enqueue( (drawable, false, from) );
 		drawableQueue.Enqueue( (drawable, true, to) );
