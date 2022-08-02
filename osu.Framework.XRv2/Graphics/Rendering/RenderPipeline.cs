@@ -51,6 +51,7 @@ partial class Scene {
 			frameBuffer.Size = size;
 			Draw( frameBuffer, projectionMatrix );
 
+			base.Draw( vertexAction );
 			blitShader.Bind();
 			frameBuffer.Texture.Bind();
 			// the texture is upside-down because o!f says Y+ is down but we and GL say Y+ is up
