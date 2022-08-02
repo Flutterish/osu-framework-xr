@@ -61,6 +61,7 @@ partial class Scene {
 				screenSpaceDrawQuad.TopLeft,
 				screenSpaceDrawQuad.TopRight
 			), DrawColourInfo.Colour );
+			blitShader.Unbind();
 		}
 
 		public void Draw ( FrameBuffer frameBuffer, Matrix4 projectionMatrix, bool clearFramebuffer = true ) {

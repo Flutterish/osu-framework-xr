@@ -48,6 +48,9 @@ public class AttributeArray : IAttributeArray {
 	}
 
 	~AttributeArray () {
+		if ( Handle == 0 )
+			return;
+
 		if ( DebugUtils.IsDebugBuild )
 			throw new InvalidOperationException( $"An {nameof( AttributeArray )} has not been disposed correctly" );
 		Dispose();
