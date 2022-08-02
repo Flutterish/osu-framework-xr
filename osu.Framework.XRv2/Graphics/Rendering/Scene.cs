@@ -100,9 +100,11 @@ public partial class Scene : CompositeDrawable {
 		return null;
 	}
 
+	GameHost? host;
 	protected override IReadOnlyDependencyContainer CreateChildDependencies ( IReadOnlyDependencyContainer parent ) {
 		var deps = new DependencyContainer( parent );
 		var store = parent.Get<Game>().Resources;
+		host = parent.Get<GameHost>();
 		var materials = MaterialStore = new MaterialStore( new ResourceStore<byte[]>( new[] {
 			CreateMaterialStoreSource( deps ) ?? new NamespacedResourceStore<byte[]>( store, "Resources/Shaders" ),
 			new NamespacedResourceStore<byte[]>( new DllResourceStore( typeof(Scene).Assembly ), "Resources/Shaders" )
@@ -146,6 +148,13 @@ public partial class Scene : CompositeDrawable {
 		deps.Cache( materials );
 		deps.Cache( textures );
 		return base.CreateChildDependencies( deps );
+	}
+
+	protected override void Dispose ( bool isDisposing ) {
+		base.Dispose( isDisposing );
+		host?.DrawThread.Scheduler.Add( () => {
+			DisposeScheduler.Execute();
+		} );
 	}
 
 	public RenderPiepline? GetRenderPiepline ()
