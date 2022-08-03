@@ -1,6 +1,7 @@
 ﻿using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Layout;
+using osu.Framework.XR.Maths;
 using System.Runtime.CompilerServices;
 
 namespace osu.Framework.XR.Graphics;

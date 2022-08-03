@@ -1,6 +1,7 @@
 ﻿using osu.Framework.Input.Events;
 using osu.Framework.Testing;
 using osu.Framework.XR.Graphics.Rendering;
+using osu.Framework.XR.Maths;
 
 namespace osu.Framework.XR.Testing;
 

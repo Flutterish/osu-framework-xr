@@ -1,4 +1,5 @@
 ﻿using osu.Framework.Graphics;
+using osu.Framework.XR.Collections;
 using osu.Framework.XR.Graphics.Buffers;
 using osu.Framework.XR.Graphics.Rendering;
 

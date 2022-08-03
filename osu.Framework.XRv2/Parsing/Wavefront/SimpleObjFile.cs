@@ -1,4 +1,5 @@
-﻿using osu.Framework.XR.Graphics.Buffers;
+﻿using osu.Framework.XR.Collections;
+using osu.Framework.XR.Graphics.Buffers;
 using osu.Framework.XR.Graphics.Meshes;
 using osu.Framework.XR.Graphics.Vertices;
 using System.Globalization;

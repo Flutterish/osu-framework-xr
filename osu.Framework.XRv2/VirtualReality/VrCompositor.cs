@@ -4,6 +4,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.OpenGL.Buffers;
 using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.XR.Graphics.Rendering;
+using osu.Framework.XR.Maths;
 using System.Diagnostics.CodeAnalysis;
 
 namespace osu.Framework.XR.VirtualReality;
