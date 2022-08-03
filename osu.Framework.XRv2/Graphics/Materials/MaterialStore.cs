@@ -25,6 +25,7 @@ public class MaterialStore {
 		=> (T)globalProperties[name]!;
 
 	Dictionary<(string material, string name), Material> sharedMaterials = new();
+	public bool SharedMaterialExists ( string material, string sharedName ) => sharedMaterials.ContainsKey( (material, sharedName) );
 	public Material GetShared ( string material, string sharedName ) => GetShared<Material, Shader>( material, sharedName );
 	public Tmaterial GetShared<Tmaterial, Tshader> ( string material, string sharedName ) where Tmaterial : Material where Tshader : Shader {
 
@@ -32,6 +33,18 @@ public class MaterialStore {
 			sharedMaterials.Add( (material, sharedName), mat = GetNew<Tmaterial, Tshader>( material ) );
 
 		return (Tmaterial)mat;
+	}
+
+	public bool GetShared ( string material, string sharedName, out Material mat ) => GetShared<Material, Shader>( material, sharedName, out mat );
+	public bool GetShared<Tmaterial, Tshader> ( string material, string sharedName, out Tmaterial mat ) where Tmaterial : Material where Tshader : Shader {
+
+		if ( !sharedMaterials.TryGetValue( (material, sharedName), out var mat2 ) ) {
+			sharedMaterials.Add( (material, sharedName), mat = GetNew<Tmaterial, Tshader>( material ) );
+			return false;
+		}
+
+		mat = (Tmaterial)mat2;
+		return true;
 	}
 
 	public Material GetNew ( string material ) => GetNew<Material, Shader>( material );
