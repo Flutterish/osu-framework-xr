@@ -13,6 +13,13 @@ public interface IUpload {
 		=> UploadScheduler.Enqueue( this );
 }
 
+public static class IUploadExtensions {
+	/// <inheritdoc cref="IUpload.Enqueue"/>
+	public static void Enqueue ( this IUpload upload ) {
+		upload.Enqueue();
+	}
+}
+
 public class CombinedUpload : IUpload {
 	RentedArray<IUpload> uploads;
 
@@ -29,6 +36,18 @@ public class CombinedUpload : IUpload {
 			i.Upload();
 
 		uploads.Dispose();
+	}
+}
+
+public class DelegateUpload : IUpload {
+	Action action;
+
+	public DelegateUpload ( Action action ) {
+		this.action = action;
+	}
+
+	public void Upload () {
+		action();
 	}
 }
 

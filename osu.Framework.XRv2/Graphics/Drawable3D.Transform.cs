@@ -83,9 +83,7 @@ public partial class Drawable3D : IHasMatrix {
 				return;
 
 			rotation = value;
-			localMatrixCache.Invalidate();
-			matrix.Invalidate();
-			Invalidate( Invalidation.DrawNode | Invalidation.DrawInfo );
+			TryInvalidateMatrix();
 		}
 	}
 
