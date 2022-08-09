@@ -1,4 +1,5 @@
 ﻿using osu.Framework.Allocation;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
 using osu.Framework.XR.Graphics.Buffers;
@@ -59,7 +60,7 @@ public class SusieCube : Drawable3D {
 	[BackgroundDependencyLoader]
 	private void load ( MaterialStore materials, TextureStore textures ) {
 		material = materials.GetNew( "unlit" );
-		texture = textures.Get( "susie", Framework.Graphics.OpenGL.Textures.WrapMode.ClampToEdge, Framework.Graphics.OpenGL.Textures.WrapMode.ClampToEdge );
+		texture = textures.Get( "susie", WrapMode.ClampToEdge, WrapMode.ClampToEdge );
 
 		material.CreateUpload( m => {
 			m.Set( "tex", texture );
@@ -98,7 +99,7 @@ public class SusieCube : Drawable3D {
 			matrix = Source.Matrix;
 		}
 
-		public override void Draw ( object? ctx = null ) {
+		public override void Draw ( IRenderer renderer, object? ctx = null ) {
 			if ( VAO.Bind() ) {
 				LinkAttributeArray( mesh, material );
 			}

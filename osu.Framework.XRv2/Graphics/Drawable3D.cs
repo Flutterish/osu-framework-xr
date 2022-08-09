@@ -1,11 +1,13 @@
 ﻿using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.OpenGL;
+using osu.Framework.Graphics.Rendering;
+using osu.Framework.Graphics.Shaders;
 using osu.Framework.XR.Graphics.Buffers;
 using osu.Framework.XR.Graphics.Materials;
 using osu.Framework.XR.Graphics.Meshes;
 using osu.Framework.XR.Graphics.Shaders;
 using System.ComponentModel;
+using System.Reflection;
 
 namespace osu.Framework.XR.Graphics;
 
@@ -106,7 +108,7 @@ public abstract class DrawNode3D {
 	/// Draws the drawable, or otherwise interacts with the render pipeline
 	/// </summary>
 	/// <param name="ctx">An optional context to be passed by the render pipeline</param>
-	public abstract void Draw ( object? ctx = null );
+	public abstract void Draw ( IRenderer renderer, object? ctx = null );
 
 	/// <summary>
 	/// Links the currently bound <see cref="IAttributeArray"/> with the mesh and material data.
@@ -170,24 +172,32 @@ public abstract class DrawNode3D {
 		}
 	}
 
-	static DrawNode3D () {
-		var shader = typeof( Framework.Graphics.Shaders.Shader );
-		var shaderpart = shader.Assembly.GetType( "osu.Framework.Graphics.Shaders.ShaderPart" )!;
-		var list = typeof( List<> ).MakeGenericType( shaderpart );
-		var constructor = shader.GetConstructor( System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance, new Type[] { typeof(string), list } )!;
-		dummyShader = (Framework.Graphics.Shaders.Shader)constructor.Invoke( new object[] { "", Activator.CreateInstance( list )! } );
+	private static Dictionary<Type, IShader> dummyShaders = new();
+	private static IShader getDummyShader ( IRenderer renderer ) {
+		if ( !dummyShaders.TryGetValue( renderer.GetType(), out var dummy ) ) {
+			var assembly = typeof( IRenderer ).Assembly;
+			var shader = assembly.GetType( "osu.Framework.Graphics.OpenGL.Shaders.OpenGLShader" )!;
+			var shaderpart = assembly.GetType( "osu.Framework.Graphics.OpenGL.Shaders.OpenGLShaderPart" )!;
+			var list = shaderpart.MakeArrayType();
+			var empty = typeof( Array ).GetMethod( nameof( Array.Empty ), BindingFlags.Static | BindingFlags.Public )!.MakeGenericMethod( shaderpart );
+			var constructor = shader.GetConstructor( BindingFlags.NonPublic | BindingFlags.Instance, new Type[] { typeof( IRenderer ), typeof( string ), list } )!;
+			dummy = (IShader)constructor.Invoke( new object[] { renderer, "", empty.Invoke( null, new object[] { } )! } );
+		}
+
+		return dummy;
 	}
-	private static Framework.Graphics.Shaders.Shader dummyShader;
+	private static MethodInfo? _bindBuffer;
 	/// <summary>
 	/// Ensures the 2D draw state is valid, and resets the 3D state
 	/// </summary>
-	public static void SwitchTo2DContext () {
+	public static void SwitchTo2DContext ( IRenderer renderer ) {
 		Shader.Unbind();
 		Material.Unbind();
 		GL.BindVertexArray( 0 );
-		GLWrapper.BindBuffer( osuTK.Graphics.ES30.BufferTarget.ElementArrayBuffer, 0 );
-		GLWrapper.BindBuffer( osuTK.Graphics.ES30.BufferTarget.ArrayBuffer, 0 );
-		GLWrapper.UseProgram( dummyShader );
-		GLWrapper.UseProgram( null );
+		_bindBuffer ??= renderer.GetType().GetMethod( "BindBuffer", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic )!;
+		_bindBuffer.Invoke( renderer, new object[] { osuTK.Graphics.ES30.BufferTarget.ElementArrayBuffer, 0 } );
+		_bindBuffer.Invoke( renderer, new object[] { osuTK.Graphics.ES30.BufferTarget.ArrayBuffer, 0 } );
+		renderer.UseProgram( getDummyShader( renderer ) );
+		renderer.UseProgram( null );
 	}
 }

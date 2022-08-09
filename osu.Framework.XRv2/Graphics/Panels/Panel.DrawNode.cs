@@ -1,6 +1,5 @@
 ﻿using osu.Framework.Graphics;
-using osu.Framework.Graphics.OpenGL;
-using osu.Framework.Graphics.OpenGL.Buffers;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.XR.Graphics.Buffers;
 using osu.Framework.XR.Graphics.Materials;
 using osu.Framework.XR.Graphics.Meshes;
@@ -34,21 +33,23 @@ public partial class Panel {
 	protected virtual PanelDrawNode CreatePanelDrawNode ()
 		=> new( this );
 
-	FrameBuffer frameBuffer = new();
+	IFrameBuffer? frameBuffer; // shared data
 	AttributeArray VAO = new();
 	protected class PanelDrawNode : DrawNode3D {
 		new protected Panel Source => (Panel)base.Source;
 		AttributeArray VAO;
 		protected readonly BasicMesh Mesh;
 		protected readonly Material Material;
-		protected readonly FrameBuffer FrameBuffer = new();
+		protected IFrameBuffer? FrameBuffer {
+			get => Source.frameBuffer;
+			set => Source.frameBuffer = value;
+		}
 		protected Matrix4 Matrix;
 		protected Vector2 Size;
 		public PanelDrawNode ( Panel source ) : base( source ) {
 			VAO = source.VAO;
 			Mesh = source.Mesh;
 			Material = source.Material;
-			FrameBuffer = source.frameBuffer;
 		}
 
 		protected override void UpdateState () {
@@ -56,33 +57,34 @@ public partial class Panel {
 			Size = Source.ContentDrawSize;
 		}
 
-		public override void Draw ( object? ctx = null ) {
-			SwitchTo2DContext();
+		public override void Draw ( IRenderer renderer, object? ctx = null ) {
+			SwitchTo2DContext( renderer );
+			FrameBuffer ??= renderer.CreateFrameBuffer();
 			FrameBuffer.Size = Size;
 			FrameBuffer.Bind();
-			GLWrapper.PushMaskingInfo( new MaskingInfo {
+			renderer.PushMaskingInfo( new MaskingInfo {
 				ScreenSpaceAABB = new( 0, 0, (int)Size.X, (int)Size.Y ),
 				MaskingRect = new( 0, 0, Size.X, Size.Y ),
 				ToMaskingSpace = Matrix3.Identity,
 				BlendRange = 1,
 				AlphaExponent = 1
 			}, true );
-			GLWrapper.PushViewport( new( 0, 0, (int)Size.X, (int)Size.Y ) );
-			GLWrapper.PushOrtho( new( 0, 0, Size.X, Size.Y ) );
-			GLWrapper.PushDepthInfo( new() );
-			GLWrapper.PushScissorState( false );
-			GLWrapper.Clear( new( colour: Color4.Transparent ) );
+			renderer.PushViewport( new( 0, 0, (int)Size.X, (int)Size.Y ) );
+			renderer.PushOrtho( new( 0, 0, Size.X, Size.Y ) );
+			renderer.PushDepthInfo( new() );
+			renderer.PushScissorState( false );
+			renderer.Clear( new( colour: Color4.Transparent ) );
 
 			using ( var buffer = Source.tripleBuffer.GetForRead() ) {
 				var node = Source.contentDrawNodes[buffer.Index];
-				node?.Draw( null );
+				node?.Draw( renderer );
 			}
 
-			GLWrapper.PopScissorState();
-			GLWrapper.PopDepthInfo();
-			GLWrapper.PopOrtho();
-			GLWrapper.PopViewport();
-			GLWrapper.PopMaskingInfo();
+			renderer.PopScissorState();
+			renderer.PopDepthInfo();
+			renderer.PopOrtho();
+			renderer.PopViewport();
+			renderer.PopMaskingInfo();
 			FrameBuffer.Unbind();
 
 			if ( VAO.Bind() ) {

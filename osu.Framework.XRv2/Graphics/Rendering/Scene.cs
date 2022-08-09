@@ -1,5 +1,6 @@
 ﻿using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
@@ -108,22 +109,24 @@ public partial class Scene : CompositeDrawable {
 		var deps = new DependencyContainer( parent );
 		var store = parent.Get<Game>().Resources;
 		host = parent.Get<GameHost>();
+		var renderer = parent.Get<IRenderer>();
 		var materials = MaterialStore = new MaterialStore( new ResourceStore<byte[]>( new[] {
 			CreateMaterialStoreSource( deps ) ?? new NamespacedResourceStore<byte[]>( store, "Resources/Shaders" ),
 			new NamespacedResourceStore<byte[]>( new DllResourceStore( typeof(Scene).Assembly ), "Resources/Shaders" )
 		} ) );
 		var textures = new TextureStore(
+			renderer,
 			parent.Get<GameHost>().CreateTextureLoaderStore( new NamespacedResourceStore<byte[]>( store, "Resources/Textures" ) ),
 			useAtlas: true,
-			osuTK.Graphics.ES30.All.Nearest,
+			TextureFilteringMode.Nearest,
 			manualMipmaps: false,
 			scaleAdjust: 1
 		);
 		materials.AddDescriptor( "unlit", new MaterialDescriptor()
 			.SetAttribute( "aPos", MeshDescriptor.Position )
 			.SetAttribute( "aUv", MeshDescriptor.UV )
-			.SetUniform( "tex", Texture.WhitePixel )
-			.SetUniform( "subImage", Texture.WhitePixel.GetTextureRect() )
+			.SetUniform( "tex", renderer.WhitePixel )
+			.SetUniform( "subImage", renderer.WhitePixel.GetTextureRect() )
 			.SetUniform( "tint", Color4.White )
 			.SetOnBind( ( m, store ) => {
 				m.Shader.SetUniform( "gProj", store.GetGlobalProperty<Matrix4>( "gProj" ) );

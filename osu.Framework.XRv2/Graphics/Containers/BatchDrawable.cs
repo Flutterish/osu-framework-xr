@@ -1,4 +1,5 @@
 ﻿using osu.Framework.Graphics;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.XR.Collections;
 using osu.Framework.XR.Graphics.Buffers;
 using osu.Framework.XR.Graphics.Rendering;
@@ -67,7 +68,7 @@ public abstract class BatchDrawable<Tdrawable, Tnode> : Container3D<Tdrawable> w
 			}
 		}
 
-		public sealed override void Draw ( object? ctx = null ) {
+		public sealed override void Draw ( IRenderer renderer, object? ctx = null ) {
 			if ( VAO.Bind() )
 				Initialize();
 

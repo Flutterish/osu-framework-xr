@@ -1,4 +1,5 @@
-﻿using osu.Framework.Utils;
+﻿using osu.Framework.Graphics.Rendering;
+using osu.Framework.Utils;
 using osu.Framework.XR.Graphics.Buffers;
 using osu.Framework.XR.Graphics.Meshes;
 using osu.Framework.XR.Graphics.Shaders;
@@ -75,7 +76,7 @@ public class BatchedSusieCube : Drawable3D {
 			matrix = Source.Matrix;
 		}
 
-		public override void Draw ( object? ctx = null ) {
+		public override void Draw ( IRenderer renderer, object? ctx = null ) {
 			var shader = (Shader)ctx!;
 
 			shader.SetUniform( "mMatrix", ref matrix );

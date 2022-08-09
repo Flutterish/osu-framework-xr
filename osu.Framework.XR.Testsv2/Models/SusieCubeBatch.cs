@@ -12,7 +12,7 @@ public class SusieCubeBatch : BatchDrawable<BatchDrawableSusieCube, BatchDrawabl
 	[BackgroundDependencyLoader]
 	private void load ( MaterialStore materials, TextureStore textures ) {
 		material = materials.GetNew( "unlit" );
-		var texture = textures.Get( "susie", Framework.Graphics.OpenGL.Textures.WrapMode.ClampToEdge, Framework.Graphics.OpenGL.Textures.WrapMode.ClampToEdge );
+		var texture = textures.Get( "susie", WrapMode.ClampToEdge, WrapMode.ClampToEdge );
 
 		material.CreateUpload( m => {
 			m.Set( "tex", texture );

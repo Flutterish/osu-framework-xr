@@ -1,4 +1,5 @@
 ﻿using osu.Framework.Graphics;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.XR.Graphics.Buffers;
 using osu.Framework.XR.Graphics.Materials;
 using osu.Framework.XR.Graphics.Meshes;
@@ -92,7 +93,7 @@ public class BasicModel : Drawable3D {
 			normalMatrixComputed = false;
 		}
 
-		public override void Draw ( object? ctx = null ) {
+		public override void Draw ( IRenderer renderer, object? ctx = null ) {
 			if ( VAO.Bind() ) { // TODO check if mesh/material changed and update them
 				LinkAttributeArray( mesh, material );
 			}

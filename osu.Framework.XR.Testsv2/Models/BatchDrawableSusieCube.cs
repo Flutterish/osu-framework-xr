@@ -1,4 +1,5 @@
-﻿using osu.Framework.Utils;
+﻿using osu.Framework.Graphics.Rendering;
+using osu.Framework.Utils;
 using osu.Framework.XR.Graphics.Rendering;
 using osuTK;
 using osuTK.Graphics;
@@ -32,6 +33,6 @@ public class BatchDrawableSusieCube : Drawable3D, IUnrenderable {
 			matrix = Source.Matrix;
 		}
 
-		public override void Draw ( object? ctx = null ) { }
+		public override void Draw ( IRenderer renderer, object? ctx = null ) { }
 	}
 }

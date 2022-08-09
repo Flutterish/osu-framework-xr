@@ -1,4 +1,5 @@
 ﻿using osu.Framework.Graphics;
+using osu.Framework.Graphics.Rendering;
 
 namespace osu.Framework.XR.Graphics;
 
@@ -39,7 +40,7 @@ public class DrawDataStream<T> : Drawable3D {
 			Source.hasNewData = false;
 		}
 
-		public override void Draw ( object? ctx = null ) {
+		public override void Draw ( IRenderer renderer, object? ctx = null ) {
 			if ( newData ) {
 				Source.uploadAction( data );
 				newData = false;

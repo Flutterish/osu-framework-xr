@@ -1,4 +1,5 @@
 ﻿using osu.Framework.Allocation;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.XR.Graphics;
 using osu.Framework.XR.Graphics.Materials;
@@ -15,7 +16,7 @@ public class TestingScene : Scene {
 		var textures = Dependencies.Get<TextureStore>();
 
 		susieCubeMaterial = materials.GetNew( "unlit" );
-		var susieTexture = textures.Get( "susie", Framework.Graphics.OpenGL.Textures.WrapMode.ClampToEdge, Framework.Graphics.OpenGL.Textures.WrapMode.ClampToEdge );
+		var susieTexture = textures.Get( "susie", WrapMode.ClampToEdge, WrapMode.ClampToEdge );
 
 		susieCubeMaterial.CreateUpload( m => {
 			m.Set( "tex", susieTexture );
@@ -29,20 +30,20 @@ public class TestingScene : Scene {
 		new protected TestingScene Source => (TestingScene)base.Source;
 		public TestingRenderPiepline ( TestingScene source ) : base( source ) { }
 
-		protected override void Draw ( int subtreeIndex, Matrix4 projectionMatrix ) {
+		protected override void Draw ( IRenderer renderer, int subtreeIndex, Matrix4 projectionMatrix ) {
 			foreach ( var stage in RenderStages ) {
 				if ( stage is TestingRenderStage.SusieCubeBatch ) {
-					DrawCubes( subtreeIndex, projectionMatrix, GetRenderStage( stage ) );
+					DrawCubes( renderer, subtreeIndex, projectionMatrix, GetRenderStage( stage ) );
 				}
 				else {
 					foreach ( var i in GetRenderStage( stage ) ) {
-						i.GetDrawNodeAtSubtree( subtreeIndex )?.Draw();
+						i.GetDrawNodeAtSubtree( subtreeIndex )?.Draw( renderer );
 					}
 				}
 			}
 		}
 
-		void DrawCubes ( int subtreeIndex, Matrix4 projectionMatrix, ReadOnlySpan<Drawable3D> cubes ) {
+		void DrawCubes ( IRenderer renderer, int subtreeIndex, Matrix4 projectionMatrix, ReadOnlySpan<Drawable3D> cubes ) {
 			var VAO = BatchedSusieCube.VAO;
 			var mesh = BatchedSusieCube.Mesh;
 			var material = Source.susieCubeMaterial;
@@ -56,7 +57,7 @@ public class TestingScene : Scene {
 			material.Bind();
 			material.Shader.SetUniform( "gProj", ref projectionMatrix );
 			foreach ( var i in cubes ) {
-				i.GetDrawNodeAtSubtree( subtreeIndex )?.Draw( material.Shader );
+				i.GetDrawNodeAtSubtree( subtreeIndex )?.Draw( renderer, material.Shader );
 				mesh.Draw();
 			}
 		}

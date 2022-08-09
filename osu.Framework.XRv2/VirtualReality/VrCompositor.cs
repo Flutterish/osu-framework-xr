@@ -1,11 +1,12 @@
 ﻿using OpenVR.NET;
 using OpenVR.NET.Devices;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.OpenGL.Buffers;
-using osu.Framework.Graphics.OpenGL.Vertices;
+using osu.Framework.Graphics.Rendering;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.XR.Graphics.Rendering;
 using osu.Framework.XR.Maths;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 
 namespace osu.Framework.XR.VirtualReality;
 
@@ -66,21 +67,32 @@ public class VrCompositor : Drawable {
 		=> new( this );
 
 	protected class VrCompositorDrawNode : DrawNode {
+		static PropertyInfo _getNativeTexture = typeof( Texture ).GetProperty( "NativeTexture", BindingFlags.Instance | BindingFlags.NonPublic )!;
+		static FieldInfo? _getGlTextureId;
+		static IntPtr GetTexturePointer ( Texture texture ) {
+			var native = _getNativeTexture.GetValue( texture )!;
+			var type = native.GetType();
+			// assume TextureGL right now
+			_getGlTextureId ??= type.GetField( "textureId", BindingFlags.Instance | BindingFlags.NonPublic )!;
+			return (IntPtr)(int)_getGlTextureId.GetValue( texture )!;
+		}
+
 		new protected VrCompositor Source => (VrCompositor)base.Source;
 		public VrCompositorDrawNode ( VrCompositor source ) : base( source ) { }
 
-		FrameBuffer? left;
-		FrameBuffer? right;
-		public override void Draw ( Action<TexturedVertex2D> vertexAction ) {
+		IFrameBuffer? left;
+		IFrameBuffer? right;
+		public override void Draw ( IRenderer renderer ) {
 			var context = Source.VR?.UpdateDraw();
 			if ( context is null || Source.VR!.Headset is not Headset headset )
 				return;
 
 			if ( ( Source.ActivePlayer?.Root as Drawable )?.Parent is not Scene scene || scene.GetRenderPiepline() is not Scene.RenderPiepline pipeline )
 				return;
+			
 
-			left ??= new FrameBuffer( new[] { osuTK.Graphics.ES30.RenderbufferInternalFormat.DepthComponent32f } );
-			right ??= new FrameBuffer( new[] { osuTK.Graphics.ES30.RenderbufferInternalFormat.DepthComponent32f } );
+			left ??= renderer.CreateFrameBuffer( new[] { RenderBufferFormat.D16 } ); // TODO implement 32 bit depth in o!f myself (like last time)
+			right ??= renderer.CreateFrameBuffer( new[] { RenderBufferFormat.D16 } );
 
 			var size = new Vector2( context.Resolution.X, context.Resolution.Y );
 			left.Size = size;
@@ -94,11 +106,11 @@ public class VrCompositor : Drawable {
 			var rEye = context.GetEyeToHeadMatrix( Valve.VR.EVREye.Eye_Right ).ToOsuTk().Inverted();
 			var rProj = context.GetProjectionMatrix( Valve.VR.EVREye.Eye_Right, 0.01f, 1000f ).ToOsuTk();
 
-			pipeline.Draw( left, headTransform.Inverted() * lEye * Matrix4.CreateScale( 1, 1, -1 ) * lProj );
-			pipeline.Draw( right, headTransform.Inverted() * rEye * Matrix4.CreateScale( 1, 1, -1 ) * rProj );
+			pipeline.Draw( renderer, left, headTransform.Inverted() * lEye * Matrix4.CreateScale( 1, 1, -1 ) * lProj );
+			pipeline.Draw( renderer, right, headTransform.Inverted() * rEye * Matrix4.CreateScale( 1, 1, -1 ) * rProj );
 
-			context.SubmitFrame( Valve.VR.EVREye.Eye_Left, new() { eType = Valve.VR.ETextureType.OpenGL, handle = (IntPtr)left.Texture.TextureId } );
-			context.SubmitFrame( Valve.VR.EVREye.Eye_Right, new() { eType = Valve.VR.ETextureType.OpenGL, handle = (IntPtr)right.Texture.TextureId } );
+			context.SubmitFrame( Valve.VR.EVREye.Eye_Left, new() { eType = Valve.VR.ETextureType.OpenGL, handle = GetTexturePointer( left.Texture ) } );
+			context.SubmitFrame( Valve.VR.EVREye.Eye_Right, new() { eType = Valve.VR.ETextureType.OpenGL, handle = GetTexturePointer( right.Texture ) } );
 		}
 
 		protected override void Dispose ( bool isDisposing ) {

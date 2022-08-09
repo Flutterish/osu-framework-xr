@@ -1,5 +1,4 @@
-﻿using osu.Framework.Graphics.OpenGL.Textures;
-using osu.Framework.Graphics.Primitives;
+﻿using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.XR.Graphics.Shaders;
 using osuTK.Graphics;
@@ -53,35 +52,21 @@ public class Vector4MaterialUniform : IMaterialUniform<Vector4>, IMaterialUnifor
 	}
 }
 
-public class Sampler2DMaterialUniform : IMaterialUniform<Texture?>, IMaterialUniform<TextureGL?> {
+public class Sampler2DMaterialUniform : IMaterialUniform<Texture?> {
 	public Sampler2DUniform Source { get; }
 	public Sampler2DMaterialUniform ( Sampler2DUniform source ) {
 		Source = source;
 	}
 
 	Texture? texture;
-	TextureGL? texturegl;
 	Texture? IMaterialUniform<Texture?>.Value {
 		get => texture;
 		set {
 			texture = value;
-			texturegl = value?.TextureGL;
-		}
-	}
-	TextureGL? IMaterialUniform<TextureGL?>.Value {
-		get => texturegl;
-		set {
-			texture = null;
-			texturegl = value;
 		}
 	}
 
 	public void Apply () {
-		if ( texture != null ) {
-			( Source as IUniform<Texture?> ).UpdateValue( ref texture );
-		}
-		else {
-			( Source as IUniform<TextureGL?> ).UpdateValue( ref texturegl );
-		}
+		( Source as IUniform<Texture?> ).UpdateValue( ref texture );
 	}
 }

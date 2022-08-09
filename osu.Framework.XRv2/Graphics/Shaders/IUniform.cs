@@ -1,5 +1,4 @@
-﻿using osu.Framework.Graphics.OpenGL.Textures;
-using osu.Framework.Graphics.Primitives;
+﻿using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.XR.Graphics.Materials;
 using osuTK.Graphics;
@@ -191,41 +190,25 @@ public class Matrix4Uniform : IUniform<Matrix4> {
 	}
 }
 
-public class Sampler2DUniform : IUniform<Texture?>, IUniform<TextureGL?> {
+public class Sampler2DUniform : IUniform<Texture?> {
 	IMaterialUniform IUniform.CreateMaterialUniform ()
 		=> new Sampler2DMaterialUniform( this );
 
 	public TextureUnit TextureUnit { get; init; }
 	public int Location { get; init; }
 	Texture? value;
-	TextureGL? glvalue;
 	Texture? IUniform<Texture?>.Value {
 		get => value;
-		set => UpdateValue( ref value );
-	}
-	TextureGL? IUniform<TextureGL?>.Value {
-		get => glvalue;
 		set => UpdateValue( ref value );
 	}
 
 	public void UpdateValue ( ref Texture? value ) {
 		this.value = value;
-		this.glvalue = value?.TextureGL;
 		if ( value is null ) {
 			GL.ActiveTexture( TextureUnit );
 			GL.BindTexture( TextureTarget.Texture2D, 0 );
 		}
 		else
-			value.TextureGL.Bind( (osuTK.Graphics.ES30.TextureUnit)TextureUnit );
-	}
-	public void UpdateValue ( ref TextureGL? value ) {
-		this.value = null;
-		this.glvalue = value;
-		if ( value is null ) {
-			GL.ActiveTexture( TextureUnit );
-			GL.BindTexture( TextureTarget.Texture2D, 0 );
-		}
-		else
-			value.Bind( (osuTK.Graphics.ES30.TextureUnit)TextureUnit );
+			value.Bind( TextureUnit - TextureUnit.Texture0 );
 	}
 }
