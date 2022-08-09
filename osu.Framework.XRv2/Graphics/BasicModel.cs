@@ -53,6 +53,7 @@ public class BasicModel : Drawable3D {
 				return;
 
 			colour = value;
+			Invalidate( Invalidation.DrawNode );
 		}
 	}
 
@@ -87,6 +88,7 @@ public class BasicModel : Drawable3D {
 			material = Source.Material;
 			matrix = Source.Matrix;
 			tint = Source.colour;
+			Source.colour = null;
 			normalMatrixComputed = false;
 		}
 

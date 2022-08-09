@@ -84,6 +84,12 @@ public static class Extensions {
 			return y + x;
 		return x;
 	}
+	public static int Mod ( this int x, int y ) {
+		x = x % y;
+		if ( x < 0 )
+			return y + x;
+		return x;
+	}
 
 	public static float AngleDistance ( this float from, float to ) {
 		return ( to - from + MathF.PI ).Mod( MathF.Tau ) - MathF.PI;

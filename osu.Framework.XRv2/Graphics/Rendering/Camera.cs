@@ -74,6 +74,18 @@ public class Camera : Drawable3D {
 	}
 
 	/// <summary>
+	/// Projects a given point to <0;width><0;height>
+	/// </summary>
+	public Vector3 Project ( Vector3 pos, float width, float height ) {
+		var p = new Vector4( pos, 1 ) * GetProjectionMatrix( width, height );
+		return new Vector3(
+			( p.X / p.W + 1 ) / 2 * width,
+			( 1 - p.Y / p.W ) / 2 * height,
+			p.Z
+		);
+	}
+
+	/// <summary>
 	/// Computes a normal vector pointing at a given screenspace position.
 	/// </summary>
 	public Vector3 DirectionOf ( Vector2 pos, float width, float height ) {

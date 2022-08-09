@@ -21,6 +21,10 @@ partial class Scene {
 			frameBuffer = new( new[] { osuTK.Graphics.ES30.RenderbufferInternalFormat.DepthComponent32f } );
 		}
 
+		protected virtual Vector2 GetFrameBufferSize () {
+			return Source.ScreenSpaceDrawQuad.Size;
+		}
+
 		Quad screenSpaceDrawQuad;
 		Vector2 size;
 		IShader blitShader = null!;
@@ -30,7 +34,7 @@ partial class Scene {
 
 			screenSpaceDrawQuad = Source.ScreenSpaceDrawQuad;
 			blitShader = Source.blitShader;
-			size = Source.ScreenSpaceDrawQuad.Size;
+			size = GetFrameBufferSize();
 			projectionMatrix = Source.Camera.GetProjectionMatrix( size.X, size.Y );
 		}
 
