@@ -5,7 +5,6 @@ using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.XR.Graphics.Rendering;
 using osu.Framework.XR.Maths;
-using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace osu.Framework.XR.VirtualReality;
@@ -13,48 +12,57 @@ namespace osu.Framework.XR.VirtualReality;
 /// <summary>
 /// Manages what gets shown to the vr user, allows to select the controlled <see cref="VrPlayer"/>,
 /// and calls the lifetime events of VR.
-/// Only one <see cref="VrCompositor"/> can be active at a time - if there is a parent
-/// <see cref="VrCompositor"/>, this one will be deactivated
+/// Only one <see cref="VrCompositor"/> should exist at one time. (TBD nesting)
 /// </summary>
-[Cached]
 public class VrCompositor : Drawable {
-	[Resolved(canBeNull: true)]
-	new protected VrCompositor? Parent { get; private set; }
+	public IReadOnlyList<VrPlayer> Players => players;
 
 	List<VrPlayer> players = new();
-	List<VrCompositor> children = new();
 	public void RegisterPlayer ( VrPlayer player ) {
 		players.Add( player );
 		ActivePlayer ??= player;
 	}
 
-	public VrPlayer? ActivePlayer { get; private set; }
-	VR? VR;
-	[MemberNotNullWhen(true, nameof(VR))]
-	[MemberNotNullWhen(false, nameof(Parent))]
-	protected bool IsRootCompositor => true;
-	protected override void LoadComplete () {
-		if ( IsRootCompositor ) {
-			VR = new();
-			var ok = VR.TryStart();
-
-		}
-		else {
-			Parent.children.Add( this );
+	VrPlayer? activePlayer;
+	public VrPlayer? ActivePlayer {
+		get => activePlayer;
+		set {
+			activePlayer = value;
 		}
 	}
 
+	public VR? VR { get; private set; }
+	public event Action? InitializationFailed;
+	public event Action<VR>? Initialized;
+	protected override void LoadComplete () {
+		Task.Run( () => {
+			var vr = new VR();
+			var ok = vr.TryStart();
+
+			if ( ok ) {
+				Schedule( () => {
+					VR = vr;
+					Initialized?.Invoke( vr );
+				} );
+			}
+			else {
+				Schedule( () => InitializationFailed?.Invoke() );
+			}
+		} );
+	}
+
 	protected override void Update () {
-		if ( IsRootCompositor ) {
-			VR.Update();
-			VR.UpdateInput();
-		}
+		if ( VR is null )
+			return;
+
+		VR.Update();
+		VR.UpdateInput(); // TODO when input events get timestamps, we might want to move this to another thread
 	}
 
 	protected override void Dispose ( bool isDisposing ) {
 		if ( !IsDisposed ) {
 			VR?.Exit();
-			VR = null;
+			VR = null!;
 		}
 
 		base.Dispose( isDisposing );
@@ -89,10 +97,10 @@ public class VrCompositor : Drawable {
 
 			if ( ( Source.ActivePlayer?.Root as Drawable )?.Parent is not Scene scene || scene.GetRenderPiepline() is not Scene.RenderPiepline pipeline )
 				return;
-			
 
-			left ??= renderer.CreateFrameBuffer( new[] { RenderBufferFormat.D16 } ); // TODO implement 32 bit depth in o!f myself (like last time)
-			right ??= renderer.CreateFrameBuffer( new[] { RenderBufferFormat.D16 } );
+
+			left ??= renderer.CreateFrameBuffer( new[] { RenderBufferFormat.D32S8 } ); // TODO these should be anti-aliased
+			right ??= renderer.CreateFrameBuffer( new[] { RenderBufferFormat.D32S8 } );
 
 			var size = new Vector2( context.Resolution.X, context.Resolution.Y );
 			left.Size = size;
