@@ -70,9 +70,12 @@ public partial class Panel : Drawable3D {
 	public readonly BasicMesh Mesh = new();
 	protected readonly Cached MeshCache = new();
 	protected Material Material { get; private set; } = null!;
+	protected virtual Material GetDefaultMaterial ( MaterialStore materials )
+		=> materials.GetNew( "unlit_panel" );
+
 	[BackgroundDependencyLoader]
 	private void load ( MaterialStore materials ) {
-		Material = materials.GetNew( "unlit_panel" );
+		Material ??= GetDefaultMaterial( materials );
 	}
 
 	protected override void Update () {
@@ -115,12 +118,13 @@ public partial class Panel : Drawable3D {
 		if ( !IsDisposed ) {
 			VAO.Dispose();
 			Mesh.Dispose();
-			frameBuffer.Dispose();
+			FrameBuffer?.Dispose();
 		}
 
 		base.Dispose( isDisposing );
 	}
 
+	// TODO this probably shouldnt be here?
 	public void CreateUVTest ( int tilesX, int tilesY, int? seed = null ) {
 		Random rng = seed is int i ? new( i ) : new();
 

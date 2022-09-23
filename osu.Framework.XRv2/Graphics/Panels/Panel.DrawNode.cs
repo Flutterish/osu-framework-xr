@@ -9,8 +9,8 @@ using System.Reflection;
 namespace osu.Framework.XR.Graphics.Panels;
 
 public partial class Panel {
-	TripleBuffer<Drawable> tripleBuffer = new();
-	DrawNode[] contentDrawNodes = new DrawNode[3];
+	protected TripleBuffer<Drawable> TripleBuffer = new();
+	protected DrawNode[] ContentDrawNodes = new DrawNode[3];
 
 	// yuck, internal
 	static MethodInfo generateDrawNodeSubtree = typeof( Drawable ).GetMethod( "GenerateDrawNodeSubtree", BindingFlags.Instance | BindingFlags.NonPublic )!;
@@ -21,8 +21,8 @@ public partial class Panel {
 	protected override void UpdateAfterChildren () {
 		base.UpdateAfterChildren();
 
-		using ( var buffer = tripleBuffer.GetForWrite() ) {
-			var node = contentDrawNodes[buffer.Index] = GenerateDrawNodeSubtree( Content, frameId, buffer.Index, false );
+		using ( var buffer = TripleBuffer.GetForWrite() ) {
+			var node = ContentDrawNodes[buffer.Index] = GenerateDrawNodeSubtree( Content, frameId, buffer.Index, false );
 		}
 		frameId++;
 	}
@@ -33,16 +33,16 @@ public partial class Panel {
 	protected virtual PanelDrawNode CreatePanelDrawNode ()
 		=> new( this );
 
-	IFrameBuffer? frameBuffer; // shared data
+	protected IFrameBuffer? FrameBuffer; // shared data
 	AttributeArray VAO = new();
 	protected class PanelDrawNode : DrawNode3D {
 		new protected Panel Source => (Panel)base.Source;
-		AttributeArray VAO;
+		protected readonly AttributeArray VAO;
 		protected readonly BasicMesh Mesh;
 		protected readonly Material Material;
 		protected IFrameBuffer? FrameBuffer {
-			get => Source.frameBuffer;
-			set => Source.frameBuffer = value;
+			get => Source.FrameBuffer;
+			set => Source.FrameBuffer = value;
 		}
 		protected Matrix4 Matrix;
 		protected Vector2 Size;
@@ -75,8 +75,8 @@ public partial class Panel {
 			renderer.PushScissorState( false );
 			renderer.Clear( new( colour: Color4.Transparent ) );
 
-			using ( var buffer = Source.tripleBuffer.GetForRead() ) {
-				var node = Source.contentDrawNodes[buffer.Index];
+			using ( var buffer = Source.TripleBuffer.GetForRead() ) {
+				var node = Source.ContentDrawNodes[buffer.Index];
 				node?.Draw( renderer );
 			}
 

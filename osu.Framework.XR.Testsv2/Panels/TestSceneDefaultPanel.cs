@@ -6,10 +6,10 @@ using osuTK.Graphics;
 
 namespace osu.Framework.XR.Tests.Panels;
 
-public class TestSceneFlatPanel : BasicTestScene {
-	public TestSceneFlatPanel () {
-		FlatPanel panel;
-		Scene.Add( panel = new FlatPanel {
+public class TestSceneDefaultPanel : BasicTestScene {
+	public TestSceneDefaultPanel () {
+		Panel panel;
+		Scene.Add( panel = new Panel {
 			ContentAutoSizeAxes = Axes.Both
 		} );
 

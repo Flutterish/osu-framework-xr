@@ -47,7 +47,7 @@ partial class Scene {
 			UploadScheduler.Execute();
 			DisposeScheduler.Execute();
 
-			frameBuffer ??= renderer.CreateFrameBuffer( new[] { RenderBufferFormat.D16 } );
+			frameBuffer ??= renderer.CreateFrameBuffer( new[] { RenderBufferFormat.D32S8 } );
 			MaterialStore.SetGlobalProperty( "viewPos", Source.Camera.Position ); // TODO do this better
 			frameBuffer.Size = size;
 			Draw( renderer, frameBuffer, projectionMatrix );
@@ -80,10 +80,12 @@ partial class Scene {
 			if ( clearFramebuffer )
 				renderer.Clear( new( depth: 1 ) );
 
+			renderer.PushProjectionMatrix( projectionMatrix );
 			MaterialStore.SetGlobalProperty( "gProj", projectionMatrix );
 			using ( var read = Source.tripleBuffer.GetForRead() ) {
 				Draw( renderer, read.Index, projectionMatrix );
 			}
+			renderer.PopProjectionMatrix();
 
 			DrawNode3D.SwitchTo2DContext( renderer );
 			renderer.PopScissorState();
