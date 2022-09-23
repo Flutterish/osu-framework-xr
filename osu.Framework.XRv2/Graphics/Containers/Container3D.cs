@@ -30,18 +30,18 @@ public class Container3D<T> : CompositeDrawable3D where T : Drawable3D {
 			Content.AddRange( children );
 	}
 
-	public virtual void Remove ( T child ) {
+	public virtual void Remove ( T child, bool disposeImmediately ) {
 		if ( Content == this )
-			RemoveInternal( child );
+			RemoveInternal( child, disposeImmediately );
 		else
-			Content.Remove( child );
+			Content.Remove( child, disposeImmediately );
 	}
 
-	public void RemoveRange ( IEnumerable<T> children ) {
+	public void RemoveRange ( IEnumerable<T> children, bool disposeImmediately ) {
 		if ( Content == this )
-			RemoveRangeInternal( children );
+			RemoveRangeInternal( children, disposeImmediately );
 		else
-			Content.RemoveRange( children );
+			Content.RemoveRange( children, disposeImmediately );
 	}
 
 	public void Clear ( bool disposeChildren = true ) {

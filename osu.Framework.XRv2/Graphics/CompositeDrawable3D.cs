@@ -50,14 +50,14 @@ public class CompositeDrawable3D : Drawable3D {
 	}
 
 	[EditorBrowsable( EditorBrowsableState.Never )]
-	protected sealed override bool RemoveInternal ( Drawable drawable )
+	protected sealed override bool RemoveInternal ( Drawable drawable, bool disposeImmediately )
 		=> throw new InvalidOperationException( "Cannot remove a 2D drawable from a 3D container" );
-	protected virtual void RemoveInternal ( Drawable3D child ) {
+	protected virtual void RemoveInternal ( Drawable3D child, bool disposeImmediately ) {
 		if ( child.Parent == this )
 			child.Parent = null;
 
 		children.Remove( child );
-		base.RemoveInternal( child );
+		base.RemoveInternal( child, disposeImmediately );
 
 		subtreeRemoved( this, this, child );
 		ChildRemoved?.Invoke( child, this );
@@ -77,9 +77,9 @@ public class CompositeDrawable3D : Drawable3D {
 		}
 	}
 
-	protected void RemoveRangeInternal ( IEnumerable<Drawable3D> children ) {
+	protected void RemoveRangeInternal ( IEnumerable<Drawable3D> children, bool disposeImmediately ) {
 		foreach ( var i in children ) {
-			RemoveInternal( i );
+			RemoveInternal( i, disposeImmediately );
 		}
 	}
 
@@ -87,10 +87,8 @@ public class CompositeDrawable3D : Drawable3D {
 		while ( children.Count != 0 ) {
 			var child = children[^1];
 
-			RemoveInternal( child );
+			RemoveInternal( child, disposeChildren );
 			children.RemoveAt( children.Count - 1 );
-			if ( disposeChildren )
-				child.Dispose();
 		}
 	}
 

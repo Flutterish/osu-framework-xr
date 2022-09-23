@@ -75,7 +75,7 @@ partial class Scene {
 				AlphaExponent = 1
 			}, true );
 			renderer.PushViewport( new( 0, 0, (int)frameBuffer.Size.X, (int)frameBuffer.Size.Y ) );
-			renderer.PushDepthInfo( new( function: osuTK.Graphics.ES30.DepthFunction.Less ) );
+			renderer.PushDepthInfo( new( function: BufferTestFunction.LessThan ) );
 			renderer.PushScissorState( false );
 			if ( clearFramebuffer )
 				renderer.Clear( new( depth: 1 ) );

@@ -176,12 +176,14 @@ public abstract class DrawNode3D {
 	private static IShader getDummyShader ( IRenderer renderer ) {
 		if ( !dummyShaders.TryGetValue( renderer.GetType(), out var dummy ) ) {
 			var assembly = typeof( IRenderer ).Assembly;
-			var shader = assembly.GetType( "osu.Framework.Graphics.OpenGL.Shaders.OpenGLShader" )!;
-			var shaderpart = assembly.GetType( "osu.Framework.Graphics.OpenGL.Shaders.OpenGLShaderPart" )!;
+			var shader = assembly.GetType( "osu.Framework.Graphics.OpenGL.Shaders.GLShader" )!;
+			var shaderpart = assembly.GetType( "osu.Framework.Graphics.OpenGL.Shaders.GLShaderPart" )!;
 			var list = shaderpart.MakeArrayType();
 			var empty = typeof( Array ).GetMethod( nameof( Array.Empty ), BindingFlags.Static | BindingFlags.Public )!.MakeGenericMethod( shaderpart );
-			var constructor = shader.GetConstructor( BindingFlags.NonPublic | BindingFlags.Instance, new Type[] { typeof( IRenderer ), typeof( string ), list } )!;
+			var constructor = shader.GetConstructor( BindingFlags.NonPublic | BindingFlags.Instance, new Type[] { renderer.GetType(), typeof( string ), list } )!;
 			dummy = (IShader)constructor.Invoke( new object[] { renderer, "", empty.Invoke( null, new object[] { } )! } );
+
+			dummyShaders.Add( renderer.GetType(), dummy );
 		}
 
 		return dummy;
@@ -197,7 +199,7 @@ public abstract class DrawNode3D {
 		_bindBuffer ??= renderer.GetType().GetMethod( "BindBuffer", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic )!;
 		_bindBuffer.Invoke( renderer, new object[] { osuTK.Graphics.ES30.BufferTarget.ElementArrayBuffer, 0 } );
 		_bindBuffer.Invoke( renderer, new object[] { osuTK.Graphics.ES30.BufferTarget.ArrayBuffer, 0 } );
-		renderer.UseProgram( getDummyShader( renderer ) );
-		renderer.UseProgram( null );
+		(renderer as Renderer)!.BindShader( getDummyShader( renderer ) );
+		(renderer as Renderer)!.UnbindShader( getDummyShader( renderer ) );
 	}
 }

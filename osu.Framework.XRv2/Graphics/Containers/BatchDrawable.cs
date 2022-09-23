@@ -22,8 +22,8 @@ public abstract class BatchDrawable<Tdrawable, Tnode> : Container3D<Tdrawable> w
 		Invalidate( Invalidation.DrawNode );
 	}
 
-	public override void Remove ( Tdrawable child ) {
-		base.Remove( child );
+	public override void Remove ( Tdrawable child, bool disposeImmediately ) {
+		base.Remove( child, disposeImmediately );
 		subtreeUpdateID++;
 		Invalidate( Invalidation.DrawNode );
 	}

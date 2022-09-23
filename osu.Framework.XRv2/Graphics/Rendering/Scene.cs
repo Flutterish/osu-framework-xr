@@ -64,10 +64,10 @@ public partial class Scene : CompositeDrawable {
 		=> Root.Add( drawable );
 	public void AddRange ( IEnumerable<Drawable3D> drawables )
 		=> Root.AddRange( drawables );
-	public void Remove ( Drawable3D drawable )
-		=> Root.Remove( drawable );
-	public void RemoveRange ( IEnumerable<Drawable3D> drawables )
-		=> Root.RemoveRange( drawables );
+	public void Remove ( Drawable3D drawable, bool disposeImmediately )
+		=> Root.Remove( drawable, disposeImmediately );
+	public void RemoveRange ( IEnumerable<Drawable3D> drawables, bool disposeImmediately )
+		=> Root.RemoveRange( drawables, disposeImmediately );
 	public void Clear ( bool disposeChildren = true )
 		=> Root.Clear( disposeChildren );
 
