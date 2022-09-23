@@ -23,7 +23,7 @@ public interface IVertexBuffer : IDisposable {
 	/// <summary>
 	/// Uploads the data to the vertex buffer. The created upload will *copy*
 	/// the current data and send it to the draw thread to make sure it is not modified while it is being uploaded.
-	/// If you are *absolutely sure* the data will not be modified in that peroid, you can use <see cref="CreateUnsafeUpload(BufferUsageHint)"/>
+	/// If you are *absolutely sure* the data will not be modified in that period, you can use <see cref="CreateUnsafeUpload(BufferUsageHint)"/>
 	/// to avoid copying data
 	/// </summary>
 	IUpload CreateUpload ( BufferUsageHint usage = BufferUsageHint.StaticDraw );

@@ -24,7 +24,7 @@ public class Mesh : IDisposable {
 	/// <summary>
 	/// The amount of uploaded vertices stored by vertice buffers
 	/// </summary>
-	public int VertexCout => vertexBuffers[0].Count;
+	public int VertexCount => vertexBuffers[0].Count;
 
 	/// <summary>
 	/// Draws the elements specified by the <see cref="IElementBuffer"/>
@@ -52,7 +52,7 @@ public class Mesh : IDisposable {
 	/// Draws all vertices using a given primitive without an <see cref="IElementBuffer"/>
 	/// </summary>
 	public void Draw ( PrimitiveType primitive )
-		=> Draw( primitive, VertexCout, 0 );
+		=> Draw( primitive, VertexCount, 0 );
 
 	/// <summary>
 	/// Combines the uploads of <see cref="CreateVertexUpload(BufferUsageHint)"/> and <see cref="CreateElementBufferUpload(BufferUsageHint)"/>
@@ -87,7 +87,7 @@ public class Mesh : IDisposable {
 	/// <summary>
 	/// Uploads the data to the vertex buffers. The created upload will *copy*
 	/// the current data and send it to the draw thread to make sure it is not modified while it is being uploaded.
-	/// If you are *absolutely sure* the data will not be modified in that peroid, you can use <see cref="CreateUnsafeVertexUpload(BufferUsageHint)"/>
+	/// If you are *absolutely sure* the data will not be modified in that period, you can use <see cref="CreateUnsafeVertexUpload(BufferUsageHint)"/>
 	/// to avoid copying data
 	/// </summary>
 	/// <remarks>
