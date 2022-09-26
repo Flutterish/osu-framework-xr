@@ -104,7 +104,7 @@ public class SusieCube : Drawable3D {
 				LinkAttributeArray( mesh, material );
 			}
 
-			material.Bind();
+			material.BindUniforms();
 			material.Shader.SetUniform( "mMatrix", ref matrix );
 			mesh.Draw();
 		}

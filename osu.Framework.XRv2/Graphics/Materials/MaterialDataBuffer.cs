@@ -1,11 +1,12 @@
 ﻿namespace osu.Framework.XR.Graphics.Materials;
 
-public sealed class MaterialUploader {
+// TODO probably merge this into Material
+public sealed class MaterialDataBuffer {
 	public readonly Material Material;
 	Dictionary<string, MaterialValue> values = new();
 	List<MaterialValue> valuesArray = new();
 
-	public MaterialUploader ( Material material ) {
+	public MaterialDataBuffer ( Material material ) {
 		Material = material;
 	}
 

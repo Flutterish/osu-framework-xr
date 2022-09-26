@@ -41,7 +41,7 @@ public class SusieCubeBatch : BatchDrawable<BatchDrawableSusieCube, BatchDrawabl
 			var mMatrix = material.Shader.GetUniform<Matrix4>( "mMatrix" );
 			var tint = material.Shader.GetUniform<Color4>( "tint" );
 
-			material.Bind();
+			material.BindUniforms();
 			foreach ( var i in Children ) {
 				mMatrix.UpdateValue( ref i.matrix );
 				tint.UpdateValue( ref i.color );

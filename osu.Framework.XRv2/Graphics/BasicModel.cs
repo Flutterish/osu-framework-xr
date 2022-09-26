@@ -45,18 +45,18 @@ public class BasicModel : Drawable3D {
 	private void load ( MaterialStore materials ) {
 		material ??= CreateDefaultMaterial( materials );
 		if ( colour is Color4 color )
-			material.Uploader.Set( "tint", color );
+			material.Set( "tint", color );
 	}
 
 	Color4? colour = null;
 	new public Color4 Colour {
-		get => Material?.Uploader.Get<Color4>( "tint" ) ?? colour ?? Color4.White;
+		get => Material?.Get<Color4>( "tint" ) ?? colour ?? Color4.White;
 		set {
 			if ( Colour == value )
 				return;
 
 			colour = value;
-			Material?.Uploader.Set( "tint", value );
+			Material?.Set( "tint", value );
 			Invalidate( Invalidation.DrawNode );
 		}
 	}
@@ -98,7 +98,7 @@ public class BasicModel : Drawable3D {
 			matrix = Source.Matrix;
 			normalMatrixComputed = false;
 
-			material.Uploader.UpdateState( nodeIndex );
+			material.UpdateProperties( nodeIndex );
 		}
 
 		public override void Draw ( IRenderer renderer, object? ctx = null ) {
@@ -106,8 +106,7 @@ public class BasicModel : Drawable3D {
 				LinkAttributeArray( mesh, material );
 			}
 
-			material.Uploader.UploadState( nodeIndex );
-			material.Bind();
+			material.Bind( nodeIndex );
 			material.Shader.SetUniform( "mMatrix", ref matrix );
 			if ( material.Shader.TryGetUniform<Matrix3>( "mNormal", out var mNormal ) ) {
 				if ( !normalMatrixComputed ) {

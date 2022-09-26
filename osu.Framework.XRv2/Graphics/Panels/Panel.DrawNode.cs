@@ -91,7 +91,7 @@ public partial class Panel {
 				LinkAttributeArray( Mesh, Material );
 			}
 
-			Material.Bind();
+			Material.BindUniforms();
 			Material.SetUniform( "tex", FrameBuffer.Texture );
 			Material.Shader.SetUniform( "mMatrix", ref Matrix );
 			Mesh.Draw();

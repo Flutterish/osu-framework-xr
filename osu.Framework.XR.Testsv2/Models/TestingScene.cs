@@ -54,7 +54,7 @@ public class TestingScene : Scene {
 			}
 			else VAO.Bind();
 
-			material.Bind();
+			material.BindUniforms();
 			material.Shader.SetUniform( "gProj", ref projectionMatrix );
 			foreach ( var i in cubes ) {
 				i.GetDrawNodeAtSubtree( subtreeIndex )?.Draw( renderer, material.Shader );

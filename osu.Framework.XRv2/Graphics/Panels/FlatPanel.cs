@@ -28,7 +28,7 @@ public class FlatPanel : Panel {
 				LinkAttributeArray( Mesh, Material );
 			}
 
-			Material.Bind();
+			Material.BindUniforms();
 			Material.Shader.SetUniform( "tint", Color4.Transparent );
 			Material.Shader.SetUniform( "mMatrix", Matrix );
 
@@ -55,7 +55,7 @@ public class FlatPanel : Panel {
 			renderer.PopStencilInfo();
 
 			VAO.Bind();
-			Material.Bind();
+			Material.BindUniforms();
 			Material.Shader.SetUniform( "tint", Color4.Transparent );
 			Material.Shader.SetUniform( "mMatrix", Matrix );
 

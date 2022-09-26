@@ -44,7 +44,7 @@ public class Model : Drawable3D {
 
 	Color4? colour = Color4.White;
 	new public Color4 Colour {
-		get => colour ?? ( material?.TryGet<Color4>( "tint", out var tint ) == true ? tint : Color4.White );
+		get => colour ?? ( material?.TryGetUniformValue<Color4>( "tint", out var tint ) == true ? tint : Color4.White );
 		set {
 			if ( Colour == value )
 				return;
@@ -91,7 +91,7 @@ public class Model : Drawable3D {
 			}
 
 			GL.PolygonMode( MaterialFace.FrontAndBack, PolygonMode.Line );
-			material.Bind();
+			material.BindUniforms();
 			if ( tint is Color4 color ) {
 				material.TrySetUniform( "tint", color );
 				tint = null;
