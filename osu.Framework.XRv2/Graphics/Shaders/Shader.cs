@@ -67,9 +67,9 @@ public class Shader {
 	public T GetUniformValue<T> ( string name )
 		=> GetUniform<T>( name ).Value;
 
-	/// <returns>Whether default uniforms should be created</returns>
+	/// <returns>Whether default uniforms should *not* be created</returns>
 	protected virtual bool PerformCustomCompilation ( Dictionary<string, IUniform> uniforms, ref TextureUnit currentTextureUnit )
-		=> true;
+		=> false;
 
 	void compile () {
 		Handle = GL.CreateProgram();
@@ -82,7 +82,7 @@ public class Shader {
 		GL.LinkProgram( Handle );
 
 		TextureUnit unit = TextureUnit.Texture0;
-		if ( PerformCustomCompilation( uniforms, ref unit ) ) {
+		if ( !PerformCustomCompilation( uniforms, ref unit ) ) {
 			GL.GetProgram( Handle, GetProgramParameterName.ActiveUniforms, out int uniformCount );
 			for ( int i = 0; i < uniformCount; i++ ) {
 				GL.GetActiveUniform( Handle, i, 100, out _, out _, out ActiveUniformType type, out string uniformName );

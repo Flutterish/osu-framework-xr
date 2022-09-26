@@ -36,15 +36,15 @@ public class Material {
 
 	public bool IsLoaded { get; private set; }
 
-	/// <returns>Whether default material uniforms should be created</returns>
+	/// <returns>Whether default material uniforms should *not* be created</returns>
 	protected virtual bool PerformCustomLoad ( Dictionary<string, IMaterialUniform> uniforms )
-		=> true;
+		=> false;
 
 	Dictionary<string, IMaterialUniform> uniforms = null!;
 	IMaterialUniform[] uniformArray = null!;
 	void createUniforms () {
 		uniforms = new Dictionary<string, IMaterialUniform>();
-		if ( PerformCustomLoad( uniforms ) ) {
+		if ( !PerformCustomLoad( uniforms ) ) {
 			foreach ( var (name, uniform) in Shader.AllUniforms ) {
 				if ( nameIsNotMaterialUniformRegex.IsMatch( name ) )
 					continue;
