@@ -37,6 +37,9 @@ public class MaterialDescriptor {
 		uniforms.Add( name, new DescriptorUniform<T>( name, defaultValue ) );
 		return this;
 	}
+	public T GetUniformDefault<T> ( string name ) {
+		return uniforms[name] is DescriptorUniform<T> d ? d.DefaultValue : default!;
+	}
 
 	public Action<Material, MaterialStore>? OnBind { get; private set; }
 	public MaterialDescriptor SetOnBind ( Action<Material, MaterialStore>? action ) {

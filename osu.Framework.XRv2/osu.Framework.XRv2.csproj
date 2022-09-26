@@ -17,6 +17,8 @@
   </ItemGroup>
 	
   <ItemGroup>
+    <None Remove="Resources\Shaders\blit.frag" />
+    <None Remove="Resources\Shaders\blit.vert" />
     <None Remove="Resources\Shaders\lit.frag" />
     <None Remove="Resources\Shaders\lit.vert" />
     <None Remove="Resources\Shaders\unlit_panel.frag" />

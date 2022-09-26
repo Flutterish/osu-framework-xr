@@ -15,8 +15,8 @@ public class SusieCubeBatch : BatchDrawable<BatchDrawableSusieCube, BatchDrawabl
 		var texture = textures.Get( "susie", WrapMode.ClampToEdge, WrapMode.ClampToEdge );
 
 		material.CreateUpload( m => {
-			m.Set( "tex", texture );
-			m.Set( "subImage", texture.GetTextureRect() );
+			m.SetUniform( "tex", texture );
+			m.SetUniform( "subImage", texture.GetTextureRect() );
 		} ).Enqueue();
 	}
 	Material material = null!;

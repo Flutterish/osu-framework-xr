@@ -93,7 +93,7 @@ public class Model : Drawable3D {
 			GL.PolygonMode( MaterialFace.FrontAndBack, PolygonMode.Line );
 			material.Bind();
 			if ( tint is Color4 color ) {
-				material.TrySet( "tint", color );
+				material.TrySetUniform( "tint", color );
 				tint = null;
 			}
 			material.Shader.SetUniform( "mMatrix", ref matrix );

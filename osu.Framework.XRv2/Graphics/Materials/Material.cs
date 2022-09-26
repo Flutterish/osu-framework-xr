@@ -22,8 +22,10 @@ public class Material {
 	public readonly Shader Shader;
 	public readonly MaterialStore? SourceStore;
 	public readonly MaterialDescriptor? Descriptor;
+	public readonly MaterialUploader Uploader;
 
 	public Material ( Shader shader, MaterialDescriptor? descriptor = null, MaterialStore? store = null ) {
+		Uploader = new( this );
 		Shader = shader;
 		SourceStore = store;
 		Descriptor = descriptor;
@@ -88,7 +90,7 @@ public class Material {
 	public IMaterialUniform<T> GetUniform<T> ( string name )
 		=> (IMaterialUniform<T>)uniforms[name];
 
-	public bool TrySet<T> ( string name, T value ) {
+	public bool TrySetUniform<T> ( string name, T value ) {
 		if ( TryGetUniform<T>( name, out var mat ) ) {
 			mat.Value = value;
 
@@ -100,7 +102,7 @@ public class Material {
 		return false;
 	}
 
-	public void Set<T> ( string name, T value ) {
+	public void SetUniform<T> ( string name, T value ) {
 		var mat = GetUniform<T>( name );
 		mat.Value = value;
 

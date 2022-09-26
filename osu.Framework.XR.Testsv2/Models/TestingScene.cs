@@ -19,8 +19,8 @@ public class TestingScene : Scene {
 		var susieTexture = textures.Get( "susie", WrapMode.ClampToEdge, WrapMode.ClampToEdge );
 
 		susieCubeMaterial.CreateUpload( m => {
-			m.Set( "tex", susieTexture );
-			m.Set( "subImage", susieTexture.GetTextureRect() );
+			m.SetUniform( "tex", susieTexture );
+			m.SetUniform( "subImage", susieTexture.GetTextureRect() );
 		} ).Enqueue();
 
 		return new TestingRenderPiepline( this );

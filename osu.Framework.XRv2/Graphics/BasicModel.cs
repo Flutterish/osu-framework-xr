@@ -44,18 +44,25 @@ public class BasicModel : Drawable3D {
 	[BackgroundDependencyLoader]
 	private void load ( MaterialStore materials ) {
 		material ??= CreateDefaultMaterial( materials );
+		if ( colour is Color4 color )
+			material.Uploader.Set( "tint", color );
 	}
 
 	Color4? colour = null;
 	new public Color4 Colour {
-		get => colour ?? ( material?.IsLoaded == true ? material.Get<Color4>( "tint" ) : Color4.White );
+		get => Material?.Uploader.Get<Color4>( "tint" ) ?? colour ?? Color4.White;
 		set {
 			if ( Colour == value )
 				return;
 
 			colour = value;
+			Material?.Uploader.Set( "tint", value );
 			Invalidate( Invalidation.DrawNode );
 		}
+	}
+	new public float Alpha {
+		get => Colour.A;
+		set => Colour = Colour with { A = value };
 	}
 
 	protected override void Dispose ( bool isDisposing ) {
@@ -68,12 +75,14 @@ public class BasicModel : Drawable3D {
 		base.Dispose( isDisposing );
 	}
 
-	protected override DrawNode3D? CreateDrawNode3D ()
-		=> new ModelDrawNode( this );
+	protected override DrawNode3D? CreateDrawNode3D ( int index )
+		=> new ModelDrawNode( this, index );
 
 	class ModelDrawNode : DrawNode3D {
 		new protected BasicModel Source => (BasicModel)base.Source;
-		public ModelDrawNode ( BasicModel source ) : base( source ) {
+		int nodeIndex;
+		public ModelDrawNode ( BasicModel source, int index ) : base( source ) {
+			nodeIndex = index;
 			VAO = source.VAO;
 		}
 
@@ -83,14 +92,13 @@ public class BasicModel : Drawable3D {
 		Matrix4 matrix;
 		bool normalMatrixComputed;
 		Matrix3 normalMatrix;
-		Color4? tint;
 		protected override void UpdateState () {
 			mesh = Source.Mesh;
 			material = Source.Material;
 			matrix = Source.Matrix;
-			tint = Source.colour;
-			Source.colour = null;
 			normalMatrixComputed = false;
+
+			material.Uploader.UpdateState( nodeIndex );
 		}
 
 		public override void Draw ( IRenderer renderer, object? ctx = null ) {
@@ -98,11 +106,8 @@ public class BasicModel : Drawable3D {
 				LinkAttributeArray( mesh, material );
 			}
 
+			material.Uploader.UploadState( nodeIndex );
 			material.Bind();
-			if ( tint is Color4 color ) {
-				material.TrySet( "tint", color );
-				tint = null;
-			}
 			material.Shader.SetUniform( "mMatrix", ref matrix );
 			if ( material.Shader.TryGetUniform<Matrix3>( "mNormal", out var mNormal ) ) {
 				if ( !normalMatrixComputed ) {

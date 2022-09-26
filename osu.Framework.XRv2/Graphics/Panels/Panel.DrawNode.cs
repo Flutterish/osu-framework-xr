@@ -92,7 +92,7 @@ public partial class Panel {
 			}
 
 			Material.Bind();
-			Material.Set( "tex", FrameBuffer.Texture );
+			Material.SetUniform( "tex", FrameBuffer.Texture );
 			Material.Shader.SetUniform( "mMatrix", ref Matrix );
 			Mesh.Draw();
 		}
