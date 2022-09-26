@@ -13,7 +13,7 @@ public class FlatPanel : Panel {
 	}
 
 	protected override Material GetDefaultMaterial ( MaterialStore materials )
-		=> materials.GetNew( "unlit" );
+		=> materials.GetNew( "blit" );
 
 	protected override FlatPanelDrawNode CreatePanelDrawNode ()
 		=> new( this );

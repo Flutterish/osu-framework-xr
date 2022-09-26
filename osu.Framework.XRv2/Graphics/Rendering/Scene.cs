@@ -132,6 +132,7 @@ public partial class Scene : CompositeDrawable {
 				m.Shader.SetUniform( "gProj", store.GetGlobalProperty<Matrix4>( "gProj" ) );
 			} )
 		);
+		materials.AddDescriptor( "blit", new MaterialDescriptor( materials.GetDescriptor( "unlit" ) ) );
 		materials.SetGlobalProperty( "lightPos", Vector3.Zero );
 		materials.AddDescriptor( "lit", new MaterialDescriptor( materials.GetDescriptor( "unlit" ) )
 			.SetAttribute( "aNorm", MeshDescriptor.Normal )
