@@ -19,7 +19,7 @@ float ditherLimit ( vec4 color ) {
 	if ( color.a == 1 )
 		return 1;
 
-	return dither[ ((int(gl_FragCoord.x) % 4) * 4 + int(gl_FragCoord.y) % 4 + int(color.a * 1223 + color.r * 1229 + color.g * 1231 + color.b * 1237)) % 16 ];
+	return dither[ ((int(gl_FragCoord.x) % 4) * 4 + int(gl_FragCoord.y) % 4 + int(color.r * 1229 + color.g * 1231 + color.b * 1237)) % 16 ];
 }
 
 void main ()
