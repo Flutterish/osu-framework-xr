@@ -103,10 +103,10 @@ public class Model<T> : Drawable3D where T : Mesh {
 		base.Dispose( isDisposing );
 	}
 
-	protected override DrawNode3D? CreateDrawNode3D ( int index )
+	protected override ModelDrawNode? CreateDrawNode3D ( int index )
 		=> new ModelDrawNode( this, index );
 
-	class ModelDrawNode : DrawNode3D {
+	protected class ModelDrawNode : DrawNode3D {
 		new protected Model<T> Source => (Model<T>)base.Source;
 		int nodeIndex;
 		public ModelDrawNode ( Model<T> source, int index ) : base( source ) {
