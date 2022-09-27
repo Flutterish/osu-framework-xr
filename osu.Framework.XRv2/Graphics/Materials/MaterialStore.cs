@@ -28,7 +28,6 @@ public class MaterialStore {
 	public bool SharedMaterialExists ( string material, string sharedName ) => sharedMaterials.ContainsKey( (material, sharedName) );
 	public Material GetShared ( string material, string sharedName ) => GetShared<Material, Shader>( material, sharedName );
 	public Tmaterial GetShared<Tmaterial, Tshader> ( string material, string sharedName ) where Tmaterial : Material where Tshader : Shader {
-
 		if ( !sharedMaterials.TryGetValue( (material, sharedName), out var mat ) )
 			sharedMaterials.Add( (material, sharedName), mat = GetNew<Tmaterial, Tshader>( material ) );
 
@@ -37,7 +36,6 @@ public class MaterialStore {
 
 	public bool GetShared ( string material, string sharedName, out Material mat ) => GetShared<Material, Shader>( material, sharedName, out mat );
 	public bool GetShared<Tmaterial, Tshader> ( string material, string sharedName, out Tmaterial mat ) where Tmaterial : Material where Tshader : Shader {
-
 		if ( !sharedMaterials.TryGetValue( (material, sharedName), out var mat2 ) ) {
 			sharedMaterials.Add( (material, sharedName), mat = GetNew<Tmaterial, Tshader>( material ) );
 			return false;
