@@ -1,4 +1,5 @@
 ﻿using osu.Framework.Development;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.XR.Allocation;
 using osu.Framework.XR.Graphics.Shaders;
 using osu.Framework.XR.Graphics.Vertices;
@@ -94,7 +95,7 @@ public class VertexBuffer<Tvertex> : IVertexBuffer where Tvertex : struct, IVert
 			this.source = source;
 		}
 
-		void IUpload.Upload () {
+		void IUpload.Upload ( IRenderer renderer ) {
 			if ( id != source.uploadID ) {
 				data.Dispose();
 				return;
@@ -119,7 +120,7 @@ public class VertexBuffer<Tvertex> : IVertexBuffer where Tvertex : struct, IVert
 			this.usage = usage;
 		}
 
-		void IUpload.Upload () {
+		void IUpload.Upload ( IRenderer renderer ) {
 			if ( source.Handle == 0 )
 				source.Handle = GL.GenBuffer();
 

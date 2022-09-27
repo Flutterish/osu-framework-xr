@@ -1,10 +1,12 @@
-﻿namespace osu.Framework.XR.Allocation;
+﻿using osu.Framework.Graphics.Rendering;
+
+namespace osu.Framework.XR.Allocation;
 
 public interface IUpload {
 	/// <summary>
 	/// Uploads the data on the draw thread
 	/// </summary>
-	void Upload ();
+	void Upload ( IRenderer renderer );
 
 	/// <summary>
 	/// Enqueues this <see cref="IUpload"/> to the default <see cref="UploadScheduler"/>
@@ -31,9 +33,9 @@ public class CombinedUpload : IUpload {
 		this.uploads = uploads;
 	}
 
-	void IUpload.Upload () {
+	void IUpload.Upload ( IRenderer renderer ) {
 		foreach ( var i in uploads )
-			i.Upload();
+			i.Upload( renderer );
 
 		uploads.Dispose();
 	}
@@ -46,8 +48,20 @@ public class DelegateUpload : IUpload {
 		this.action = action;
 	}
 
-	public void Upload () {
+	public void Upload ( IRenderer renderer ) {
 		action();
+	}
+}
+
+public class DelegateRendererUpload : IUpload {
+	Action<IRenderer> action;
+
+	public DelegateRendererUpload ( Action<IRenderer> action ) {
+		this.action = action;
+	}
+
+	public void Upload ( IRenderer renderer ) {
+		action( renderer );
 	}
 }
 
@@ -60,7 +74,21 @@ public class DelegateUpload<T> : IUpload {
 		this.action = action;
 	}
 
-	public void Upload () {
+	public void Upload ( IRenderer renderer ) {
 		action( context );
+	}
+}
+
+public class DelegateRendererUpload<T> : IUpload {
+	T context;
+	Action<T, IRenderer> action;
+
+	public DelegateRendererUpload ( T context, Action<T, IRenderer> action ) {
+		this.context = context;
+		this.action = action;
+	}
+
+	public void Upload ( IRenderer renderer ) {
+		action( context, renderer );
 	}
 }

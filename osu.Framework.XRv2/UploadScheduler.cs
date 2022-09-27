@@ -1,4 +1,5 @@
-﻿using osu.Framework.XR.Allocation;
+﻿using osu.Framework.Graphics.Rendering;
+using osu.Framework.XR.Allocation;
 
 namespace osu.Framework.XR;
 
@@ -14,10 +15,10 @@ public static class UploadScheduler {
 		}
 	}
 
-	public static void Execute ( int limit = int.MaxValue ) {
+	public static void Execute ( IRenderer renderer, int limit = int.MaxValue ) {
 		lock ( mutex ) {
 			while ( limit-- > 0 && queue.TryDequeue( out var upload ) ) {
-				upload.Upload();
+				upload.Upload( renderer );
 			}
 		}
 	}

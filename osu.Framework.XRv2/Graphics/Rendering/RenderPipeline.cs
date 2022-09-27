@@ -44,7 +44,7 @@ partial class Scene {
 				}
 			}
 
-			UploadScheduler.Execute();
+			UploadScheduler.Execute( renderer );
 			DisposeScheduler.Execute();
 
 			frameBuffer ??= renderer.CreateFrameBuffer( new[] { RenderBufferFormat.D32S8 } );
