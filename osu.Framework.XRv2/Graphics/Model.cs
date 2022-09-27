@@ -7,14 +7,30 @@ using osuTK.Graphics;
 
 namespace osu.Framework.XR.Graphics;
 
-public class Model : Drawable3D {
+/// <summary>
+/// A 3D drawable with a <see cref="BasicMesh"/> and a material
+/// </summary>
+public class BasicModel : Model<BasicMesh> {
+	protected override BasicMesh CreateOwnMesh () {
+		return new();
+	}
+}
+
+/// <inheritdoc cref="Model{T}"/>
+public class Model : Model<Mesh> { }
+
+/// <summary>
+/// A 3D drawable with a mesh and a material
+/// </summary>
+/// <typeparam name="T">The type of mesh</typeparam>
+public class Model<T> : Drawable3D where T : Mesh {
 	AttributeArray VAO = new();
-	Mesh? mesh;
+	T? mesh;
 	bool ownMesh = false;
-	public Mesh Mesh {
+	public T Mesh {
 		get {
 			if ( mesh is null ) {
-				mesh = new BasicMesh();
+				mesh = CreateOwnMesh();
 				ownMesh = true;
 			}
 			return mesh;
@@ -28,6 +44,10 @@ public class Model : Drawable3D {
 		}
 	}
 
+	protected virtual T CreateOwnMesh () {
+		throw new InvalidOperationException( $"This implementation of {nameof(Model<T>)} can not create its own mesh" );
+	}
+
 	Material? material;
 	public Material Material {
 		get => material!;
@@ -37,20 +57,32 @@ public class Model : Drawable3D {
 		}
 	}
 
-	[BackgroundDependencyLoader]
-	private void load ( MaterialStore materials ) {
-		material ??= materials.GetNew( "unlit" );
+	protected virtual Material CreateDefaultMaterial ( MaterialStore materials ) {
+		return materials.GetNew( "unlit" );
 	}
 
-	Color4? colour = Color4.White;
+	[BackgroundDependencyLoader]
+	private void load ( MaterialStore materials ) {
+		material ??= CreateDefaultMaterial( materials );
+		if ( colour is Color4 color )
+			material.Set( "tint", color );
+	}
+
+	Color4? colour = null;
 	new public Color4 Colour {
-		get => colour ?? ( material?.TryGetUniformValue<Color4>( "tint", out var tint ) == true ? tint : Color4.White );
+		get => Material?.Get<Color4>( "tint" ) ?? colour ?? Color4.White;
 		set {
 			if ( Colour == value )
 				return;
 
 			colour = value;
+			Material?.Set( "tint", value );
+			Invalidate( Invalidation.DrawNode );
 		}
+	}
+	new public float Alpha {
+		get => Colour.A;
+		set => Colour = Colour with { A = value };
 	}
 
 	protected override void Dispose ( bool isDisposing ) {
@@ -63,12 +95,14 @@ public class Model : Drawable3D {
 		base.Dispose( isDisposing );
 	}
 
-	protected override DrawNode3D? CreateDrawNode3D ()
-		=> new ModelDrawNode( this );
+	protected override DrawNode3D? CreateDrawNode3D ( int index )
+		=> new ModelDrawNode( this, index );
 
 	class ModelDrawNode : DrawNode3D {
-		new protected Model Source => (Model)base.Source;
-		public ModelDrawNode ( Model source ) : base( source ) {
+		new protected Model<T> Source => (Model<T>)base.Source;
+		int nodeIndex;
+		public ModelDrawNode ( Model<T> source, int index ) : base( source ) {
+			nodeIndex = index;
 			VAO = source.VAO;
 		}
 
@@ -76,13 +110,15 @@ public class Model : Drawable3D {
 		Mesh mesh = null!;
 		Material material = null!;
 		Matrix4 matrix;
-		Color4? tint;
+		bool normalMatrixComputed;
+		Matrix3 normalMatrix;
 		protected override void UpdateState () {
 			mesh = Source.Mesh;
 			material = Source.Material;
 			matrix = Source.Matrix;
-			tint = Source.colour;
-			Source.colour = null;
+			normalMatrixComputed = false;
+
+			material.UpdateProperties( nodeIndex );
 		}
 
 		public override void Draw ( IRenderer renderer, object? ctx = null ) {
@@ -90,15 +126,19 @@ public class Model : Drawable3D {
 				LinkAttributeArray( mesh, material );
 			}
 
-			GL.PolygonMode( MaterialFace.FrontAndBack, PolygonMode.Line );
-			material.BindUniforms();
-			if ( tint is Color4 color ) {
-				material.TrySetUniform( "tint", color );
-				tint = null;
-			}
+			material.Bind( nodeIndex );
 			material.Shader.SetUniform( "mMatrix", ref matrix );
+			if ( material.Shader.TryGetUniform<Matrix3>( "mNormal", out var mNormal ) ) {
+				if ( !normalMatrixComputed ) {
+					var mat = matrix.Inverted();
+					mat.Transpose();
+					normalMatrix = new Matrix3( mat );
+					normalMatrixComputed = true;
+				}
+
+				mNormal.UpdateValue( ref normalMatrix );
+			}
 			mesh.Draw();
-			GL.PolygonMode( MaterialFace.FrontAndBack, PolygonMode.Fill );
 		}
 	}
 }

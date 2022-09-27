@@ -1,10 +1,8 @@
-﻿namespace osu.Framework.XR.Graphics;
+﻿namespace osu.Framework.XR.Graphics.Lines;
 
 public class DashedPath3D : Path3D {
 	protected override void RegenerateMesh () {
-		if ( Nodes.Count == 0 ) {
-			return;
-		}
+		if ( Nodes.Count == 0 ) return;
 		else if ( Nodes.Count == 1 ) {
 			Mesh.AddCircle( Nodes[0], Nodes[0].Normalized(), Nodes[0].Normalized(), 32 );
 		}

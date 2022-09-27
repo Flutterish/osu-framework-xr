@@ -1,7 +1,7 @@
 ﻿using osu.Framework.Bindables;
 using osu.Framework.Caching;
 
-namespace osu.Framework.XR.Graphics;
+namespace osu.Framework.XR.Graphics.Lines;
 
 public class Path3D : BasicModel {
 	private Cached isPathValid = new();
@@ -35,9 +35,7 @@ public class Path3D : BasicModel {
 	}
 
 	protected virtual void RegenerateMesh () {
-		if ( Nodes.Count == 0 ) {
-			return;
-		}
+		if ( Nodes.Count == 0 ) 			return;
 		else if ( Nodes.Count == 1 ) {
 			Mesh.AddCircle( Nodes[0], Nodes[0].Normalized(), Nodes[0].Normalized(), 32 );
 		}

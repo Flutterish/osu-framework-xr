@@ -4,6 +4,9 @@ using osu.Framework.XR.Maths;
 
 namespace osu.Framework.XR.Graphics.Meshes;
 
+/// <summary>
+/// A basic generic purpose triangle mesh with UVs and normals
+/// </summary>
 public class BasicMesh : Mesh, ITriangleMesh {
 	new public ElementBuffer<uint> ElementBuffer => (ElementBuffer<uint>)base.ElementBuffer!;
 	public List<uint> Indices => ElementBuffer.Indices;

@@ -1,7 +1,7 @@
 ﻿using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.XR.Graphics;
+using osu.Framework.XR.Graphics.Lines;
 using osu.Framework.XR.Graphics.Rendering;
 
 namespace osu.Framework.XR.Testing;
