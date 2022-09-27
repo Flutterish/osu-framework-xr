@@ -2,6 +2,7 @@
 using osu.Framework.Graphics.Textures;
 using osu.Framework.XR.Allocation;
 using osu.Framework.XR.Graphics.Shaders;
+using osu.Framework.XR.Statistics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
@@ -215,6 +216,7 @@ public class Material {
 	/// This should be called at <see cref="DrawNode3D.UpdateState"/>
 	/// </summary>
 	/// <param name="index">The triple buffer index</param>
+	[MethodImpl( MethodImplOptions.AggressiveInlining )]
 	public void UpdateProperties ( int index ) {
 		dataBuffer.UpdateState( index );
 	}
@@ -230,6 +232,7 @@ public class Material {
 			return;
 
 		Shader.Bind();
+		FrameStatistics.Increment( StatisticsCounterType.MaterialBind );
 		boundMaterial = this;
 		dataBuffer.UploadState( index );
 
@@ -252,6 +255,7 @@ public class Material {
 			return;
 
 		Shader.Bind();
+		FrameStatistics.Increment( StatisticsCounterType.MaterialBind );
 		boundMaterial = this;
 
 		foreach ( var i in uniformArray ) {

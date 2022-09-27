@@ -1,4 +1,5 @@
-﻿using osu.Framework.Graphics;
+﻿using osu.Framework.Extensions.TypeExtensions;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.XR.Graphics.Buffers;
 using osu.Framework.XR.Graphics.Materials;
@@ -24,7 +25,10 @@ public class Model : Model<Mesh> { }
 /// </summary>
 /// <typeparam name="T">The type of mesh</typeparam>
 public class Model<T> : Drawable3D where T : Mesh {
-	AttributeArray VAO = new();
+	ulong materialMeshId = 1; // update thread mutable
+	ulong linkedMaterialMeshId = 0; // 
+	AttributeArray VAO = new();     // draw thread mutable
+
 	T? mesh;
 	bool ownMesh = false;
 	public T Mesh {
@@ -39,13 +43,15 @@ public class Model<T> : Drawable3D where T : Mesh {
 			if ( ownMesh )
 				mesh!.Dispose();
 
+			if ( mesh?.Descriptor != value?.Descriptor )
+				materialMeshId++;
 			mesh = value;
 			ownMesh = false;
 		}
 	}
 
 	protected virtual T CreateOwnMesh () {
-		throw new InvalidOperationException( $"This implementation of {nameof(Model<T>)} can not create its own mesh" );
+		throw new InvalidOperationException( $"{GetType().ReadableName()} can not create its own mesh" );
 	}
 
 	Material? material;
@@ -53,6 +59,8 @@ public class Model<T> : Drawable3D where T : Mesh {
 		get => material!;
 		set {
 			material = value;
+			if ( material.Shader != value.Shader )
+				materialMeshId++;
 			Invalidate( Invalidation.DrawNode );
 		}
 	}
@@ -65,7 +73,7 @@ public class Model<T> : Drawable3D where T : Mesh {
 	private void load ( MaterialStore materials ) {
 		material ??= CreateDefaultMaterial( materials );
 		if ( colour is Color4 color )
-			material.Set( "tint", color );
+			material.SetIfDefault( "tint", color );
 	}
 
 	Color4? colour = null;
@@ -112,18 +120,21 @@ public class Model<T> : Drawable3D where T : Mesh {
 		Matrix4 matrix;
 		bool normalMatrixComputed;
 		Matrix3 normalMatrix;
+		ulong linkId;
 		protected override void UpdateState () {
 			mesh = Source.Mesh;
 			material = Source.Material;
 			matrix = Source.Matrix;
 			normalMatrixComputed = false;
+			linkId = Source.materialMeshId;
 
 			material.UpdateProperties( nodeIndex );
 		}
 
 		public override void Draw ( IRenderer renderer, object? ctx = null ) {
-			if ( VAO.Bind() ) { // TODO check if mesh/material changed and update them
+			if ( VAO.Bind() || linkId > Source.linkedMaterialMeshId ) {
 				LinkAttributeArray( mesh, material );
+				Source.linkedMaterialMeshId = linkId;
 			}
 
 			material.Bind( nodeIndex );

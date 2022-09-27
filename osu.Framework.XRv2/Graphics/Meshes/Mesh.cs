@@ -1,5 +1,6 @@
 ﻿using osu.Framework.XR.Allocation;
 using osu.Framework.XR.Graphics.Buffers;
+using osu.Framework.XR.Statistics;
 
 namespace osu.Framework.XR.Graphics.Meshes;
 
@@ -66,6 +67,7 @@ public class Mesh : IDisposable {
 		if ( ElementBuffer != null )
 			arr[arr.Length - 1] = ElementBuffer.CreateUpload( elementBufferUsage ?? usage );
 
+		FrameStatistics.Increment( StatisticsCounterType.MeshUpload );
 		return new CombinedUpload( arr );
 	}
 
@@ -81,6 +83,7 @@ public class Mesh : IDisposable {
 		if ( ElementBuffer != null )
 			arr[arr.Length - 1] = ElementBuffer.CreateUnsafeUpload( elementBufferUsage ?? usage );
 
+		FrameStatistics.Increment( StatisticsCounterType.MeshUpload );
 		return new CombinedUpload( arr );
 	}
 

@@ -1,4 +1,6 @@
-﻿namespace osu.Framework.XR.Graphics.Materials;
+﻿using osu.Framework.XR.Statistics;
+
+namespace osu.Framework.XR.Graphics.Materials;
 
 // TODO probably merge this into Material
 public sealed class MaterialDataBuffer {
@@ -10,6 +12,7 @@ public sealed class MaterialDataBuffer {
 		Material = material;
 	}
 
+	ulong changeId;
 	/// <summary>
 	/// Sets a material property
 	/// </summary>
@@ -23,6 +26,8 @@ public sealed class MaterialDataBuffer {
 			values.Add( name, val );
 			valuesArray.Add( val );
 		}
+
+		changeId++;
 	}
 
 	/// <summary>
@@ -49,23 +54,20 @@ public sealed class MaterialDataBuffer {
 			: default!;
 	}
 
-	int lastUpdateIndex = -1;
+	ulong[] updateIds = new ulong[] { 0, 0, 0 };
 	public void UpdateState ( int index ) {
-		if ( lastUpdateIndex == index )
+		// prevents duplicate uploads in the same frame (when no change actually happened)
+		if ( updateIds[index] == changeId )
 			return;
 
-		lastUpdateIndex = index;
+		updateIds[index] = changeId;
+		FrameStatistics.Increment( StatisticsCounterType.MaterialUpdate );
 		for ( int i = 0; i < valuesArray.Count; i++ ) {
 			valuesArray[i].UpdateState( index );
 		}
 	}
 
-	int lastUploadIndex = -1;
 	public void UploadState ( int index ) {
-		if ( lastUploadIndex == index )
-			return;
-
-		lastUploadIndex = index;
 		for ( int i = 0; i < valuesArray.Count; i++ ) {
 			valuesArray[i].UploadState( Material, index );
 		}

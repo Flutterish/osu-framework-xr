@@ -7,5 +7,7 @@ public static class FrameStatistics {
 }
 
 public enum StatisticsCounterType {
-
+	MaterialUpdate,
+	MaterialBind,
+	MeshUpload
 }
