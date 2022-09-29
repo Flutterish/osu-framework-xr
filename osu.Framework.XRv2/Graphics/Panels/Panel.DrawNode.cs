@@ -9,33 +9,27 @@ using System.Reflection;
 namespace osu.Framework.XR.Graphics.Panels;
 
 public partial class Panel {
-	protected TripleBuffer<Drawable> TripleBuffer = new();
-	protected DrawNode[] ContentDrawNodes = new DrawNode[3];
-
 	// yuck, internal
 	static MethodInfo generateDrawNodeSubtree = typeof( Drawable ).GetMethod( "GenerateDrawNodeSubtree", BindingFlags.Instance | BindingFlags.NonPublic )!;
-	public static DrawNode GenerateDrawNodeSubtree ( Drawable drawable, ulong frameId, int treeIndex, bool forceNewDrawNode )
-		=> (DrawNode)generateDrawNodeSubtree.Invoke( drawable, new object[] { frameId, treeIndex, forceNewDrawNode } )!;
+	public static DrawNode? GenerateDrawNodeSubtree ( Drawable drawable, ulong frameId, int treeIndex, bool forceNewDrawNode )
+		=> generateDrawNodeSubtree.Invoke( drawable, new object[] { frameId, treeIndex, forceNewDrawNode } ) as DrawNode;
 
 	ulong frameId = 0;
 	protected override void UpdateAfterChildren () {
 		base.UpdateAfterChildren();
-
-		using ( var buffer = TripleBuffer.GetForWrite() ) {
-			var node = ContentDrawNodes[buffer.Index] = GenerateDrawNodeSubtree( Content, frameId, buffer.Index, false );
-		}
 		frameId++;
 	}
 
-	PanelDrawNode? singleDrawNode;
-	protected sealed override DrawNode3D? CreateDrawNode3D ()
-		=> singleDrawNode ??= CreatePanelDrawNode();
-	protected virtual PanelDrawNode CreatePanelDrawNode ()
-		=> new( this );
+	protected sealed override DrawNode3D? CreateDrawNode3D ( int index )
+		=> CreatePanelDrawNode( index );
+	protected virtual PanelDrawNode CreatePanelDrawNode ( int index )
+		=> new( this, index );
 
 	protected IFrameBuffer? FrameBuffer; // shared data
 	AttributeArray VAO = new();
 	protected class PanelDrawNode : DrawNode3D {
+		protected DrawNode? SourceDrawNode { get; private set; }
+
 		new protected Panel Source => (Panel)base.Source;
 		protected readonly AttributeArray VAO;
 		protected readonly BasicMesh Mesh;
@@ -46,15 +40,19 @@ public partial class Panel {
 		}
 		protected Matrix4 Matrix;
 		protected Vector2 Size;
-		public PanelDrawNode ( Panel source ) : base( source ) {
+		protected readonly int SubtreeIndex;
+		public PanelDrawNode ( Panel source, int index ) : base( source ) {
 			VAO = source.VAO;
 			Mesh = source.Mesh;
 			Material = source.Material;
+			SubtreeIndex = index;
 		}
 
 		protected override void UpdateState () {
 			Matrix = Source.Matrix;
 			Size = Source.ContentDrawSize;
+
+			SourceDrawNode = GenerateDrawNodeSubtree( Source.Content, Source.frameId, SubtreeIndex, false );
 		}
 
 		public override void Draw ( IRenderer renderer, object? ctx = null ) {
@@ -75,10 +73,7 @@ public partial class Panel {
 			renderer.PushScissorState( false );
 			renderer.Clear( new( colour: Color4.Transparent ) );
 
-			using ( var buffer = Source.TripleBuffer.GetForRead() ) {
-				var node = Source.ContentDrawNodes[buffer.Index];
-				node?.Draw( renderer );
-			}
+			SourceDrawNode?.Draw( renderer );
 
 			renderer.PopScissorState();
 			renderer.PopDepthInfo();

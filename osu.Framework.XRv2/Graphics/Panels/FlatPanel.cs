@@ -15,11 +15,11 @@ public class FlatPanel : Panel {
 	protected override Material GetDefaultMaterial ( MaterialStore materials )
 		=> materials.GetNew( "blit" );
 
-	protected override FlatPanelDrawNode CreatePanelDrawNode ()
-		=> new( this );
+	protected override FlatPanelDrawNode CreatePanelDrawNode ( int index )
+		=> new( this, index );
 
 	protected class FlatPanelDrawNode : PanelDrawNode {
-		public FlatPanelDrawNode ( FlatPanel source ) : base( source ) { }
+		public FlatPanelDrawNode ( FlatPanel source, int index ) : base( source, index ) { }
 
 		new protected FlatPanel Source => (FlatPanel)base.Source;
 
@@ -46,10 +46,7 @@ public class FlatPanel : Panel {
 				* Matrix
 				* renderer.ProjectionMatrix 
 			);
-			using ( var buffer = Source.TripleBuffer.GetForRead() ) {
-				var node = Source.ContentDrawNodes[buffer.Index];
-				node?.Draw( renderer );
-			}
+			SourceDrawNode?.Draw( renderer );
 			renderer.PopProjectionMatrix();
 
 			renderer.PopStencilInfo();

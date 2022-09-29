@@ -90,8 +90,9 @@ public partial class Panel : Drawable3D {
 
 		if ( lastContentDrawSize != ContentDrawSize ) {
 			lastContentDrawSize = ContentDrawSize;
-			Invalidate( Invalidation.DrawNode );
 		}
+		// we need to update the 2d content draw nodes
+		Invalidate( Invalidation.DrawNode );
 	}
 
 	protected virtual void RegenrateMesh () {
