@@ -79,10 +79,10 @@ public class VrCompositor : Drawable {
 		static FieldInfo? _getGlTextureId;
 		static IntPtr GetTexturePointer ( Texture texture ) {
 			var native = _getNativeTexture.GetValue( texture )!;
-			var type = native.GetType();
+			var type = native.GetType().BaseType!;
 			// assume TextureGL right now
 			_getGlTextureId ??= type.GetField( "textureId", BindingFlags.Instance | BindingFlags.NonPublic )!;
-			return (IntPtr)(int)_getGlTextureId.GetValue( texture )!;
+			return (IntPtr)(int)_getGlTextureId.GetValue( native )!;
 		}
 
 		new protected VrCompositor Source => (VrCompositor)base.Source;
