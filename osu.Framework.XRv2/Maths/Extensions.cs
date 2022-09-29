@@ -51,6 +51,8 @@ public static class Extensions {
 		return cross.Normalized();
 	}
 
+	public static Vector2 ToOsuTk ( this System.Numerics.Vector2 vec )
+		=> new( vec.X, vec.Y );
 	public static Vector3 ToOsuTk ( this System.Numerics.Vector3 vec )
 		=> new( vec.X, vec.Y, vec.Z );
 	public static Quaternion ToOsuTk ( this System.Numerics.Quaternion quat )

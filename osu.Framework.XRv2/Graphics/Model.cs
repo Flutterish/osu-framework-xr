@@ -117,14 +117,14 @@ public class Model<T> : Drawable3D where T : Mesh {
 		AttributeArray VAO = null!;
 		Mesh mesh = null!;
 		Material material = null!;
-		Matrix4 matrix;
+		protected Matrix4 Matrix;
 		bool normalMatrixComputed;
 		Matrix3 normalMatrix;
 		ulong linkId;
 		protected override void UpdateState () {
 			mesh = Source.Mesh;
 			material = Source.Material;
-			matrix = Source.Matrix;
+			Matrix = Source.Matrix;
 			normalMatrixComputed = false;
 			linkId = Source.materialMeshId;
 
@@ -138,10 +138,10 @@ public class Model<T> : Drawable3D where T : Mesh {
 			}
 
 			material.Bind( nodeIndex );
-			material.Shader.SetUniform( "mMatrix", ref matrix );
+			material.Shader.SetUniform( "mMatrix", ref Matrix );
 			if ( material.Shader.TryGetUniform<Matrix3>( "mNormal", out var mNormal ) ) {
 				if ( !normalMatrixComputed ) {
-					var mat = matrix.Inverted();
+					var mat = Matrix.Inverted();
 					mat.Transpose();
 					normalMatrix = new Matrix3( mat );
 					normalMatrixComputed = true;
