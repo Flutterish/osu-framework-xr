@@ -1,7 +1,7 @@
 ﻿using osu.Framework.Allocation;
-using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
+using osu.Framework.XR.Graphics;
 using osu.Framework.XR.Graphics.Buffers;
 using osu.Framework.XR.Graphics.Materials;
 using osu.Framework.XR.Graphics.Meshes;
@@ -10,12 +10,11 @@ using osuTK;
 using osuTK.Graphics;
 using System;
 
-namespace osu.Framework.XR.Graphics;
+namespace osu.Framework.XR.Tests.Models;
 
-public class SusieCube : Drawable3D {
-	AttributeArray VAO = new();
+public class ModelSusieCube : Model {
 	static Mesh mesh;
-	static SusieCube () {
+	static ModelSusieCube () {
 		ElementBuffer<uint> EBO = new();
 		EBO.Indices.AddRange( new uint[] {
 			0,  1,  2,  2,  3,  0,
@@ -51,60 +50,18 @@ public class SusieCube : Drawable3D {
 		mesh.CreateFullUnsafeUpload().Enqueue();
 	}
 
+	public ModelSusieCube () {
+		Mesh = mesh;
+	}
+
 	protected override void Update () {
 		Rotation *= Quaternion.FromAxisAngle( new Vector3( MathF.Sin( X + Y ), MathF.Cos( (float)Time.Current / 1000 ), MathF.Sin( Z - Y ) ).Normalized(), (float)Time.Elapsed / 1000 );
 	}
 
 	[BackgroundDependencyLoader]
-	private void load ( MaterialStore materials, TextureStore textures ) {
-		material = materials.GetNew( "unlit" );
-		texture = textures.Get( "susie", WrapMode.ClampToEdge, WrapMode.ClampToEdge );
-
-		material.CreateUpload( m => {
-			m.SetUniform( "tex", texture );
-			m.SetUniform( "tint", new Color4( RNG.NextSingle(), RNG.NextSingle(), RNG.NextSingle(), 1 ) );
-			m.SetUniform( "subImage", texture.GetTextureRect() );
-		} ).Enqueue();
-	}
-	Material material = null!;
-	Texture texture = null!;
-
-	protected override DrawNode3D? CreateDrawNode3D ()
-		=> new SusieCubeDrawNode( this );
-
-	protected override void Dispose ( bool isDisposing ) {
-		if ( !IsDisposed ) {
-			VAO.Dispose();
-			mesh.Dispose();
-		}
-		base.Dispose( isDisposing );
-	}
-
-	class SusieCubeDrawNode : DrawNode3D {
-		new protected SusieCube Source => (SusieCube)base.Source;
-
-		AttributeArray VAO;
-		Mesh mesh;
-		public SusieCubeDrawNode ( SusieCube source ) : base( source ) {
-			mesh = SusieCube.mesh;
-			VAO = source.VAO;
-			material = Source.material;
-		}
-
-		Material material;
-		Matrix4 matrix;
-		protected override void UpdateState () {
-			matrix = Source.Matrix;
-		}
-
-		public override void Draw ( IRenderer renderer, object? ctx = null ) {
-			if ( VAO.Bind() ) {
-				LinkAttributeArray( mesh, material );
-			}
-
-			material.BindUniforms();
-			material.Shader.SetUniform( "mMatrix", ref matrix );
-			mesh.Draw();
-		}
+	private void load ( TextureStore textures ) {
+		var texture = textures.Get( "susie", WrapMode.ClampToEdge, WrapMode.ClampToEdge );
+		Material.SetTexture( "tex", texture );
+		Material.Set( "tint", new Color4( RNG.NextSingle(), RNG.NextSingle(), RNG.NextSingle(), 1 ) );
 	}
 }

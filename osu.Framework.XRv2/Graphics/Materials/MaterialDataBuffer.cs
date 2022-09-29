@@ -19,7 +19,6 @@ public sealed class MaterialDataBuffer {
 	public void Set<T> ( string name, T value ) {
 		if ( values.TryGetValue( name, out var val ) ) {
 			((MaterialValue<T>)val).Value = value;
-			val.Id++;
 		}
 		else {
 			val = new MaterialValue<T>( name, value );
@@ -67,14 +66,19 @@ public sealed class MaterialDataBuffer {
 		}
 	}
 
+	ulong[] uploadIds = new ulong[] { 0, 0, 0 };
 	public void UploadState ( int index ) {
+		// prevents duplicate uploads in the same frame (when no change actually happened)
+		if ( uploadIds[index] >= updateIds[index] )
+			return;
+
+		uploadIds[index] = updateIds[index];
 		for ( int i = 0; i < valuesArray.Count; i++ ) {
 			valuesArray[i].UploadState( Material, index );
 		}
 	}
 
 	abstract class MaterialValue {
-		public ulong Id = 1;
 		public abstract void UpdateState ( int index );
 		public abstract void UploadState ( Material mat, int index );
 	}
@@ -83,21 +87,16 @@ public sealed class MaterialDataBuffer {
 		public T Value;
 		public string Name;
 
-		ulong[] ids;
 		T[] uploaded;
 
 		public MaterialValue ( string name, T value ) {
 			Name = name;
 			Value = value;
-			ids = new ulong[3];
 			uploaded = new T[3] { value, value, value };
 		}
 
 		public override void UpdateState ( int index ) {
-			if ( ids[index] != Id ) {
-				ids[index] = Id;
-				uploaded[index] = Value;
-			}
+			uploaded[index] = Value;
 		}
 
 		public override void UploadState ( Material mat, int index ) {
