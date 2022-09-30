@@ -25,14 +25,14 @@ public class VrResourceStore {
 		ReserveResources( source );
 		await source.LoadAsync(
 			begin: t => {
-				var load = loadPredicate is null || loadPredicate( t );
-				if ( load ) {
+				if ( loadPredicate is null || loadPredicate( t ) ) {
 					mesh = new();
+					return true;
 				}
 				else {
 					ReleaseResources( source );
+					return false;
 				}
-				return load;
 			},
 			finish: t => {
 				type = t;
