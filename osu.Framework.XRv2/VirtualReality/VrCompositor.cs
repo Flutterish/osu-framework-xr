@@ -31,12 +31,17 @@ public class VrCompositor : Drawable {
 		}
 	}
 
+	bool ownVr;
 	public VR? VR { get; private set; }
 	public event Action? InitializationFailed;
 	public event Action<VR>? Initialized;
-	protected override void LoadComplete () {
+
+	protected override void InjectDependencies ( IReadOnlyDependencyContainer dependencies ) {
+		base.InjectDependencies( dependencies );
+
 		Task.Run( () => {
-			var vr = new VR();
+			ownVr = !dependencies.TryGet<VR>( out var vr );
+			vr ??= new VR();
 			var ok = vr.TryStart();
 
 			if ( ok ) {
@@ -61,7 +66,8 @@ public class VrCompositor : Drawable {
 
 	protected override void Dispose ( bool isDisposing ) {
 		if ( !IsDisposed ) {
-			VR?.Exit();
+			if ( ownVr )
+				VR?.Exit();
 			VR = null!;
 		}
 
@@ -91,8 +97,9 @@ public class VrCompositor : Drawable {
 		IFrameBuffer? left;
 		IFrameBuffer? right;
 		public override void Draw ( IRenderer renderer ) {
-			var context = Source.VR?.UpdateDraw();
-			if ( context is null || Source.VR!.Headset is not Headset headset )
+			var vr = Source.VR;
+			var context = vr?.UpdateDraw();
+			if ( context is null || vr!.Headset is not Headset headset )
 				return;
 
 			if ( ( Source.ActivePlayer?.Root as Drawable )?.Parent is not Scene scene || scene.GetRenderPiepline() is not Scene.RenderPiepline pipeline )

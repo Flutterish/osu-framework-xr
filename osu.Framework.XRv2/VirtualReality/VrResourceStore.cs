@@ -11,7 +11,7 @@ namespace osu.Framework.XR.VirtualReality;
 /// A simple container for unmanged <see cref="OpenVR.NET"/> resources
 /// which allows to load, register their usage and automatically free them when no longer used
 /// </summary>
-public class VrResourceStore {
+public class VrResourceStore : IDisposable {
 	ConcurrentDictionary<int, Task<Texture?>> textures = new();
 	Dictionary<ComponentModel, int> usedModels = new();
 
@@ -109,6 +109,12 @@ public class VrResourceStore {
 			}
 
 			usedModels.Clear();
+		}
+	}
+
+	public void Dispose () {
+		foreach ( var i in textures.Values ) {
+			i.Result?.Dispose();
 		}
 	}
 }

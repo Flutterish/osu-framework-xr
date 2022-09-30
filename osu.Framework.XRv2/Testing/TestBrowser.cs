@@ -1,4 +1,5 @@
-﻿using osu.Framework.Graphics;
+﻿using OpenVR.NET;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input.Events;
@@ -9,6 +10,9 @@ using osu.Framework.Platform;
 namespace osu.Framework.XR.Testing;
 
 public class TestBrowser : Game {
+	[Cached]
+	private VR VR = new();
+
 	[BackgroundDependencyLoader]
 	private void load () {
 		var store = new DllResourceStore( XR.Resources.ResourceAssembly );
