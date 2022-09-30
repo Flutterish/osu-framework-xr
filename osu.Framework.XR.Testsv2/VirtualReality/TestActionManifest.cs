@@ -12,5 +12,6 @@ public enum TestingAction {
 	Vector2,
 	Vector3,
 	Haptic,
-	Pose
+	PoseA,
+	PoseB
 }
