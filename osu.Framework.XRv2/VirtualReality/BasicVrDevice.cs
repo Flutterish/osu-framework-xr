@@ -9,8 +9,8 @@ namespace osu.Framework.XR.VirtualReality;
 public class BasicVrDevice : CompositeDrawable3D {
 	List<BasicVrDeviceComponent> components = new();
 	List<BasicVrDeviceComponent> references = new();
-	public IEnumerable<BasicVrDeviceComponent> Components => components;
-	public IEnumerable<BasicVrDeviceComponent> References => references;
+	public IReadOnlyList<BasicVrDeviceComponent> Components => components;
+	public IReadOnlyList<BasicVrDeviceComponent> References => references;
 	public readonly VrDevice Source;
 	public BasicVrDevice ( VrDevice source ) {
 		Source = source;
