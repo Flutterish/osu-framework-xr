@@ -55,6 +55,10 @@ public static class Extensions {
 		=> new( vec.X, vec.Y );
 	public static Vector3 ToOsuTk ( this System.Numerics.Vector3 vec )
 		=> new( vec.X, vec.Y, vec.Z );
+	public static Vector4 ToOsuTk ( this System.Numerics.Vector4 vec )
+		=> new( vec.X, vec.Y, vec.Z, vec.W );
+	public static Vector3 XyzToOsuTk ( this System.Numerics.Vector4 vec )
+		=> new( vec.X, vec.Y, vec.Z );
 	public static Quaternion ToOsuTk ( this System.Numerics.Quaternion quat )
 		=> new( quat.X, quat.Y, quat.Z, quat.W );
 	public static Matrix4 ToOsuTk ( this System.Numerics.Matrix4x4 mat ) {
