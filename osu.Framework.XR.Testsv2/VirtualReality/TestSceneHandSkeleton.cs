@@ -1,4 +1,5 @@
 ﻿using OpenVR.NET.Devices;
+using OpenVR.NET.Manifest;
 using osu.Framework.XR.VirtualReality;
 
 namespace osu.Framework.XR.Tests.VirtualReality;
@@ -6,7 +7,15 @@ namespace osu.Framework.XR.Tests.VirtualReality;
 public class TestSceneHandSkeleton : VrScene {
 	public TestSceneHandSkeleton () {
 		VrCompositor.Initialized += vr => {
-			vr.SetActionManifest( TestActionManifest.Value );
+			vr.SetActionManifest( new ActionManifest<TestingCategory, TestingAction> {
+				ActionSets = new() {
+					new() { Name = TestingCategory.All, Type = ActionSetType.Single }
+				},
+				Actions = new() {
+					new() { Category = TestingCategory.All, Name = TestingAction.HandLeft, Type = ActionType.LeftHandSkeleton },
+					new() { Category = TestingCategory.All, Name = TestingAction.HandRight, Type = ActionType.RightHandSkeleton }
+				}
+			} );
 
 			vr.DeviceDetected += onVrDeviceDetected;
 			foreach ( var i in vr.TrackedDevices )

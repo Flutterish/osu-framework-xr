@@ -13,7 +13,6 @@ public class BasicHandSkeleton : BasicModel {
 		controller.VR.BindActionsLoaded( () => {
 			source = controller.GetAction<HandSkeletonAction>( name );
 		} );
-		Alpha = 0.6f;
 	}
 
 	protected override void Update () {
