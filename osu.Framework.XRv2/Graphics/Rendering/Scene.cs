@@ -35,22 +35,24 @@ public partial class Scene : CompositeDrawable {
 	public Scene () {
 		onRenderStageChangedDelegate = onRenderStageChanged;
 		AddInternal( Root );
-		Root.SubtreeChildAdded += ( d, p ) => {
-			if ( d is IUnrenderable )
-				return;
+		Root.SubscribeSubtreeModified( 
+			added: ( d, p, _ ) => {
+				if ( d is IUnrenderable )
+					return;
 
-			drawables.Add( d );
-			drawableQueue.Enqueue( (d, true, d.RenderStage) );
-			d.RenderStageChanged += onRenderStageChangedDelegate;
-		};
-		Root.SubtreeChildRemoved += ( d, p ) => {
-			if ( d is IUnrenderable )
-				return;
+				drawables.Add( d );
+				drawableQueue.Enqueue( (d, true, d.RenderStage) );
+				d.RenderStageChanged += onRenderStageChangedDelegate;
+			}, 
+			removed: ( d, p, _ ) => {
+				if ( d is IUnrenderable )
+					return;
 
-			drawables.Remove( d );
-			drawableQueue.Enqueue( (d, false, d.RenderStage) );
-			d.RenderStageChanged -= onRenderStageChangedDelegate;
-		};
+				drawables.Remove( d );
+				drawableQueue.Enqueue( (d, false, d.RenderStage) );
+				d.RenderStageChanged -= onRenderStageChangedDelegate;
+			} 
+		);
 	}
 
 	// cached delegate to avoid allocs
