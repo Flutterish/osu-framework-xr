@@ -1,9 +1,7 @@
 ﻿using OpenVR.NET.Devices;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Rendering;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.XR.Graphics;
-using osu.Framework.XR.Graphics.Meshes;
 using osu.Framework.XR.Maths;
 
 namespace osu.Framework.XR.VirtualReality;
@@ -22,60 +20,26 @@ public class BasicVrDevice : CompositeDrawable3D {
 	private void load ( IRenderer renderer, VrResourceStore resources ) {
 		if ( Source.Model is DeviceModel model ) {
 			foreach ( var i in model.Components ) {
-				BasicMesh mesh = null!;
-				BasicVrDeviceComponent child = null!;
-				i.LoadAsync(
-					begin: type => {
-						if ( type is ComponentModel.ComponentType.Component ) {
-							child = new BasicVrDeviceComponent( Source, i ) { Mesh = mesh = new() };
-							components.Add( child );
-							return true;
-						}
-						else if ( type is ComponentModel.ComponentType.ReferencePoint ) {
-							child = new BasicVrDeviceComponent( Source, i ) { Mesh = mesh = new() };
-							references.Add( child );
-							return true;
-						}
-						return false;
-					},
-					finish: type => {
-						mesh.CreateFullUnsafeUpload().Enqueue();
-						Schedule( () => AddInternal( child ) );
-					},
-					addVertice: ( pos, norm, uv ) => mesh.VertexBuffer.Data.Add( new() {
-						Position = pos.ToOsuTk(),
-						Normal = norm.ToOsuTk(),
-						UV = uv.ToOsuTk()
-					} ),
-					addTriangle: ( a, b, c ) => mesh.AddFace( (uint)a, (uint)b, (uint)c ),
-					addTexture: async tex => {
-						var tx = await resources.Textures.GetOrAdd( tex.ID, async _ => {
-							var image = await tex.LoadImage( flipVertically: true );
-							if ( image == null )
-								return null;
+				resources.LoadComponent( i, renderer, t => t is ComponentModel.ComponentType.Component or ComponentModel.ComponentType.ReferencePoint ).ContinueWith( r => {
+					if ( r.Result is not var (tx, mesh, type) )
+						return;
 
-							var tx = renderer.CreateTexture( image.Width, image.Height );
-							tx.SetData( new TextureUpload( image ) );
-							return tx;
-						} );
+					BasicVrDeviceComponent child = new( Source, i ) { Mesh = mesh! };
 
-						if ( tx is null )
-							return;
-
-						Schedule( () => {
-							if ( child.IsLoaded ) {
-								child.Material.SetTexture( "tex", tx );
-								child.Material.Set( "useGamma", true );
-							}
-							else {
-								child.OnLoadComplete += c => {
-									child.Material.SetTexture( "tex", tx );
-									child.Material.Set( "useGamma", true );
-								};
-							}
-						} );
+					if ( tx != null ) {
+						child.OnLoadComplete += c => {
+							child.Material.SetTexture( "tex", tx );
+							child.Material.Set( "useGamma", true );
+						};
 					}
-				);
+					Schedule( () => {
+						AddInternal( child );
+						if ( type is ComponentModel.ComponentType.Component )
+							components.Add( child );
+						else
+							references.Add( child );
+					} );
+				} );
 			}
 		}
 	}
