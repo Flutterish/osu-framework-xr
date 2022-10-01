@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 namespace osu.Framework.XR.Graphics.Buffers;
 
 /// <summary>
-/// A GPU array of indices which point into vertice buffers in order to not duplicate vetrex data. 
+/// A GPU array of indices which point into vertice buffers in order to not duplicate vertex data. 
 /// Elements such as triangles or lines are created using a method defined by <see cref="PrimitiveType"/>. 
 /// </summary>
 /// <remarks>

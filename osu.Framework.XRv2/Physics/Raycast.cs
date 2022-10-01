@@ -199,14 +199,49 @@ public static class Raycast {
 	/// </summary>
 	public static bool TryHit ( Vector3 origin, Vector3 direction, ITriangleMesh mesh, Matrix4 transform, out RaycastHit hit, bool includeBehind = false )
 		=> TryHitPrenormalized( origin, direction.Normalized(), mesh, transform, out hit, includeBehind );
-	// TODO optimize mesh physics by caching transformed vertices
+
+	/// <summary>
+	/// Intersect a ray and a Mesh.
+	/// <paramref name="direction"/> must be a normal vector.
+	/// </summary>
+	public static bool TryHitPrenormalized ( Vector3 origin, Vector3 direction, ITriangleMesh mesh, out RaycastHit hit, bool includeBehind = false ) {
+		var tris = mesh.TriangleCount;
+		if ( tris > 6 ) {
+			if ( !Intersects( origin, direction, mesh.BoundingBox, includeBehind ) ) {
+				hit = default;
+				return false;
+			}
+		}
+		RaycastHit? closest = null;
+
+		for ( int i = 0; i < tris; i++ ) {
+			var face = mesh.GetTriangleFace( i );
+			if ( TryHitPrenormalized( origin, direction, face, out hit, includeBehind ) && ( closest is null || Math.Abs( closest.Value.Distance ) > Math.Abs( hit.Distance ) ) ) {
+				closest = hit with { TrisIndex = i };
+			}
+		}
+
+		if ( closest is null ) {
+			hit = default;
+			return false;
+		}
+		else {
+			hit = closest.Value;
+			return true;
+		}
+	}
+	/// <summary>
+	/// Intersect a ray and a Mesh.
+	/// </summary>
+	public static bool TryHit ( Vector3 origin, Vector3 direction, ITriangleMesh mesh, out RaycastHit hit, bool includeBehind = false )
+		=> TryHitPrenormalized( origin, direction.Normalized(), mesh, out hit, includeBehind );
 
 	/// <summary>
 	/// Intersect a ray and a Mesh.
 	/// <paramref name="direction"/> must be a normal vector.
 	/// </summary>
 	public static bool TryHitPrenormalized ( Vector3 origin, Vector3 direction, IHasCollider target, out RaycastHit hit, bool includeBehind = false ) {
-		var ok = TryHitPrenormalized( origin, direction, target.Mesh, target.Matrix, out hit, includeBehind );
+		var ok = TryHitPrenormalized( origin, direction, target.ColliderMesh, out hit, includeBehind );
 		if ( ok ) {
 			hit = hit with { Collider = target };
 		}

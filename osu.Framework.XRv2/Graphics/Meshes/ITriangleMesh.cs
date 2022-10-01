@@ -2,17 +2,18 @@
 
 namespace osu.Framework.XR.Graphics.Meshes;
 
-public interface ITriangleMesh : IMesh {
+public interface ITriangleMesh : IGeometryMesh {
 	int TriangleCount { get; }
 	(uint indexA, uint indexB, uint indexC) GetTriangleIndices ( int index );
-	Vector3 GetTriangleVertex ( uint index );
+}
 
-	public Face GetTriangleFace ( int triangleIndex ) {
-		var (a, b, c) = GetTriangleIndices( triangleIndex );
+public static class ITriangleMeshExtensions {
+	public static Face GetTriangleFace ( this ITriangleMesh self, int triangleIndex ) {
+		var (a, b, c) = self.GetTriangleIndices( triangleIndex );
 		return new(
-			GetTriangleVertex( a ),
-			GetTriangleVertex( b ),
-			GetTriangleVertex( c )
+			self.GetVertexPosition( a ),
+			self.GetVertexPosition( b ),
+			self.GetVertexPosition( c )
 		);
 	}
 }

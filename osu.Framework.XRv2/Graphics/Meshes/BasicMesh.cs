@@ -22,8 +22,9 @@ public class BasicMesh : Mesh, ITriangleMesh {
 		base.Descriptor = Descriptor;
 	}
 
+	uint IGeometryMesh.VertexCount => (uint)Vertices.Count;
 	public int TriangleCount => Indices.Count / 3;
-	public Vector3 GetTriangleVertex ( uint index )
+	public Vector3 GetVertexPosition ( uint index )
 		=> VertexBuffer.Data[(int)index].Position;
 	public (uint indexA, uint indexB, uint indexC) GetTriangleIndices ( int index )
 		=> (Indices[index * 3], Indices[index * 3 + 1], Indices[index * 3 + 2]);

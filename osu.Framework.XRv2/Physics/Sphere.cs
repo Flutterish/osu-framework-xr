@@ -98,8 +98,34 @@ public static class Sphere {
 		}
 	}
 
+	public static bool TryHit ( Vector3 origin, double radius, ITriangleMesh mesh, out SphereHit hit ) {
+		var aabb = mesh.BoundingBox;
+		if ( ( aabb.Min + aabb.Size / 2 - origin ).Length > aabb.Size.Length + radius ) {
+			hit = default;
+			return false;
+		}
+
+		SphereHit? closest = null;
+		var tris = mesh.TriangleCount;
+		for ( int i = 0; i < tris; i++ ) {
+			var face = mesh.GetTriangleFace( i );
+			if ( TryHit( origin, radius, face, out hit ) && ( closest is null || closest.Value.Distance > hit.Distance ) ) {
+				closest = hit with { TrisIndex = i };
+			}
+		}
+
+		if ( closest is null ) {
+			hit = default;
+			return false;
+		}
+		else {
+			hit = closest.Value;
+			return true;
+		}
+	}
+
 	public static bool TryHit ( Vector3 origin, double radius, IHasCollider target, out SphereHit hit ) {
-		if ( TryHit( origin, radius, target.Mesh, target.Matrix, out hit ) ) {
+		if ( TryHit( origin, radius, target.ColliderMesh, out hit ) ) {
 			hit = hit with { Collider = target };
 			return true;
 		}

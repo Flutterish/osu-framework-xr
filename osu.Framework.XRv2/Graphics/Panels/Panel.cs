@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.XR.Graphics.Materials;
 using osu.Framework.XR.Graphics.Meshes;
 using osu.Framework.XR.Maths;
+using osu.Framework.XR.Physics;
 using osuTK.Graphics;
 
 namespace osu.Framework.XR.Graphics.Panels;
@@ -17,7 +18,7 @@ namespace osu.Framework.XR.Graphics.Panels;
 /// A 3D panel on which 2D content can be rendered and interacted with through virtual input.
 /// You need to manually set the size of content, or set its auto size axes
 /// </summary>
-public partial class Panel : Drawable3D {
+public partial class Panel : Drawable3D, IHasCollider {
 	/// <summary>
 	/// The size of the contained 2D drawable content.
 	/// </summary>
@@ -41,6 +42,7 @@ public partial class Panel : Drawable3D {
 	public readonly RootContainer Content;
 	public Panel () { // TODO penels should/could have a virtual game host in order to manipulate textinput, clipboard etc.
 		AddInternal( Content = CreateRootContainer() );
+		colliderMesh = new TransformedBasicMesh( Mesh );
 	}
 	protected virtual RootContainer CreateRootContainer ()
 		=> new();
@@ -81,9 +83,12 @@ public partial class Panel : Drawable3D {
 	protected override void Update () {
 		base.Update();
 
+		colliderMesh.Matrix = Matrix;
+
 		if ( !MeshCache.IsValid ) {
 			Mesh.Clear();
 			RegenrateMesh();
+			colliderMesh.InvalidateAll();
 			Mesh.CreateFullUpload().Enqueue();
 			MeshCache.Validate();
 		}
@@ -151,4 +156,9 @@ public partial class Panel : Drawable3D {
 			}
 		}
 	}
+
+	TransformedBasicMesh colliderMesh;
+	public ITriangleMesh ColliderMesh => colliderMesh;
+	public bool IsColliderEnabled { get; set; } = true;
+	public ulong PhysicsLayer { get; set; } = 1;
 }

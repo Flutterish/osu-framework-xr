@@ -2,6 +2,8 @@
 
 namespace osu.Framework.XR.Graphics.Meshes;
 
-public interface IMesh {
+public interface IGeometryMesh {
+	uint VertexCount { get; }
+	Vector3 GetVertexPosition ( uint index );
 	AABox BoundingBox { get; }
 }

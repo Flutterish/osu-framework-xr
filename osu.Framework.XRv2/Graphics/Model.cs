@@ -4,17 +4,39 @@ using osu.Framework.Graphics.Rendering;
 using osu.Framework.XR.Graphics.Buffers;
 using osu.Framework.XR.Graphics.Materials;
 using osu.Framework.XR.Graphics.Meshes;
+using osu.Framework.XR.Physics;
 using osuTK.Graphics;
 
 namespace osu.Framework.XR.Graphics;
 
 /// <summary>
-/// A 3D drawable with a <see cref="BasicMesh"/> and a material
+/// A 3D drawable with a <see cref="BasicMesh"/> and a material. 
+/// Implements a collider whose cache is invalidated every frame, but is disabled by default
 /// </summary>
-public class BasicModel : Model<BasicMesh> {
+public class BasicModel : Model<BasicMesh>, IHasCollider {
 	protected override BasicMesh CreateOwnMesh () {
 		return new();
 	}
+
+	protected override void InvalidateMatrix () {
+		base.InvalidateMatrix();
+		if ( colliderMesh != null ) {
+			colliderMesh.Matrix = Matrix;
+		}
+	}
+
+	protected override void Update () {
+		base.Update();
+		if ( colliderMesh != null ) {
+			colliderMesh.Mesh = Mesh;
+			colliderMesh.InvalidateAll();
+		}
+	}
+
+	TransformedBasicMesh? colliderMesh;
+	public ITriangleMesh ColliderMesh => colliderMesh ??= new( Mesh );
+	public bool IsColliderEnabled { get; set; } = false;
+	public ulong PhysicsLayer { get; set; } = 1;
 }
 
 /// <inheritdoc cref="Model{T}"/>
