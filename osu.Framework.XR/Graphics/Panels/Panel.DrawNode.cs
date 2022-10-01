@@ -1,4 +1,5 @@
 ﻿using osu.Framework.Graphics;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.XR.Graphics.Buffers;
 using osu.Framework.XR.Graphics.Materials;
@@ -57,7 +58,7 @@ public partial class Panel {
 
 		public override void Draw ( IRenderer renderer, object? ctx = null ) {
 			SwitchTo2DContext( renderer );
-			FrameBuffer ??= renderer.CreateFrameBuffer();
+			FrameBuffer ??= renderer.CreateFrameBuffer( new[] { RenderBufferFormat.D32S8 } );
 			FrameBuffer.Size = Size;
 			FrameBuffer.Bind();
 			renderer.PushMaskingInfo( new MaskingInfo {
@@ -65,17 +66,24 @@ public partial class Panel {
 				MaskingRect = new( 0, 0, Size.X, Size.Y ),
 				ToMaskingSpace = Matrix3.Identity,
 				BlendRange = 1,
-				AlphaExponent = 1
+				AlphaExponent = 1,
+				CornerExponent = 2.5f
 			}, true );
 			renderer.PushViewport( new( 0, 0, (int)Size.X, (int)Size.Y ) );
 			renderer.PushOrtho( new( 0, 0, Size.X, Size.Y ) );
 			renderer.PushDepthInfo( new() );
-			renderer.PushScissorState( false );
+			renderer.PushStencilInfo( StencilInfo.Default );
+			renderer.PushScissorState( true );
+			renderer.PushScissor( new( 0, 0, (int)Size.X, (int)Size.Y ) );
+			renderer.PushScissorOffset( Vector2I.Zero );
 			renderer.Clear( new( colour: Color4.Transparent ) );
 
 			SourceDrawNode?.Draw( renderer );
 
+			renderer.PopScissorOffset();
+			renderer.PopScissor();
 			renderer.PopScissorState();
+			renderer.PopStencilInfo();
 			renderer.PopDepthInfo();
 			renderer.PopOrtho();
 			renderer.PopViewport();
