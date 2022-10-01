@@ -67,6 +67,12 @@ public partial class Panel : Drawable3D, IHasCollider {
 		public RootContainer () {
 			RelativeSizeAxes = Axes.None;
 		}
+
+		public override bool UpdateSubTree () {
+			var v = base.UpdateSubTree();
+			UpdateSubTreeMasking( this, ScreenSpaceDrawQuad.AABBFloat );
+			return v;
+		}
 	}
 
 	public readonly BasicMesh Mesh = new();
