@@ -1,32 +1,51 @@
-﻿using osuTK;
-using System;
+﻿namespace osu.Framework.XR.Maths;
 
-namespace osu.Framework.XR.Maths {
+/// <summary>
+/// A 3D axis-aligned Box.
+/// </summary>
+public struct AABox {
 	/// <summary>
-	/// A 3D axis-aligned Box.
+	/// Origin located at X-, Y-, Z- most point of the box
 	/// </summary>
-	public struct AABox {
-		/// <summary>
-		/// Origin located at X-, Y-, Z- most point of the box
-		/// </summary>
-		public Vector3 Min;
-		/// <summary>
-		/// How much the box expands into X+, Y+, Z+ from the origin.
-		/// </summary>
-		public Vector3 Size;
-		public Vector3 Max => Min + Size;
+	public Vector3 Min;
+	/// <summary>
+	/// How much the box expands into X+, Y+, Z+ from the origin.
+	/// </summary>
+	public Vector3 Size;
+	public Vector3 Max => Min + Size;
 
-		public static AABox operator * ( Matrix4x4 matrix, AABox box ) {
-			var origin = ( matrix * new Vector4( box.Min, 1 ) ).Xyz;
-			var point2 = ( matrix * new Vector4( box.Min + box.Size, 1 ) ).Xyz;
+	public static AABox operator * ( AABox box, Matrix4 matrix ) {
+		var min = box.Min;
+		var max = box.Max;
 
-			var lowest = new Vector3( MathF.Min( origin.X, point2.X ), MathF.Min( origin.Y, point2.Y ), MathF.Min( origin.Z, point2.Z ) );
-			var greatest = new Vector3( MathF.Max( origin.X, point2.X ), MathF.Max( origin.Y, point2.Y ), MathF.Max( origin.Z, point2.Z ) );
+		Span<Vector3> points = stackalloc Vector3[] {
+			matrix.Apply( new( min.X, min.Y, min.Z ) ),
+			matrix.Apply( new( min.X, min.Y, max.Z ) ),
+			matrix.Apply( new( min.X, max.Y, min.Z ) ),
+			matrix.Apply( new( min.X, max.Y, max.Z ) ),
+			matrix.Apply( new( max.X, min.Y, min.Z ) ),
+			matrix.Apply( new( max.X, min.Y, max.Z ) ),
+			matrix.Apply( new( max.X, max.Y, min.Z ) ),
+			matrix.Apply( new( max.X, max.Y, max.Z ) )
+		};
 
-			return new AABox {
-				Min = lowest,
-				Size = greatest - lowest
-			};
+		min = new( float.PositiveInfinity );
+		max = new( float.NegativeInfinity );
+		foreach ( var v in points ) {
+			if ( v.X > max.X )
+				max.X = v.X;
+			if ( v.X < min.X )
+				min.X = v.X;
+			if ( v.Y > max.Y )
+				max.Y = v.Y;
+			if ( v.Y < min.Y )
+				min.Y = v.Y;
+			if ( v.Z > max.Z )
+				max.Z = v.Z;
+			if ( v.Z < min.Z )
+				min.Z = v.Z;
 		}
+
+		return new() { Min = min, Size = max - min };
 	}
 }
