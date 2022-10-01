@@ -33,7 +33,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\osu.Framework.XRv2\osu.Framework.XRv2.csproj" />
+	  <ProjectReference Include="..\osu.Framework.XR\osu.Framework.XR.csproj" />
 	</ItemGroup>
 
 </Project>
