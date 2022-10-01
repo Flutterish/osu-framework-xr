@@ -125,13 +125,20 @@ public class CompositeDrawable3D : Drawable3D {
 		return new() { AddedVisitor = addedVisitor, RemovedVisitor = removedVisitor };
 	}
 
-	public void UnsubscribeSubtreeModified ( SubtreeModifiedSubscription subscription ) {
+	public void UnsubscribeSubtreeModified ( SubtreeModifiedSubscription subscription, bool invokeRemoved = false ) {
 		ChildAdded -= subscription.AddedVisitor;
 		ChildRemoved -= subscription.RemovedVisitor;
 
-		foreach ( var child in children ) {
-			if ( child is CompositeDrawable3D comp ) {
-				comp.UnsubscribeSubtreeModified( subscription );
+		if ( invokeRemoved ) {
+			foreach ( var child in children ) {
+				subscription.RemovedVisitor( child, this, false );
+			}
+		}
+		else {
+			foreach ( var child in children ) {
+				if ( child is CompositeDrawable3D comp ) {
+					comp.UnsubscribeSubtreeModified( subscription );
+				}
 			}
 		}
 	}
