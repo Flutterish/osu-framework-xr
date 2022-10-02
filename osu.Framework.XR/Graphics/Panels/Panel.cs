@@ -68,6 +68,11 @@ public partial class Panel : Drawable3D, IHasCollider {
 		Vector2 IContainer.RelativeChildSize { get => RelativeChildSize; set => RelativeChildSize = value; }
 		Vector2 IContainer.RelativeChildOffset { get => RelativeChildOffset; set => RelativeChildOffset = value; }
 
+		public override Vector2 Size { 
+			get => base.Size; 
+			set => base.Size = platformActions.Size = value; 
+		}
+
 		new public Axes AutoSizeAxes { 
 			get => base.AutoSizeAxes; 
 			set => base.AutoSizeAxes = platformActions.AutoSizeAxes = value;
