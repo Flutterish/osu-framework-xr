@@ -139,8 +139,19 @@ public partial class Panel : Drawable3D, IHasCollider {
 		} );
 	}
 
-	public Vector2 ContentPositionAt ( int trisIndex, Vector3 position ) {
-		var face = ( Mesh as ITriangleMesh ).GetTriangleFace( trisIndex );
+	public Vector2 GlobalSpaceContentPositionAt ( int trisIndex, Vector3 position ) {
+		var face = ColliderMesh.GetTriangleFace( trisIndex );
+		var barycentric = Triangles.BarycentricFast( face, position );
+		var tris = Mesh.GetTriangleIndices( trisIndex );
+		var textureCoord =
+			  Mesh.VertexBuffer.Data[(int)tris.indexA].UV * barycentric.X
+			+ Mesh.VertexBuffer.Data[(int)tris.indexB].UV * barycentric.Y
+			+ Mesh.VertexBuffer.Data[(int)tris.indexC].UV * barycentric.Z;
+		return new Vector2( Content.DrawWidth * textureCoord.X, Content.DrawHeight * ( 1 - textureCoord.Y ) );
+	}
+
+	public Vector2 ModelSpaceContentPositionAt ( int trisIndex, Vector3 position ) {
+		var face = Mesh.GetTriangleFace( trisIndex );
 		var barycentric = Triangles.BarycentricFast( face, position );
 		var tris = Mesh.GetTriangleIndices( trisIndex );
 		var textureCoord =
