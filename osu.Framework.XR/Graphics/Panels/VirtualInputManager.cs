@@ -18,8 +18,10 @@ public class VirtualInputManager : CustomInputManager {
 		get => hasFocus;
 		set {
 			hasFocus = value;
-			if ( !hasFocus )
+			if ( !hasFocus ) {
 				ReleaseAllInput();
+				ChangeFocus( null );
+			}
 		}
 	}
 	public override bool HandleHoverEvents => HasFocus;
