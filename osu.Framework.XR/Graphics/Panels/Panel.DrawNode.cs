@@ -16,10 +16,6 @@ public partial class Panel {
 		=> generateDrawNodeSubtree.Invoke( drawable, new object[] { frameId, treeIndex, forceNewDrawNode } ) as DrawNode;
 
 	ulong frameId = 0;
-	protected override void UpdateAfterChildren () {
-		base.UpdateAfterChildren();
-		frameId++;
-	}
 
 	protected sealed override DrawNode3D? CreateDrawNode3D ( int index )
 		=> CreatePanelDrawNode( index );
@@ -53,7 +49,7 @@ public partial class Panel {
 			Matrix = Source.Matrix;
 			Size = Source.ContentDrawSize;
 
-			SourceDrawNode = GenerateDrawNodeSubtree( Source.Content, Source.frameId, SubtreeIndex, false );
+			SourceDrawNode = GenerateDrawNodeSubtree( Source.Content, Source.frameId++, SubtreeIndex, false );
 		}
 
 		public override void Draw ( IRenderer renderer, object? ctx = null ) {
