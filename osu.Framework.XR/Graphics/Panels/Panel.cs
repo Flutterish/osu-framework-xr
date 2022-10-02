@@ -6,6 +6,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input;
 using osu.Framework.XR.Graphics.Materials;
 using osu.Framework.XR.Graphics.Meshes;
 using osu.Framework.XR.Maths;
@@ -50,6 +51,9 @@ public partial class Panel : Drawable3D, IHasCollider {
 		// this ensures that the panel is the "root node" for cases like buffered containers which clip their size to the root node
 		CompositeDrawable? IDrawable.Parent => null;
 
+		PlatformActionContainer platformActions;
+		protected override Container<Drawable> Content => platformActions;
+
 		public override DrawInfo DrawInfo => new( Matrix3.Identity, Matrix3.Identity );
 		public override DrawColourInfo DrawColourInfo => new DrawColourInfo( Colour.MultiplyAlpha( Alpha ), null );
 
@@ -64,7 +68,22 @@ public partial class Panel : Drawable3D, IHasCollider {
 		Vector2 IContainer.RelativeChildSize { get => RelativeChildSize; set => RelativeChildSize = value; }
 		Vector2 IContainer.RelativeChildOffset { get => RelativeChildOffset; set => RelativeChildOffset = value; }
 
+		new public Axes AutoSizeAxes { 
+			get => base.AutoSizeAxes; 
+			set => base.AutoSizeAxes = platformActions.AutoSizeAxes = value;
+		}
+		public override Axes RelativeSizeAxes { 
+			get => base.RelativeSizeAxes; 
+			set {
+				if ( platformActions is null )
+					return;
+
+				base.RelativeSizeAxes = platformActions.RelativeSizeAxes = value;
+			}
+		}
+
 		public RootContainer () {
+			AddInternal( platformActions = new() );
 			RelativeSizeAxes = Axes.None;
 		}
 	}
