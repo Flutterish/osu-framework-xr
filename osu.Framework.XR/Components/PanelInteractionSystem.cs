@@ -28,7 +28,6 @@ public class PanelInteractionSystem : Drawable {
 	}
 
 	public PanelInteractionSystem ( Scene scene, PhysicsSystem physics ) {
-		RelativeSizeAxes = Axes.Both;
 		Physics = physics;
 		Scene = scene;
 
