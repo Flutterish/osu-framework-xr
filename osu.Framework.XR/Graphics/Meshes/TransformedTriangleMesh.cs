@@ -4,12 +4,13 @@ namespace osu.Framework.XR.Graphics.Meshes;
 
 /// <inheritdoc/>
 public class TransformedBasicMesh : TransformedTriangleMesh<BasicMesh> {
-	public TransformedBasicMesh ( BasicMesh mesh ) : base(
+	public TransformedBasicMesh ( BasicMesh mesh, Func<Matrix4> matrixGetter ) : base(
 		mesh,
 		m => m.TriangleCount,
 		m => (uint)m.Vertices.Count,
 		(m, i) => m.GetTriangleIndices( i ),
-		(m, i) => m.Vertices[(int)i].Position
+		(m, i) => m.Vertices[(int)i].Position,
+		matrixGetter
 	) { }
 }
 
@@ -35,25 +36,24 @@ public class TransformedTriangleMesh<T> : ITriangleMesh {
 			InvalidateAll();
 		}
 	}
-	Matrix4 matrix = Matrix4.Identity;
-	public Matrix4 Matrix {
-		get => matrix;
-		set {
-			if ( matrix == value )
-				return;
 
-			matrix = value;
-			vertices.Clear();
-		}
+	public void InvalidateMatrix () {
+		matrix = null;
+		vertices.Clear();
 	}
+	Func<Matrix4> matrixGetter;
+	Matrix4? matrix;
+	public Matrix4 Matrix => matrix ??= matrixGetter();
 
 	public TransformedTriangleMesh (
 		T mesh,
 		Func<T, int> getTriangleCount, 
 		Func<T, uint> getVertexCount, 
 		Func<T, int, (uint indexA, uint indexB, uint indexC)> getTriangle, 
-		Func<T, uint, Vector3> getVertex )
+		Func<T, uint, Vector3> getVertex,
+		Func<Matrix4> matrixGetter )
 	{
+		this.matrixGetter = matrixGetter;
 		this.getTriangleCount = getTriangleCount;
 		this.getVertexCount = getVertexCount;
 		this.getTriangle = getTriangle;
@@ -131,7 +131,7 @@ public class TransformedTriangleMesh<T> : ITriangleMesh {
 			vertices.Add( null );
 		}
 
-		return vertices[(int)index] ??= matrix.Apply( getVertex( mesh, index ) );
+		return vertices[(int)index] ??= Matrix.Apply( getVertex( mesh, index ) );
 	}
 
 	AABox? boundingBox;
@@ -161,7 +161,7 @@ public class TransformedTriangleMesh<T> : ITriangleMesh {
 				boundingBox = box = new() { Min = min, Size = max - min };
 			}
 
-			return box * matrix;
+			return box * Matrix;
 		}
 	}
 }

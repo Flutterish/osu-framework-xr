@@ -20,9 +20,7 @@ public class BasicModel : Model<BasicMesh>, IHasCollider {
 
 	protected override void InvalidateMatrix () {
 		base.InvalidateMatrix();
-		if ( colliderMesh != null ) {
-			colliderMesh.Matrix = Matrix;
-		}
+		colliderMesh?.InvalidateMatrix();
 	}
 
 	protected override void Update () {
@@ -34,7 +32,7 @@ public class BasicModel : Model<BasicMesh>, IHasCollider {
 	}
 
 	TransformedBasicMesh? colliderMesh;
-	public ITriangleMesh ColliderMesh => colliderMesh ??= new( Mesh ) { Matrix = Matrix };
+	public ITriangleMesh ColliderMesh => colliderMesh ??= new( Mesh, () => Matrix );
 	public bool IsColliderEnabled { get; set; } = false;
 	public ulong PhysicsLayer { get; set; } = 1;
 }

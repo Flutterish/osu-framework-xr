@@ -41,9 +41,9 @@ public partial class Panel : Drawable3D, IHasCollider {
 
 	[Cached( type: typeof( ISafeArea ) )]
 	public readonly RootContainer Content;
-	public Panel () { // TODO penels should/could have a virtual game host in order to manipulate textinput, clipboard etc.
+	public Panel () {
 		AddInternal( Content = CreateRootContainer() );
-		colliderMesh = new TransformedBasicMesh( Mesh );
+		colliderMesh = new TransformedBasicMesh( Mesh, () => Matrix );
 	}
 	protected virtual RootContainer CreateRootContainer ()
 		=> new();
@@ -110,10 +110,13 @@ public partial class Panel : Drawable3D, IHasCollider {
 		Material ??= GetDefaultMaterial( materials );
 	}
 
+	protected override void InvalidateMatrix () {
+		base.InvalidateMatrix();
+		colliderMesh.InvalidateMatrix();
+	}
+
 	protected override void Update () {
 		base.Update();
-
-		colliderMesh.Matrix = Matrix;
 
 		if ( !MeshCache.IsValid ) {
 			Mesh.Clear();
