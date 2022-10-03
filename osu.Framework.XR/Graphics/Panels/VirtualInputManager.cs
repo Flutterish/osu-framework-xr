@@ -1,4 +1,5 @@
-﻿using osu.Framework.Input;
+﻿using osu.Framework.Graphics;
+using osu.Framework.Input;
 using osuTK.Input;
 
 namespace osu.Framework.XR.Graphics.Panels;
@@ -11,8 +12,11 @@ public class VirtualInputManager : CustomInputManager {
 		AddHandler( Mouse = new() );
 		AddHandler( Keyboard = new() );
 		AddHandler( Touch = new() );
+
+		AddInternal( focusLock = new() );
 	}
 
+	FocusLock focusLock;
 	bool hasFocus = false;
 	new public bool HasFocus {
 		get => hasFocus;
@@ -20,11 +24,17 @@ public class VirtualInputManager : CustomInputManager {
 			hasFocus = value;
 			if ( !hasFocus ) {
 				ReleaseAllInput();
-				ChangeFocus( null );
+				ChangeFocus( focusLock );
 			}
 		}
 	}
 	public override bool HandleHoverEvents => HasFocus;
+
+	protected override void Update () {
+		base.Update();
+		if ( !hasFocus && FocusedDrawable != focusLock )
+			ChangeFocus( focusLock );
+	}
 
 	public virtual void ReleaseAllInput () {
 		ReleaseKeyboardInput();
@@ -105,4 +115,12 @@ public class VirtualInputManager : CustomInputManager {
 
 	public void TouchMove ( object source, Vector2 position )
 		=> Touch.EmulateTouchMove( source, position );
+
+	class FocusLock : Drawable {
+		public FocusLock () {
+			AlwaysPresent = true;
+		}
+
+		public override bool AcceptsFocus => true;
+	}
 }
