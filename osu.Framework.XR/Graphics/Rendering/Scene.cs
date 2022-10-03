@@ -124,7 +124,7 @@ public partial class Scene : CompositeDrawable {
 			manualMipmaps: false,
 			scaleAdjust: 1
 		);
-		materials.AddDescriptor( "unlit", new MaterialDescriptor()
+		materials.AddDescriptor( MaterialNames.Unlit, new MaterialDescriptor()
 			.SetAttribute( "aPos", MeshDescriptor.Position )
 			.SetAttribute( "aUv", MeshDescriptor.UV )
 			.SetUniform( "tex", renderer.WhitePixel )
@@ -134,9 +134,9 @@ public partial class Scene : CompositeDrawable {
 				m.Shader.SetUniform( "gProj", store.GetGlobalProperty<Matrix4>( "gProj" ) );
 			} )
 		);
-		materials.AddDescriptor( "blit", new MaterialDescriptor( materials.GetDescriptor( "unlit" ) ) );
+		materials.AddDescriptor( MaterialNames.Blit, new MaterialDescriptor( materials.GetDescriptor( MaterialNames.Unlit ) ) );
 		materials.SetGlobalProperty( "lightPos", Vector3.Zero );
-		materials.AddDescriptor( "lit", new MaterialDescriptor( materials.GetDescriptor( "unlit" ) )
+		materials.AddDescriptor( "lit", new MaterialDescriptor( materials.GetDescriptor( MaterialNames.Unlit ) )
 			.SetAttribute( "aNorm", MeshDescriptor.Normal )
 			.SetUniform( "lightColor", Vector3.One )
 			.SetUniform( "specularStr", 0.5f )
@@ -147,7 +147,7 @@ public partial class Scene : CompositeDrawable {
 				m.Shader.SetUniform( "lightPos", store.GetGlobalProperty<Vector3>( "lightPos" ) );
 			} )
 		);
-		materials.AddDescriptor( "unlit_panel", new MaterialDescriptor()
+		materials.AddDescriptor( MaterialNames.UnlitPanel, new MaterialDescriptor()
 			.SetAttribute( "aPos", MeshDescriptor.Position )
 			.SetAttribute( "aUv", MeshDescriptor.UV )
 			.SetUniform( "tint", Color4.White )

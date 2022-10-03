@@ -1,5 +1,6 @@
 ﻿using osu.Framework.Utils;
 using osu.Framework.XR.Graphics;
+using osu.Framework.XR.Graphics.Materials;
 using osu.Framework.XR.Graphics.Meshes;
 
 namespace osu.Framework.XR.Tests.Shaders;
@@ -15,7 +16,7 @@ public class TestSceneModel : BasicTestScene {
 		AddStep( "Random Color", () => model.Colour = new( RNG.NextSingle(), RNG.NextSingle(), RNG.NextSingle(), model.Alpha ) );
 		AddStep( "White", () => model.Colour = new( 1, 1, 1, model.Alpha ) );
 		AddLabel( "Material" );
-		foreach ( var mat in new[] { "unlit", "blit" } ) {
+		foreach ( var mat in new[] { MaterialNames.Unlit, MaterialNames.Blit } ) {
 			AddStep( mat, () => model.Material = Scene.MaterialStore.GetNew( mat ) );
 		}
 	}

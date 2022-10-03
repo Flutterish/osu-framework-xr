@@ -15,7 +15,7 @@ public class TestingScene : Scene {
 		var materials = Dependencies.Get<MaterialStore>();
 		var textures = Dependencies.Get<TextureStore>();
 
-		susieCubeMaterial = materials.GetNew( "unlit" );
+		susieCubeMaterial = materials.GetNew( MaterialNames.Unlit );
 		var susieTexture = textures.Get( "susie", WrapMode.ClampToEdge, WrapMode.ClampToEdge );
 
 		susieCubeMaterial.CreateUpload( m => {

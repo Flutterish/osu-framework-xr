@@ -57,7 +57,7 @@ public class SusieCube : Drawable3D {
 
 	[BackgroundDependencyLoader]
 	private void load ( MaterialStore materials, TextureStore textures ) {
-		material = materials.GetNew( "unlit" );
+		material = materials.GetNew( MaterialNames.Unlit );
 		texture = textures.Get( "susie", WrapMode.ClampToEdge, WrapMode.ClampToEdge );
 
 		material.CreateUpload( m => {

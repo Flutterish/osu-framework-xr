@@ -86,7 +86,7 @@ public class Model<T> : Drawable3D where T : Mesh {
 	}
 
 	protected virtual Material CreateDefaultMaterial ( MaterialStore materials ) {
-		return materials.GetNew( "unlit" );
+		return materials.GetNew( MaterialNames.Unlit );
 	}
 
 	[BackgroundDependencyLoader]

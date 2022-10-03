@@ -103,7 +103,7 @@ public partial class Panel : Drawable3D, IHasCollider {
 	protected readonly Cached MeshCache = new();
 	protected Material Material { get; private set; } = null!;
 	protected virtual Material GetDefaultMaterial ( MaterialStore materials )
-		=> materials.GetNew( "unlit_panel" );
+		=> materials.GetNew( MaterialNames.UnlitPanel );
 
 	[BackgroundDependencyLoader]
 	private void load ( MaterialStore materials ) {
