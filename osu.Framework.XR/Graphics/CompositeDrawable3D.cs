@@ -5,11 +5,18 @@ namespace osu.Framework.XR.Graphics;
 
 public class CompositeDrawable3D : Drawable3D {
 	List<Drawable3D> children = new();
-	new protected IReadOnlyList<Drawable3D> InternalChildren { get; }
+	IReadOnlyList<Drawable3D> internalChildren;
+	new protected IReadOnlyList<Drawable3D> InternalChildren {
+		get => internalChildren;
+		set {
+			ClearInternal( true );
+			AddRangeInternal( value );
+		}
+	}
 	new protected IReadOnlyList<Drawable3D> AliveInternalChildren => InternalChildren;
 
 	public CompositeDrawable3D () {
-		InternalChildren = children.AsReadOnly();
+		internalChildren = children.AsReadOnly();
 	}
 
 	[EditorBrowsable( EditorBrowsableState.Never )]
