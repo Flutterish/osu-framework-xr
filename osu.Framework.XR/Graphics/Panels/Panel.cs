@@ -108,6 +108,25 @@ public partial class Panel : Drawable3D, IHasCollider {
 	[BackgroundDependencyLoader]
 	private void load ( MaterialStore materials ) {
 		Material ??= GetDefaultMaterial( materials );
+		if ( colour is Color4 color )
+			Material.SetIfDefault( "tint", color );
+	}
+
+	Color4? colour = null;
+	new public Color4 Colour {
+		get => Material?.Get<Color4>( "tint" ) ?? colour ?? Color4.White;
+		set {
+			if ( Colour == value )
+				return;
+
+			colour = value;
+			Material?.Set( "tint", value );
+			Invalidate( Invalidation.DrawNode );
+		}
+	}
+	new public float Alpha {
+		get => Colour.A;
+		set => Colour = Colour with { A = value };
 	}
 
 	protected override void InvalidateMatrix () {

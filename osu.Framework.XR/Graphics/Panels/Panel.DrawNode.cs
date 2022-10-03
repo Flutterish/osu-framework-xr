@@ -49,6 +49,7 @@ public partial class Panel {
 			Matrix = Source.Matrix;
 			Size = Source.ContentDrawSize;
 
+			Material.UpdateProperties( SubtreeIndex );
 			SourceDrawNode = GenerateDrawNodeSubtree( Source.Content, Source.frameId++, SubtreeIndex, false );
 		}
 
@@ -90,8 +91,8 @@ public partial class Panel {
 				LinkAttributeArray( Mesh, Material );
 			}
 
-			Material.BindUniforms();
-			Material.SetUniform( "tex", FrameBuffer.Texture );
+			Material.Bind( SubtreeIndex );
+			Material.Shader.SetUniform( "tex", FrameBuffer.Texture );
 			Material.Shader.SetUniform( "mMatrix", ref Matrix );
 			Mesh.Draw();
 		}

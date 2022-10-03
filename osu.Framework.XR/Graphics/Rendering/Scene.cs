@@ -150,6 +150,7 @@ public partial class Scene : CompositeDrawable {
 		materials.AddDescriptor( "unlit_panel", new MaterialDescriptor()
 			.SetAttribute( "aPos", MeshDescriptor.Position )
 			.SetAttribute( "aUv", MeshDescriptor.UV )
+			.SetUniform( "tint", Color4.White )
 			.SetOnBind( ( m, store ) => {
 				m.Shader.SetUniform( "gProj", store.GetGlobalProperty<Matrix4>( "gProj" ) );
 			} )
