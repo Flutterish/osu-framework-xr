@@ -152,6 +152,13 @@ public partial class Panel : Drawable3D, IHasCollider {
 		Invalidate( Invalidation.DrawNode );
 	}
 
+	/// <summary>
+	/// Regenrate mesh after it's been invalidated though <see cref="MeshCache.Invalidate()"/>
+	/// </summary>
+	/// <remarks>
+	/// Note that <see cref="ContentDrawSize"/> might be a fractional value, while 
+	/// rendered content is snapped to the truncated pixel value
+	/// </remarks>
 	protected virtual void RegenrateMesh () {
 		Mesh.AddQuad( new Quad3 {
 			TL = new Vector3( -1, 1, 0 ),
