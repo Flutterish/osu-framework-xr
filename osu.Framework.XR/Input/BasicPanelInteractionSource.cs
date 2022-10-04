@@ -5,15 +5,15 @@ using osu.Framework.XR.Graphics.Panels;
 using osu.Framework.XR.Graphics.Rendering;
 using osu.Framework.XR.Physics;
 
-namespace osu.Framework.XR.Components;
+namespace osu.Framework.XR.Input;
 
 /// <summary>
 /// A system which allows pointer and keyboard interaction with panels contained within a scene
 /// </summary>
-public class PanelInteractionSystem : Drawable {
+public class BasicPanelInteractionSource : Drawable {
 	protected readonly PhysicsSystem Physics;
 	protected readonly Scene Scene;
-	
+
 	public readonly Bindable<Panel?> FocusedPanelBindable = new();
 	public Panel? FocusedPanel {
 		get => FocusedPanelBindable.Value;
@@ -27,20 +27,19 @@ public class PanelInteractionSystem : Drawable {
 		set => UseTouchBindable.Value = value;
 	}
 
-	public PanelInteractionSystem ( Scene scene, PhysicsSystem physics ) {
+	PanelInteractionSystem.Source source;
+	public BasicPanelInteractionSource ( Scene scene, PhysicsSystem physics, PanelInteractionSystem system ) {
 		Physics = physics;
 		Scene = scene;
+		source = system.GetSource( this );
 
-		FocusedPanelBindable.BindValueChanged( v => {
-			if ( v.OldValue is Panel old )
-				old.Content.HasFocus = false;
-
-			if ( v.NewValue is Panel panel )
-				panel.Content.HasFocus = true;
-		} );
+		FocusedPanelBindable.BindTo( source.FocusedPanelBindable );
 		UseTouchBindable.BindValueChanged( v => {
-			FocusedPanel?.Content.ReleaseAllInput();
-			UseTouch = v.NewValue;
+			if ( v.NewValue )
+				source.ReleaseMouse();
+			else
+				source.TouchUp();
+
 			touchDown = false;
 		} );
 	}
@@ -59,7 +58,7 @@ public class PanelInteractionSystem : Drawable {
 		e.Target = Scene;
 		if ( UseTouch ) {
 			if ( touchDown && TryHit( e.MousePosition, out var pos ) == FocusedPanel ) {
-				FocusedPanel!.Content.TouchMove( this, pos );
+				source.TouchMove( pos );
 				return true;
 			}
 		}
@@ -73,9 +72,8 @@ public class PanelInteractionSystem : Drawable {
 
 	protected override bool OnDragStart ( DragStartEvent e ) {
 		e.Target = Scene;
-		if ( TryHit( e.MouseDownPosition, out _ ) != null ) {
+		if ( TryHit( e.MouseDownPosition, out _ ) != null ) 			
 			return false;
-		}
 
 		return base.OnDragStart( e );
 	}
@@ -87,11 +85,11 @@ public class PanelInteractionSystem : Drawable {
 
 			if ( UseTouch ) {
 				touchDown = true;
-				panel.Content.TouchDown( this, pos );
+				source.TouchDown( pos );
 			}
 			else {
-				panel.Content.MoveMouse( pos );
-				panel.Content.Press( e.Button );
+				source.MoveMouse( pos );
+				source.Press( e.Button );
 			}
 
 			return true;
@@ -106,10 +104,10 @@ public class PanelInteractionSystem : Drawable {
 	protected override void OnMouseUp ( MouseUpEvent e ) {
 		if ( UseTouch ) {
 			touchDown = false;
-			FocusedPanel?.Content.TouchUp( this );
+			source.TouchUp();
 		}
 		else {
-			FocusedPanel?.Content.Release( e.Button );
+			source.Release( e.Button );
 		}
 	}
 
@@ -125,8 +123,8 @@ public class PanelInteractionSystem : Drawable {
 
 	protected override bool OnKeyDown ( KeyDownEvent e ) {
 		e.Target = Scene;
-		if ( FocusedPanel is Panel panel ) {
-			panel.Content.Press( e.Key );
+		if ( FocusedPanel != null ) {
+			source.Press( e.Key );
 			return true;
 		}
 
@@ -135,8 +133,8 @@ public class PanelInteractionSystem : Drawable {
 
 	protected override void OnKeyUp ( KeyUpEvent e ) {
 		e.Target = Scene;
-		if ( FocusedPanel is Panel panel ) {
-			panel.Content.Release( e.Key );
+		if ( FocusedPanel != null ) {
+			source.Release( e.Key );
 			return;
 		}
 

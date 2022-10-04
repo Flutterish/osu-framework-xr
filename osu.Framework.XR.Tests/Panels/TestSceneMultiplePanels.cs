@@ -6,19 +6,19 @@ using osu.Framework.Utils;
 using osu.Framework.XR.Graphics.Panels;
 using osuTK.Graphics;
 using osu.Framework.XR.Physics;
-using osu.Framework.XR.Components;
 using osu.Framework.XR.Testing;
 using osuTK;
+using osu.Framework.XR.Input;
 
 namespace osu.Framework.XR.Tests.Panels;
 
 public class TestSceneMultiplePanels : TestScene3D {
 	PhysicsSystem physics = new();
-	PanelInteractionSystem interactionSystem;
+	BasicPanelInteractionSource interactionSystem;
 
 	public TestSceneMultiplePanels () {
 		physics.AddSubtree( Scene.Root );
-		Add( interactionSystem = new PanelInteractionSystem( Scene, physics ) { RelativeSizeAxes = Axes.Both } );
+		Add( interactionSystem = new BasicPanelInteractionSource( Scene, physics, new() ) { RelativeSizeAxes = Axes.Both } );
 
 		Scene.Add( createPanel( new( RNG.NextSingle( -5, 5 ), RNG.NextSingle( -5, 5 ), RNG.NextSingle( -5, 5 ) ) ) );
 		Scene.Add( createPanel( new( RNG.NextSingle( -5, 5 ), RNG.NextSingle( -5, 5 ), RNG.NextSingle( -5, 5 ) ) ) );

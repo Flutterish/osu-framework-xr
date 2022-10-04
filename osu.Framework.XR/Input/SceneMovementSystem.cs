@@ -3,7 +3,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.XR.Graphics.Rendering;
 using osu.Framework.XR.Maths;
 
-namespace osu.Framework.XR.Components;
+namespace osu.Framework.XR.Input;
 
 /// <summary>
 /// A system which allows pointer and keyboard movement though a scene.
@@ -62,9 +62,7 @@ public class SceneMovementSystem : Drawable {
 	}
 
 	protected override bool OnScroll ( ScrollEvent e ) {
-		if ( ControlType is ControlType.Orbit ) {
-			Scene.Camera.Position = cameraOrigin + ( Scene.Camera.Position - cameraOrigin ) * ( 1 + e.ScrollDelta.Y / 10 );
-		}
+		if ( ControlType is ControlType.Orbit ) 			Scene.Camera.Position = cameraOrigin + ( Scene.Camera.Position - cameraOrigin ) * ( 1 + e.ScrollDelta.Y / 10 );
 
 		return base.OnScroll( e );
 	}
