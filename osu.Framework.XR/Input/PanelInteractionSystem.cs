@@ -38,7 +38,7 @@ public class PanelInteractionSystem {
 	Dictionary<object, Source> sources = new();
 	public Source GetSource ( object source ) {
 		if ( !sources.TryGetValue( source, out var v ) )
-			sources.Add( sources, v = new( this ) );
+			sources.Add( source, v = new( this ) );
 
 		return v;
 	}
