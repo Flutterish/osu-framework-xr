@@ -134,8 +134,8 @@ public partial class Panel : Drawable3D, IHasCollider {
 		colliderMesh.InvalidateMatrix();
 	}
 
-	protected override void Update () {
-		base.Update();
+	protected override void UpdateAfterChildren () {
+		base.UpdateAfterChildren();
 
 		if ( !MeshCache.IsValid ) {
 			Mesh.Clear();

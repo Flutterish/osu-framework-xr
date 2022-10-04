@@ -55,23 +55,25 @@ public partial class Panel {
 
 		public override void Draw ( IRenderer renderer, object? ctx = null ) {
 			SwitchTo2DContext( renderer );
+			Vector2I size = new( (int)Size.X, (int)Size.Y );
+			RectangleI rect = new( 0, 0, size.X, size.Y );
 			FrameBuffer ??= renderer.CreateFrameBuffer( new[] { RenderBufferFormat.D32S8 } );
-			FrameBuffer.Size = Size;
+			FrameBuffer.Size = size;
 			FrameBuffer.Bind();
 			renderer.PushMaskingInfo( new MaskingInfo {
-				ScreenSpaceAABB = new( 0, 0, (int)Size.X, (int)Size.Y ),
-				MaskingRect = new( 0, 0, Size.X, Size.Y ),
+				ScreenSpaceAABB = rect,
+				MaskingRect = rect,
 				ToMaskingSpace = Matrix3.Identity,
 				BlendRange = 1,
 				AlphaExponent = 1,
 				CornerExponent = 2.5f
 			}, true );
-			renderer.PushViewport( new( 0, 0, (int)Size.X, (int)Size.Y ) );
-			renderer.PushOrtho( new( 0, 0, Size.X, Size.Y ) );
+			renderer.PushViewport( rect );
+			renderer.PushOrtho( rect );
 			renderer.PushDepthInfo( new() );
 			renderer.PushStencilInfo( StencilInfo.Default );
 			renderer.PushScissorState( true );
-			renderer.PushScissor( new( 0, 0, (int)Size.X, (int)Size.Y ) );
+			renderer.PushScissor( rect );
 			renderer.PushScissorOffset( Vector2I.Zero );
 			renderer.Clear( new( colour: Color4.Transparent ) );
 
