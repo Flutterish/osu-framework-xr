@@ -1,4 +1,5 @@
 ﻿using OpenVR.NET.Devices;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.XR.Graphics;
@@ -16,6 +17,8 @@ public class BasicVrDevice : CompositeDrawable3D {
 		Source = source;
 	}
 
+	public readonly BindableBool UseRealtimePosition = new( true );
+
 	[BackgroundDependencyLoader]
 	private void load ( IRenderer renderer, VrResourceStore resources ) {
 		if ( Source.Model is DeviceModel model ) {
@@ -25,6 +28,7 @@ public class BasicVrDevice : CompositeDrawable3D {
 						return;
 
 					BasicVrDeviceComponent child = new( Source, i ) { Mesh = mesh! };
+					child.UseRealtimePosition.BindTo( UseRealtimePosition );
 
 					if ( tx != null ) {
 						child.OnLoadComplete += c => {
@@ -55,7 +59,11 @@ public class BasicVrDevice : CompositeDrawable3D {
 		public BasicVrDeviceComponent ( VrDevice device, ComponentModel source ) {
 			Source = source;
 			Device = device;
+
+			UseRealtimePosition.BindValueChanged( v => Invalidate( Invalidation.DrawNode ) );
 		}
+
+		public readonly BindableBool UseRealtimePosition = new( true );
 
 		bool wasVisible = false;
 		bool isVisible;
@@ -87,6 +95,7 @@ public class BasicVrDevice : CompositeDrawable3D {
 
 			Matrix4 parentMatrix;
 			bool isVisible;
+			bool isRealtime;
 			public DrawNode ( BasicVrDeviceComponent source, int index ) : base( source, index ) {
 				parentMatrix = source.Parent!.Parent?.Matrix ?? Matrix4.Identity;
 			}
@@ -94,23 +103,26 @@ public class BasicVrDevice : CompositeDrawable3D {
 			protected override void UpdateState () {
 				base.UpdateState();
 				isVisible = Source.isVisible;
+				isRealtime = Source.UseRealtimePosition.Value;
 			}
 
 			public override void Draw ( IRenderer renderer, object? ctx = null ) {
 				if ( !isVisible )
 					return;
 
-				Matrix = parentMatrix;
+				if ( isRealtime ) {
+					Matrix = parentMatrix;
 
-				var maybeState = ( Source.Device as Controller )?.GetComponentState( Source.Source );
-				if ( maybeState is Controller.ComponentState state ) {
-					Matrix *= Matrix4.CreateFromQuaternion( state.Rotation.ToOsuTk() ) 
-							* Matrix4.CreateTranslation( state.Position.ToOsuTk() );
+					var maybeState = ( Source.Device as Controller )?.GetComponentState( Source.Source );
+					if ( maybeState is Controller.ComponentState state ) {
+						Matrix *= Matrix4.CreateFromQuaternion( state.Rotation.ToOsuTk() )
+								* Matrix4.CreateTranslation( state.Position.ToOsuTk() );
+					}
+
+					Matrix *= Matrix4.CreateFromQuaternion( Source.Device.RenderRotation.ToOsuTk() )
+							* Matrix4.CreateTranslation( Source.Device.RenderPosition.ToOsuTk() );
 				}
-
-				Matrix *= Matrix4.CreateFromQuaternion( Source.Device.RenderRotation.ToOsuTk() )
-						* Matrix4.CreateTranslation( Source.Device.RenderPosition.ToOsuTk() );
-
+				
 				base.Draw( renderer, ctx );
 			}
 		}
