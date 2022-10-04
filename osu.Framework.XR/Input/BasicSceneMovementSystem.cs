@@ -8,11 +8,11 @@ namespace osu.Framework.XR.Input;
 /// <summary>
 /// A system which allows pointer and keyboard movement though a scene.
 /// </summary>
-public class SceneMovementSystem : Drawable {
+public class BasicSceneMovementSystem : Drawable {
 	protected readonly Scene Scene;
 	public ControlType ControlType = ControlType.Orbit;
 	Vector3 cameraOrigin;
-	public SceneMovementSystem ( Scene scene ) {
+	public BasicSceneMovementSystem ( Scene scene ) {
 		Scene = scene;
 		Scene.Camera.Z = -10;
 	}

@@ -7,7 +7,7 @@ namespace osu.Framework.XR.Testing;
 
 public abstract class TestScene3D : TestScene {
 	protected readonly Scene Scene;
-	protected readonly SceneMovementSystem MovementSystem;
+	protected readonly BasicSceneMovementSystem MovementSystem;
 
 	public ControlType ControlType {
 		get => MovementSystem.ControlType;
@@ -18,7 +18,7 @@ public abstract class TestScene3D : TestScene {
 		Add( Scene = CreateScene() );
 		Scene.RelativeSizeAxes = Framework.Graphics.Axes.Both;
 
-		Add( MovementSystem = new SceneMovementSystem( Scene ) );
+		Add( MovementSystem = new BasicSceneMovementSystem( Scene ) );
 	}
 
 	protected override bool Handle ( UIEvent e ) {
