@@ -51,8 +51,10 @@ public static class Extensions {
 		return cross.Normalized();
 	}
 
-	public static Vector3 ExtractCameraPosition ( this Matrix4 projectionMatrix )
-		=> new Matrix3( projectionMatrix ) * -projectionMatrix.Row3.Xyz;
+	public static Vector3 ExtractCameraPosition ( this Matrix4 projectionMatrix ) {
+		var inv = projectionMatrix.Inverted();
+		return inv.Apply( Vector3.Zero ) / inv.Column3.W;
+	}
 
 	public static Vector2 ToOsuTk ( this System.Numerics.Vector2 vec )
 		=> new( vec.X, vec.Y );
