@@ -34,30 +34,57 @@ public partial class Scene : CompositeDrawable {
 
 	public Scene () {
 		onRenderStageChangedDelegate = onRenderStageChanged;
+		onVisibilityChangedDelegate = onVisibilityChanged;
 		AddInternal( Root );
 		Root.SubscribeSubtreeModified( 
 			added: ( d, p, _ ) => {
 				if ( d is IUnrenderable )
 					return;
 
+				d.RenderStageChanged += onRenderStageChangedDelegate;
+				d.VisibilityChanged += onVisibilityChangedDelegate;
+
+				if ( !d.IsRendered )
+					return;
+
 				drawables.Add( d );
 				drawableQueue.Enqueue( (d, true, d.RenderStage) );
-				d.RenderStageChanged += onRenderStageChangedDelegate;
 			}, 
 			removed: ( d, p, _ ) => {
 				if ( d is IUnrenderable )
 					return;
 
+				d.RenderStageChanged -= onRenderStageChangedDelegate;
+				d.VisibilityChanged -= onVisibilityChangedDelegate;
+
+				if ( !d.IsRendered )
+					return;
+
 				drawables.Remove( d );
 				drawableQueue.Enqueue( (d, false, d.RenderStage) );
-				d.RenderStageChanged -= onRenderStageChangedDelegate;
 			} 
 		);
 	}
 
 	// cached delegate to avoid allocs
+	Action<Drawable3D, bool> onVisibilityChangedDelegate;
+	private void onVisibilityChanged ( Drawable3D drawable, bool isRendered ) {
+		if ( isRendered ) {
+			drawables.Add( drawable );
+			drawableQueue.Enqueue( (drawable, true, drawable.RenderStage) );
+		}
+		else {
+			drawables.Remove( drawable );
+			drawableQueue.Enqueue( (drawable, false, drawable.RenderStage) );
+		}
+	}
+
+	// cached delegate to avoid allocs
 	Drawable3D.RenderStageChangedHandler onRenderStageChangedDelegate;
 	private void onRenderStageChanged ( Drawable3D drawable, Enum from, Enum to ) {
+		if ( !drawable.IsRendered )
+			return;
+
 		drawableQueue.Enqueue( (drawable, false, from) );
 		drawableQueue.Enqueue( (drawable, true, to) );
 	}

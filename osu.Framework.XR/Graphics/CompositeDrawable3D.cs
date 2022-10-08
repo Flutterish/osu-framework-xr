@@ -13,6 +13,13 @@ public class CompositeDrawable3D : Drawable3D {
 			AddRangeInternal( value );
 		}
 	}
+	new protected Drawable3D InternalChild {
+		get => internalChildren.Single();
+		set {
+			ClearInternal();
+			AddInternal( value );
+		}
+	}
 	new protected IReadOnlyList<Drawable3D> AliveInternalChildren => InternalChildren;
 
 	public CompositeDrawable3D () {
@@ -29,6 +36,7 @@ public class CompositeDrawable3D : Drawable3D {
 		child.Parent = this;
 		children.Add( child );
 		base.AddInternal( child );
+		child.IsSupertreeVisible = IsRendered;
 		if ( !ShouldUpdateChildrenLife )
 			MakeChildAlive( child );
 
@@ -76,6 +84,36 @@ public class CompositeDrawable3D : Drawable3D {
 	protected virtual bool ShouldUpdateChildrenLife => false;
 	protected override bool UpdateChildrenLife () {
 		return ShouldUpdateChildrenLife ? base.UpdateChildrenLife() : false;
+	}
+
+	/// <summary>
+	/// Whether this drawable and its children should be rendered. 
+	/// This does not affect whether it is updated
+	/// </summary>
+	public override bool IsVisible {
+		get => base.IsVisible;
+		set {
+			if ( IsVisible == value )
+				return;
+
+			base.IsVisible = value;
+			foreach ( var i in children ) {
+				i.IsSupertreeVisible = IsRendered;
+			}
+		}
+	}
+
+	public override bool IsSupertreeVisible { 
+		get => base.IsSupertreeVisible; 
+		internal set {
+			if ( IsSupertreeVisible == value )
+				return;
+
+			base.IsSupertreeVisible = value;
+			foreach ( var i in children ) {
+				i.IsSupertreeVisible = IsRendered;
+			}
+		}
 	}
 
 	protected override void InvalidateMatrix () {

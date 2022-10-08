@@ -44,6 +44,43 @@ public partial class Drawable3D : CompositeDrawable {
 	}
 	public delegate void RenderStageChangedHandler ( Drawable3D drawable, Enum from, Enum to );
 	public event RenderStageChangedHandler? RenderStageChanged;
+	public event Action<Drawable3D, bool>? VisibilityChanged;
+
+	bool isVisible = true;
+	/// <summary>
+	/// Whether this drawable should be rendered. 
+	/// This does not affect whether it is updated
+	/// </summary>
+	public virtual bool IsVisible {
+		get => isVisible;
+		set {
+			var prev = IsRendered;
+			isVisible = value;
+			if ( prev != IsRendered )
+				VisibilityChanged?.Invoke( this, IsRendered );
+		}
+	}
+
+	bool isSupertreeVisible = true;
+	/// <summary>
+	/// Whether the parent and all its parents are visible
+	/// </summary>
+	public virtual bool IsSupertreeVisible {
+		get => isSupertreeVisible;
+		[Friend( typeof( CompositeDrawable3D ) )]
+		internal set {
+			var prev = IsRendered;
+			isSupertreeVisible = value;
+			if ( prev != IsRendered )
+				VisibilityChanged?.Invoke( this, IsRendered );
+		}
+	}
+
+	/// <summary>
+	/// Whether this drawable is being rendered. 
+	/// This is only true when this <see cref="IsVisible"/> and <see cref="IsSupertreeVisible"/> are both <see langword="true"/>
+	/// </summary>
+	public bool IsRendered => isVisible && IsSupertreeVisible;
 
 	/// <summary>
 	/// Render layer expressed as a bitfield (or custom via the given render pipeline).

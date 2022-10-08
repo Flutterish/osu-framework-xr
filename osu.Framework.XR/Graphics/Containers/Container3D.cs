@@ -13,6 +13,13 @@ public class Container3D<T> : CompositeDrawable3D where T : Drawable3D {
 			AddRange( value );
 		}
 	}
+	public T Child {
+		get => Children.Single();
+		set {
+			Clear();
+			Add( value );
+		}
+	}
 	private IReadOnlyList<T> internalChildrenAsT;
 
 	static readonly bool storesDrawable3D = typeof( T ) == typeof( Drawable3D );
