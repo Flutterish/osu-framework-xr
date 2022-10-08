@@ -172,4 +172,81 @@ public partial class Drawable3D : IHasMatrix {
 	public Vector3 Back => ( Rotation * new Vector4( 0, 0, -1, 1 ) ).Xyz;
 	public Vector3 Left => ( Rotation * new Vector4( -1, 0, 0, 1 ) ).Xyz;
 	public Vector3 Down => ( Rotation * new Vector4( 0, -1, 0, 1 ) ).Xyz;
+
+	/// <summary>
+	/// The absolute position on the scene
+	/// </summary>
+	public Vector3 GlobalPosition {
+		get => Matrix.ExtractTranslation();
+		set {
+			if ( parent is null )
+				Position = value;
+			else
+				Position = parent.Matrix.Inverted().Apply( value );
+		}
+	}
+	/// <inheritdoc cref="GlobalPosition"/>
+	public float GlobalX { 
+		get => GlobalPosition.X; 
+		set => GlobalPosition = GlobalPosition with { X = value }; 
+	}
+	/// <inheritdoc cref="GlobalPosition"/>
+	public float GlobalY { 
+		get => GlobalPosition.Y; 
+		set => GlobalPosition = GlobalPosition with { Y = value }; 
+	}
+	/// <inheritdoc cref="GlobalPosition"/>
+	public float GlobalZ { 
+		get => GlobalPosition.Z; 
+		set => GlobalPosition = GlobalPosition with { Z = value }; 
+	}
+	/// <summary>
+	/// The absolute rotation on the scene
+	/// </summary>
+	public Quaternion GlobalRotation {
+		get => parent is null ? Rotation : (parent.GlobalRotation * Rotation);
+		set {
+			if ( parent is null )
+				Rotation = value;
+			else
+				Rotation = parent.GlobalRotation.Inverted() * value;
+		}
+	}
+	/// <inheritdoc cref="GlobalRotation"/>
+	public Vector3 GlobalEulerRotation {
+		get => rotation.ToEuler();
+		set => GlobalRotation = Quaternion.FromEulerAngles( value );
+	}
+	/// <inheritdoc cref="GlobalRotation"/>
+	public float GlobalEulerX {
+		get => GlobalEulerRotation.X;
+		set => GlobalRotation = Quaternion.FromEulerAngles( GlobalEulerRotation with { X = value } );
+	}
+	/// <inheritdoc cref="GlobalRotation"/>
+	public float GlobalEulerY {
+		get => GlobalEulerRotation.Y;
+		set => GlobalRotation = Quaternion.FromEulerAngles( GlobalEulerRotation with { Y = value } );
+	}
+	/// <inheritdoc cref="GlobalRotation"/>
+	public float GlobalEulerZ {
+		get => GlobalEulerRotation.Z;
+		set => GlobalRotation = Quaternion.FromEulerAngles( GlobalEulerRotation with { Z = value } );
+	}
+	/// <summary>
+	/// The (lossy) absolute scale on the scene. This value will not be accurate if the matrix has any skew
+	/// </summary>
+	public Vector3 GlobalScale => Matrix.ExtractScale();
+	/// <inheritdoc cref="GlobalScale"/>
+	public float GlobalScaleX => GlobalScale.X;
+	/// <inheritdoc cref="GlobalScale"/>
+	public float GlobalScaleY => GlobalScale.Y;
+	/// <inheritdoc cref="GlobalScale"/>
+	public float GlobalScaleZ => GlobalScale.Z;
+
+	public Vector3 GlobalForward => ( GlobalRotation * new Vector4( 0, 0, 1, 1 ) ).Xyz;
+	public Vector3 GlobalRight => ( GlobalRotation * new Vector4( 1, 0, 0, 1 ) ).Xyz;
+	public Vector3 GlobalUp => ( GlobalRotation * new Vector4( 0, 1, 0, 1 ) ).Xyz;
+	public Vector3 GlobalBack => ( GlobalRotation * new Vector4( 0, 0, -1, 1 ) ).Xyz;
+	public Vector3 GlobalLeft => ( GlobalRotation * new Vector4( -1, 0, 0, 1 ) ).Xyz;
+	public Vector3 GlobalDown => ( GlobalRotation * new Vector4( 0, -1, 0, 1 ) ).Xyz;
 }

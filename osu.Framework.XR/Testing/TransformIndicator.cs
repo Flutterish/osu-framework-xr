@@ -56,7 +56,7 @@ public class TransformIndicator : CompositeDrawable {
 				return;
 
 			rotLock = true;
-			rot.Current.Value = Quaternion.FromMatrix( new Matrix3( Matrix4.LookAt( pos.Value, v.NewValue, Vector3.UnitY ) ) );
+			rot.Current.Value = ( v.NewValue - pos.Value ).LookRotation();
 			rotLock = false;
 		} );
 
