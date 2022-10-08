@@ -63,6 +63,11 @@ public class BasicVrDevice : CompositeDrawable3D {
 			UseRealtimePosition.BindValueChanged( v => Invalidate( Invalidation.DrawNode ) );
 		}
 
+		protected override void LoadComplete () {
+			base.LoadComplete();
+			Material.Set( "useGamma", true );
+		}
+
 		public readonly BindableBool UseRealtimePosition = new( true );
 
 		bool wasVisible = false;

@@ -124,8 +124,8 @@ public class VrCompositor : Drawable {
 			pipeline.Draw( renderer, left, headTransform.Inverted() * lEye * Matrix4.CreateScale( 1, 1, -1 ) * lProj );
 			pipeline.Draw( renderer, right, headTransform.Inverted() * rEye * Matrix4.CreateScale( 1, 1, -1 ) * rProj );
 
-			context.SubmitFrame( Valve.VR.EVREye.Eye_Left, new() { eType = Valve.VR.ETextureType.OpenGL, handle = GetTexturePointer( left.Texture ) } );
-			context.SubmitFrame( Valve.VR.EVREye.Eye_Right, new() { eType = Valve.VR.ETextureType.OpenGL, handle = GetTexturePointer( right.Texture ) } );
+			context.SubmitFrame( Valve.VR.EVREye.Eye_Left, new() { eColorSpace = Valve.VR.EColorSpace.Linear, eType = Valve.VR.ETextureType.OpenGL, handle = GetTexturePointer( left.Texture ) } );
+			context.SubmitFrame( Valve.VR.EVREye.Eye_Right, new() { eColorSpace = Valve.VR.EColorSpace.Linear, eType = Valve.VR.ETextureType.OpenGL, handle = GetTexturePointer( right.Texture ) } );
 		}
 
 		protected override void Dispose ( bool isDisposing ) {
