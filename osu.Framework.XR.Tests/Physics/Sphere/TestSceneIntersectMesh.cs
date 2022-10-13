@@ -1,5 +1,6 @@
 ﻿using osu.Framework.XR.Graphics;
 using osu.Framework.XR.Graphics.Meshes;
+using osu.Framework.XR.Physics;
 using osu.Framework.XR.Testing;
 using osuTK;
 
@@ -23,7 +24,8 @@ public class TestSceneIntersectMesh : BasicTestScene {
 			model.Position = pos;
 			model.Rotation = rot;
 
-			if ( XR.Physics.Sphere.TryHit( origin, radius, model, out var sphereHit ) ) {
+			SphereHit sphereHit = new();
+			if ( XR.Physics.Sphere.TryHit( origin, radius, model, ref sphereHit ) ) {
 				hit.Current.Value = sphereHit.Point;
 				hit.Alpha = 1;
 			}

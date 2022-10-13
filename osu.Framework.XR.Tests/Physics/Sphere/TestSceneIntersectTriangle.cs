@@ -1,4 +1,5 @@
-﻿using osu.Framework.XR.Testing;
+﻿using osu.Framework.XR.Physics;
+using osu.Framework.XR.Testing;
 using osuTK;
 
 namespace osu.Framework.XR.Tests.Physics.Sphere;
@@ -19,7 +20,8 @@ public class TestSceneIntersectTriangle : BasicTestScene {
 		sphere.Current.Value = new Vector3( 0, 0, 1 );
 
 		(triangle.PointA, triangle.PointB, triangle.PointC, sphere.Current, sphere.RadiusBindable).BindValuesChanged( ( _, _, _, origin, radius ) => {
-			if ( XR.Physics.Sphere.TryHit( origin, radius, triangle.Face, out var sphereHit ) ) {
+			SphereHit sphereHit = new();
+			if ( XR.Physics.Sphere.TryHit( origin, radius, triangle.Face, ref sphereHit ) ) {
 				hit.Current.Value = sphereHit.Point;
 				hit.Alpha = 1;
 			}

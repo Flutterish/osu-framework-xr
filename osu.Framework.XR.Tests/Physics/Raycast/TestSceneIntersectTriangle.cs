@@ -1,4 +1,5 @@
-﻿using osu.Framework.XR.Testing;
+﻿using osu.Framework.XR.Physics;
+using osu.Framework.XR.Testing;
 using osuTK;
 
 namespace osu.Framework.XR.Tests.Physics.Raycast;
@@ -20,7 +21,8 @@ public class TestSceneIntersectTriangle : BasicTestScene {
 		ray.LookCurrent.Value = -Vector3.UnitY;
 
 		(triangle.PointA, triangle.PointB, triangle.PointC, ray.OriginCurrent, ray.LookCurrent, ray.IsBidirectionalBindable).BindValuesChanged( ( _, _, _, rayOrigin, _, bi ) => {
-			if ( XR.Physics.Raycast.TryHit( rayOrigin, ray.Direction, triangle.Face, out var raycastHit, bi ) ) {
+			RaycastHit raycastHit = new();
+			if ( XR.Physics.Raycast.TryHit( rayOrigin, ray.Direction, triangle.Face, ref raycastHit, bi ) ) {
 				hit.Current.Value = raycastHit.Point;
 				hit.Alpha = 1;
 			}

@@ -4,11 +4,14 @@ using osu.Framework.XR.Maths;
 namespace osu.Framework.XR.Physics;
 
 public static class Raycast {
+	[ThreadStatic]
+	static RaycastHit swapHit; // used for temp values with ref swapping
+
 	/// <summary>
 	/// Intersect a ray and a plane.
 	/// <paramref name="direction"/> and <paramref name="planeNormal"/> must be normal vectors.
 	/// </summary>
-	public static bool TryHitPrenormalized ( Vector3 origin, Vector3 direction, Vector3 pointOnPlane, Vector3 planeNormal, out RaycastHit hit, bool includeBehind = false ) {
+	public static bool TryHitPrenormalized ( Vector3 origin, Vector3 direction, Vector3 pointOnPlane, Vector3 planeNormal, ref RaycastHit hit, bool includeBehind = false ) {
 		// plane := all points where ( point - pointOnPlane ) dot planeNormal = 0
 		// line := all points where ( point - pointOnLine ) - d * direction = 0
 		// in other words, point = pointOnLine + d * direction
@@ -20,37 +23,31 @@ public static class Raycast {
 		var dot = Vector3.Dot( direction, planeNormal );
 		if ( dot == 0 ) {
 			if ( Vector3.Dot( origin - pointOnPlane, planeNormal ) == 0 ) {
-				hit = new RaycastHit {
-					Point = origin,
-					Origin = origin,
-					Normal = planeNormal,
-					Direction = direction
-				};
+				hit.Point = origin;
+				hit.Origin = origin;
+				hit.Normal = planeNormal;
+				hit.Direction = direction;
 				return true;
 			}
 			else {
-				hit = default;
 				return false;
 			}
 		}
 		else {
 			var distance = Vector3.Dot( pointOnPlane - origin, planeNormal ) / dot;
-
-			hit = new RaycastHit {
-				Point = origin + direction * distance,
-				Origin = origin,
-				Normal = planeNormal,
-				Direction = direction,
-				Distance = distance
-			};
+			hit.Point = origin + direction * distance;
+			hit.Origin = origin;
+			hit.Normal = planeNormal;
+			hit.Direction = direction;
+			hit.Distance = distance;
 			return distance >= 0 || includeBehind;
 		}
 	}
 	/// <summary>
 	/// Intersect a ray and a plane.
 	/// </summary>
-	public static bool TryHit ( Vector3 origin, Vector3 direction, Vector3 pointOnPlane, Vector3 planeNormal, out RaycastHit hit, bool includeBehind = false )
-		=> TryHitPrenormalized( origin, direction.Normalized(), pointOnPlane, planeNormal.Normalized(), out hit, includeBehind );
+	public static bool TryHit ( Vector3 origin, Vector3 direction, Vector3 pointOnPlane, Vector3 planeNormal, ref RaycastHit hit, bool includeBehind = false )
+		=> TryHitPrenormalized( origin, direction.Normalized(), pointOnPlane, planeNormal.Normalized(), ref hit, includeBehind );
 
 	/// <summary>
 	/// Finds points on both lines that are closest to the other line.
@@ -94,30 +91,30 @@ public static class Raycast {
 	/// Intersect a ray and a triangle.
 	/// <paramref name="direction"/> must be a normal vector.
 	/// </summary>
-	public static bool TryHitPrenormalized ( Vector3 origin, Vector3 direction, Face face, out RaycastHit hit, bool includeBehind = false ) {
+	public static bool TryHitPrenormalized ( Vector3 origin, Vector3 direction, Face face, ref RaycastHit hit, bool includeBehind = false ) {
 		var normal = Vector3.Cross( face.B - face.A, face.C - face.A );
 		// we want the normal to be pointing towards the hit origin
 		if ( Vector3.Dot( normal, direction ) > 0 ) {
 			normal *= -1;
 		}
 
-		if ( TryHitPrenormalized( origin, direction, face.A, normal.Normalized(), out hit, includeBehind ) ) {
+		if ( TryHitPrenormalized( origin, direction, face.A, normal.Normalized(), ref hit, includeBehind ) ) {
 			return Triangles.IsPointInside( hit.Point, face );
 		}
 
-		hit = default;
 		return false;
 	}
 	/// <summary>
 	/// Intersect a ray and a triangle.
 	/// </summary>
-	public static bool TryHit ( Vector3 origin, Vector3 direction, Face face, out RaycastHit hit, bool includeBehind = false )
-		=> TryHitPrenormalized( origin, direction.Normalized(), face, out hit, includeBehind );
+	public static bool TryHit ( Vector3 origin, Vector3 direction, Face face, ref RaycastHit hit, bool includeBehind = false )
+		=> TryHitPrenormalized( origin, direction.Normalized(), face, ref hit, includeBehind );
 
 	/// <summary>
 	/// Checks if a ray intersects an axis aligned box.
 	/// </summary>
 	public static bool Intersects ( Vector3 origin, Vector3 direction, AABox box, bool includeBehind = false ) {
+		// TODO simplify this? also use includeBehind
 		if ( direction.X == 0 ) {
 			if ( origin.X < box.Min.X || origin.X > box.Max.X ) return false;
 		}
@@ -165,93 +162,103 @@ public static class Raycast {
 	/// Intersect a ray and a Mesh.
 	/// <paramref name="direction"/> must be a normal vector.
 	/// </summary>
-	public static bool TryHitPrenormalized ( Vector3 origin, Vector3 direction, ITriangleMesh mesh, Matrix4 transform, out RaycastHit hit, bool includeBehind = false ) {
+	public static bool TryHitPrenormalized ( Vector3 origin, Vector3 direction, ITriangleMesh mesh, Matrix4 transform, ref RaycastHit hit, bool includeBehind = false ) {
 		var tris = mesh.TriangleCount;
 		if ( tris > 6 ) {
 			if ( !Intersects( origin, direction, mesh.BoundingBox * transform, includeBehind ) ) {
-				hit = default;
 				return false;
 			}
 		}
-		RaycastHit? closest = null;
+
+		bool hasResult = false;
+		ref RaycastHit closest = ref swapHit;
+		ref RaycastHit swap = ref hit;
 
 		for ( int i = 0; i < tris; i++ ) {
 			var face = mesh.GetTriangleFace( i );
 			face.A = transform.Apply( face.A );
 			face.B = transform.Apply( face.B );
 			face.C = transform.Apply( face.C );
-			if ( TryHitPrenormalized( origin, direction, face, out hit, includeBehind ) && ( closest is null || Math.Abs( closest.Value.Distance ) > Math.Abs( hit.Distance ) ) ) {
-				closest = hit with { TrisIndex = i };
+			if ( TryHitPrenormalized( origin, direction, face, ref swap, includeBehind ) && ( !hasResult || Math.Abs( closest.Distance ) > Math.Abs( swap.Distance ) ) ) {
+				ref RaycastHit temp = ref closest;
+				closest = ref swap;
+				swap = ref temp;
+				closest.TrisIndex = i;
+				hasResult = true;
 			}
 		}
 
-		if ( closest is null ) {
-			hit = default;
-			return false;
+		if ( hasResult ) {
+			hit = closest;
+			return true;
 		}
 		else {
-			hit = closest.Value;
-			return true;
+			return false;
 		}
 	}
 	/// <summary>
 	/// Intersect a ray and a Mesh.
 	/// </summary>
-	public static bool TryHit ( Vector3 origin, Vector3 direction, ITriangleMesh mesh, Matrix4 transform, out RaycastHit hit, bool includeBehind = false )
-		=> TryHitPrenormalized( origin, direction.Normalized(), mesh, transform, out hit, includeBehind );
+	public static bool TryHit ( Vector3 origin, Vector3 direction, ITriangleMesh mesh, Matrix4 transform, ref RaycastHit hit, bool includeBehind = false )
+		=> TryHitPrenormalized( origin, direction.Normalized(), mesh, transform, ref hit, includeBehind );
 
 	/// <summary>
 	/// Intersect a ray and a Mesh.
 	/// <paramref name="direction"/> must be a normal vector.
 	/// </summary>
-	public static bool TryHitPrenormalized ( Vector3 origin, Vector3 direction, ITriangleMesh mesh, out RaycastHit hit, bool includeBehind = false ) {
+	public static bool TryHitPrenormalized ( Vector3 origin, Vector3 direction, ITriangleMesh mesh, ref RaycastHit hit, bool includeBehind = false ) {
 		var tris = mesh.TriangleCount;
 		if ( tris > 6 ) {
 			if ( !Intersects( origin, direction, mesh.BoundingBox, includeBehind ) ) {
-				hit = default;
 				return false;
 			}
 		}
-		RaycastHit? closest = null;
+
+		bool hasResult = false;
+		ref RaycastHit closest = ref swapHit;
+		ref RaycastHit swap = ref hit;
 
 		for ( int i = 0; i < tris; i++ ) {
 			var face = mesh.GetTriangleFace( i );
-			if ( TryHitPrenormalized( origin, direction, face, out hit, includeBehind ) && ( closest is null || Math.Abs( closest.Value.Distance ) > Math.Abs( hit.Distance ) ) ) {
-				closest = hit with { TrisIndex = i };
+			if ( TryHitPrenormalized( origin, direction, face, ref swap, includeBehind ) && ( !hasResult || Math.Abs( closest.Distance ) > Math.Abs( swap.Distance ) ) ) {
+				ref RaycastHit temp = ref closest;
+				closest = ref swap;
+				swap = ref temp;
+				closest.TrisIndex = i;
+				hasResult = true;
 			}
 		}
 
-		if ( closest is null ) {
-			hit = default;
-			return false;
+		if ( hasResult ) {
+			hit = closest;
+			return true;
 		}
 		else {
-			hit = closest.Value;
-			return true;
+			return false;
 		}
 	}
 	/// <summary>
 	/// Intersect a ray and a Mesh.
 	/// </summary>
-	public static bool TryHit ( Vector3 origin, Vector3 direction, ITriangleMesh mesh, out RaycastHit hit, bool includeBehind = false )
-		=> TryHitPrenormalized( origin, direction.Normalized(), mesh, out hit, includeBehind );
+	public static bool TryHit ( Vector3 origin, Vector3 direction, ITriangleMesh mesh, ref RaycastHit hit, bool includeBehind = false )
+		=> TryHitPrenormalized( origin, direction.Normalized(), mesh, ref hit, includeBehind );
 
 	/// <summary>
 	/// Intersect a ray and a Mesh.
 	/// <paramref name="direction"/> must be a normal vector.
 	/// </summary>
-	public static bool TryHitPrenormalized ( Vector3 origin, Vector3 direction, IHasCollider target, out RaycastHit hit, bool includeBehind = false ) {
-		var ok = TryHitPrenormalized( origin, direction, target.ColliderMesh, out hit, includeBehind );
-		if ( ok ) {
-			hit = hit with { Collider = target };
+	public static bool TryHitPrenormalized ( Vector3 origin, Vector3 direction, IHasCollider target, ref RaycastHit hit, bool includeBehind = false ) {
+		if ( TryHitPrenormalized( origin, direction, target.ColliderMesh, ref hit, includeBehind ) ) {
+			hit.Collider = target;
+			return true;
 		}
-		return ok;
+		return false;
 	}
 	/// <summary>
 	/// Intersect a ray and a Mesh.
 	/// </summary>
-	public static bool TryHit ( Vector3 origin, Vector3 direction, IHasCollider target, out RaycastHit hit, bool includeBehind = false )
-		=> TryHitPrenormalized( origin, direction.Normalized(), target, out hit, includeBehind );
+	public static bool TryHit ( Vector3 origin, Vector3 direction, IHasCollider target, ref RaycastHit hit, bool includeBehind = false )
+		=> TryHitPrenormalized( origin, direction.Normalized(), target, ref hit, includeBehind );
 
 	/// <summary>
 	/// The closest point to a line [from;to]
@@ -260,7 +267,8 @@ public static class Raycast {
 		var dir = to - from;
 		var ndir = dir.Normalized();
 
-		TryHitPrenormalized( from, ndir, other, ndir, out var hit, true );
+		RaycastHit hit = new();
+		TryHitPrenormalized( from, ndir, other, ndir, ref hit, true );
 		Vector3 point = hit.Point;
 
 		// P = from + (to-from) * T -> T = (P - from)/(to-from);
@@ -275,33 +283,33 @@ public static class Raycast {
 	}
 }
 
-public readonly struct RaycastHit {
+public struct RaycastHit {
 	/// <summary>
 	/// The point that was hit.
 	/// </summary>
-	public Vector3 Point { get; init; }
+	public Vector3 Point;
 	/// <summary>
 	/// From where the raycast originated.
 	/// </summary>
-	public Vector3 Origin { get; init; }
+	public Vector3 Origin;
 	/// <summary>
 	/// The normal of the surface which was hit.
 	/// </summary>
-	public Vector3 Normal { get; init; }
+	public Vector3 Normal;
 	/// <summary>
 	/// The direction of the raycast.
 	/// </summary>
-	public Vector3 Direction { get; init; }
+	public Vector3 Direction;
 	/// <summary>
 	/// Distance from the origin to the hit point. Can be negative to indicate the ray travelled backward with regard to <see cref="Direction"/>.
 	/// </summary>
-	public float Distance { get; init; }
+	public float Distance;
 	/// <summary>
 	/// The triangle of the mesh that was hit, if any.
 	/// </summary>
-	public int TrisIndex { get; init; }
+	public int TrisIndex;
 	/// <summary>
 	/// The hit collider, if any.
 	/// </summary>
-	public IHasCollider? Collider { get; init; }
+	public IHasCollider? Collider;
 }

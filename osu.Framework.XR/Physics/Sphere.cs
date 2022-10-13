@@ -4,25 +4,25 @@ using osu.Framework.XR.Maths;
 namespace osu.Framework.XR.Physics;
 
 public static class Sphere {
-	public static bool TryHit ( Vector3 origin, double radius, Face face, out SphereHit hit ) {
+	[ThreadStatic]
+	static SphereHit swapHit; // used for temp values with ref swapping
+
+	public static bool TryHit ( Vector3 origin, double radius, Face face, ref SphereHit hit ) {
 		Vector3 normal = Vector3.Cross( face.A - face.B, face.C - face.B ).Normalized();
-		if ( !Raycast.TryHitPrenormalized( origin, normal, face.A, normal, out var rh, true ) ) {
-			hit = default;
+		RaycastHit rh = new();
+		if ( !Raycast.TryHitPrenormalized( origin, normal, face.A, normal, ref rh, true ) ) {
 			return false;
 		}
 
 		if ( Triangles.IsPointInside( rh.Point, face ) ) {
 			if ( Math.Abs( rh.Distance ) <= radius ) {
-				hit = new SphereHit {
-					Origin = origin,
-					Normal = rh.Normal,
-					Radius = radius,
-					Point = rh.Point
-				};
+				hit.Origin = origin;
+				hit.Normal = rh.Normal;
+				hit.Radius = radius;
+				hit.Point = rh.Point;
 				return true;
 			}
 			else {
-				hit = default;
 				return false;
 			}
 		}
@@ -36,116 +36,119 @@ public static class Sphere {
 			var cl = ( C - origin ).Length;
 
 			if ( al > radius && bl > radius && cl > radius ) {
-				hit = default;
 				return false;
 			}
 			else if ( al < bl && al < cl ) {
-				hit = new SphereHit {
-					Origin = origin,
-					Normal = rh.Normal,
-					Radius = radius,
-					Point = A
-				};
+				hit.Origin = origin;
+				hit.Normal = rh.Normal;
+				hit.Radius = radius;
+				hit.Point = A;
 				return true;
 			}
 			else if ( bl < cl ) {
-				hit = new SphereHit {
-					Origin = origin,
-					Normal = rh.Normal,
-					Radius = radius,
-					Point = B
-				};
+				hit.Origin = origin;
+				hit.Normal = rh.Normal;
+				hit.Radius = radius;
+				hit.Point = B;
 				return true;
 			}
 			else {
-				hit = new SphereHit {
-					Origin = origin,
-					Normal = rh.Normal,
-					Radius = radius,
-					Point = C
-				};
+				hit.Origin = origin;
+				hit.Normal = rh.Normal;
+				hit.Radius = radius;
+				hit.Point = C;
 				return true;
 			}
 		}
 	}
 
-	public static bool TryHit ( Vector3 origin, double radius, ITriangleMesh mesh, Matrix4 transform, out SphereHit hit ) {
+	public static bool TryHit ( Vector3 origin, double radius, ITriangleMesh mesh, Matrix4 transform, ref SphereHit hit ) {
 		var aabb = mesh.BoundingBox * transform;
 		if ( ( aabb.Min + aabb.Size / 2 - origin ).Length > aabb.Size.Length + radius ) {
-			hit = default;
 			return false;
 		}
 
-		SphereHit? closest = null;
+		bool hasResult = false;
+		ref SphereHit closest = ref hit;
+		ref SphereHit swap = ref swapHit;
+
 		var tris = mesh.TriangleCount;
 		for ( int i = 0; i < tris; i++ ) {
 			var face = mesh.GetTriangleFace( i );
 			face.A = transform.Apply( face.A );
 			face.B = transform.Apply( face.B );
 			face.C = transform.Apply( face.C );
-			if ( TryHit( origin, radius, face, out hit ) && ( closest is null || closest.Value.Distance > hit.Distance ) ) {
-				closest = hit with { TrisIndex = i };
+			if ( TryHit( origin, radius, face, ref swap ) && ( !hasResult || closest.Distance > swap.Distance ) ) {
+				ref SphereHit temp = ref closest;
+				closest = ref swap;
+				swap = ref temp;
+				closest.TrisIndex = i;
+				hasResult = true;
 			}
 		}
 
-		if ( closest is null ) {
-			hit = default;
-			return false;
+		if ( hasResult ) {
+			hit = closest;
+			return true;
 		}
 		else {
-			hit = closest.Value;
-			return true;
+			return false;
 		}
 	}
 
-	public static bool TryHit ( Vector3 origin, double radius, ITriangleMesh mesh, out SphereHit hit ) {
+	public static bool TryHit ( Vector3 origin, double radius, ITriangleMesh mesh, ref SphereHit hit ) {
 		var aabb = mesh.BoundingBox;
 		if ( ( aabb.Min + aabb.Size / 2 - origin ).Length > aabb.Size.Length + radius ) {
-			hit = default;
 			return false;
 		}
 
-		SphereHit? closest = null;
+		bool hasResult = false;
+		ref SphereHit closest = ref hit;
+		ref SphereHit swap = ref swapHit;
+
 		var tris = mesh.TriangleCount;
 		for ( int i = 0; i < tris; i++ ) {
 			var face = mesh.GetTriangleFace( i );
-			if ( TryHit( origin, radius, face, out hit ) && ( closest is null || closest.Value.Distance > hit.Distance ) ) {
-				closest = hit with { TrisIndex = i };
+			if ( TryHit( origin, radius, face, ref swap ) && ( !hasResult || closest.Distance > swap.Distance ) ) {
+				ref SphereHit temp = ref closest;
+				closest = ref swap;
+				swap = ref temp;
+				closest.TrisIndex = i;
+				hasResult = true;
 			}
 		}
 
-		if ( closest is null ) {
-			hit = default;
-			return false;
+		if ( hasResult ) {
+			hit = closest;
+			return true;
 		}
 		else {
-			hit = closest.Value;
-			return true;
+			return false;
 		}
 	}
 
-	public static bool TryHit ( Vector3 origin, double radius, IHasCollider target, out SphereHit hit ) {
-		if ( TryHit( origin, radius, target.ColliderMesh, out hit ) ) {
-			hit = hit with { Collider = target };
+	public static bool TryHit ( Vector3 origin, double radius, IHasCollider target, ref SphereHit hit ) {
+		if ( TryHit( origin, radius, target.ColliderMesh, ref hit ) ) {
+			hit.Collider = target;
 			return true;
 		}
 		return false;
 	}
 }
 
-public readonly struct SphereHit {
+public struct SphereHit {
 	/// <summary>
 	/// The point that was hit.
 	/// </summary>
-	public Vector3 Point { get; init; }
+	public Vector3 Point;
 	/// <summary>
 	/// The origin of the sphere.
 	/// </summary>
-	public Vector3 Origin { get; init; }
+	public Vector3 Origin;
 	/// <summary>
 	/// The normal of the surface which was hit.
 	/// </summary>
-	public Vector3 Normal { get; init; }
+	public Vector3 Normal;
 	/// <summary>
 	/// The direction from the origin to the hit point.
 	/// </summary>
@@ -157,13 +160,13 @@ public readonly struct SphereHit {
 	/// <summary>
 	/// The size of the sphere.
 	/// </summary>
-	public double Radius { get; init; }
+	public double Radius;
 	/// <summary>
 	/// The triangle of the mesh that was hit, if any.
 	/// </summary>
-	public int TrisIndex { get; init; }
+	public int TrisIndex;
 	/// <summary>
 	/// The hit collider, if any.
 	/// </summary>
-	public IHasCollider? Collider { get; init; }
+	public IHasCollider? Collider;
 }

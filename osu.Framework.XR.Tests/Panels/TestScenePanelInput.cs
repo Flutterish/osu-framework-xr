@@ -47,7 +47,8 @@ public class TestScenePanelInput : BasicTestScene, IRequireHighFrequencyMousePos
 	}
 
 	bool tryHit ( Vector2 e, out Vector2 pos ) {
-		if ( Raycast.TryHit( Scene.Camera.Position, Scene.Camera.DirectionOf( e, Scene.DrawWidth, Scene.DrawHeight ), Panel.Mesh, Panel.Matrix, out var hit ) ) {
+		RaycastHit hit = new();
+		if ( Raycast.TryHit( Scene.Camera.Position, Scene.Camera.DirectionOf( e, Scene.DrawWidth, Scene.DrawHeight ), Panel, ref hit ) ) {
 			pos = Panel.GlobalSpaceContentPositionAt( hit.TrisIndex, hit.Point );
 
 			return true;

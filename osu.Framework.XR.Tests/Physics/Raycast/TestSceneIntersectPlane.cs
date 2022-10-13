@@ -1,4 +1,5 @@
-﻿using osu.Framework.XR.Testing;
+﻿using osu.Framework.XR.Physics;
+using osu.Framework.XR.Testing;
 using osuTK;
 
 namespace osu.Framework.XR.Tests.Physics.Raycast;
@@ -18,7 +19,8 @@ public class TestSceneIntersectPlane : BasicTestScene {
 		ray.LookCurrent.Value = -Vector3.UnitY;
 
 		(plane.OriginCurrent, plane.LookCurrent, ray.OriginCurrent, ray.LookCurrent, ray.IsBidirectionalBindable).BindValuesChanged( ( planePoint, _, rayOrigin, _, bi ) => {
-			if ( XR.Physics.Raycast.TryHit( rayOrigin, ray.Direction, planePoint, plane.Normal, out var raycastHit, bi ) ) {
+			RaycastHit raycastHit = new();
+			if ( XR.Physics.Raycast.TryHit( rayOrigin, ray.Direction, planePoint, plane.Normal, ref raycastHit, bi ) ) {
 				hit.Current.Value = raycastHit.Point;
 				hit.Alpha = 1;
 			}

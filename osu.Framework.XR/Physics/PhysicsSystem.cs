@@ -39,27 +39,35 @@ public class PhysicsSystem {
 	/// Intersect a ray and a the closest collider.
 	/// </summary>
 	public bool TryHitRay ( Vector3 origin, Vector3 direction, out RaycastHit hit, bool includeBehind = false, ulong layers = ulong.MaxValue ) {
-		RaycastHit? closest = null;
 		direction.Normalize();
+
+		bool hasResult = false;
+		RaycastHit hitA = new();
+		RaycastHit hitB = new();
+		ref RaycastHit closest = ref hitA;
+		ref RaycastHit swap = ref hitB;
 
 		foreach ( var collider in colliders.AsSpan() ) {
 			if ( !collider.IsColliderEnabled || ( collider.PhysicsLayer & layers ) == 0 )
 				continue;
 
-			if ( Raycast.TryHitPrenormalized( origin, direction, collider, out hit, includeBehind ) ) {
-				if ( closest is null || Math.Abs( closest.Value.Distance ) > Math.Abs( hit.Distance ) ) {
-					closest = hit;
+			if ( Raycast.TryHitPrenormalized( origin, direction, collider, ref swap, includeBehind ) ) {
+				if ( !hasResult || Math.Abs( closest.Distance ) > Math.Abs( swap.Distance ) ) {
+					ref RaycastHit temp = ref closest;
+					closest = swap;
+					swap = temp;
+					hasResult = true;
 				}
 			}
 		}
 
-		if ( closest is null ) {
-			hit = default;
-			return false;
+		if ( hasResult ) {
+			hit = closest;
+			return true;
 		}
 		else {
-			hit = closest.Value;
-			return true;
+			hit = default;
+			return false;
 		}
 	}
 
@@ -67,26 +75,33 @@ public class PhysicsSystem {
 	/// Intersect a sphere and the closest collider.
 	/// </summary>
 	public bool TryHitSphere ( Vector3 origin, double radius, out SphereHit hit, ulong layers = ulong.MaxValue ) {
-		SphereHit? closest = null;
+		bool hasResult = false;
+		SphereHit hitA = new();
+		SphereHit hitB = new();
+		ref SphereHit closest = ref hitA;
+		ref SphereHit swap = ref hitB;
 
 		foreach ( var collider in colliders.AsSpan() ) {
 			if ( !collider.IsColliderEnabled || ( collider.PhysicsLayer & layers ) == 0 )
 				continue;
 
-			if ( Sphere.TryHit( origin, radius, collider, out hit ) ) {
-				if ( closest is null || Math.Abs( closest.Value.Distance ) > Math.Abs( hit.Distance ) ) {
-					closest = hit;
+			if ( Sphere.TryHit( origin, radius, collider, ref swap ) ) {
+				if ( !hasResult || Math.Abs( closest.Distance ) > Math.Abs( swap.Distance ) ) {
+					ref SphereHit temp = ref closest;
+					closest = swap;
+					swap = temp;
+					hasResult = true;
 				}
 			}
 		}
 
-		if ( closest is null ) {
-			hit = default;
-			return false;
+		if ( hasResult ) {
+			hit = closest;
+			return true;
 		}
 		else {
-			hit = closest.Value;
-			return true;
+			hit = default;
+			return false;
 		}
 	}
 }
