@@ -14,8 +14,8 @@ public static class Sphere {
 		if ( Triangles.IsPointInside( rh.Point, face ) ) {
 			if ( Math.Abs( rh.Distance ) <= radius ) {
 				hit = new SphereHit {
-					Distance = Math.Abs( rh.Distance ),
 					Origin = origin,
+					Normal = rh.Normal,
 					Radius = radius,
 					Point = rh.Point
 				};
@@ -41,8 +41,8 @@ public static class Sphere {
 			}
 			else if ( al < bl && al < cl ) {
 				hit = new SphereHit {
-					Distance = al,
 					Origin = origin,
+					Normal = rh.Normal,
 					Radius = radius,
 					Point = A
 				};
@@ -50,8 +50,8 @@ public static class Sphere {
 			}
 			else if ( bl < cl ) {
 				hit = new SphereHit {
-					Distance = bl,
 					Origin = origin,
+					Normal = rh.Normal,
 					Radius = radius,
 					Point = B
 				};
@@ -59,8 +59,8 @@ public static class Sphere {
 			}
 			else {
 				hit = new SphereHit {
-					Distance = cl,
 					Origin = origin,
+					Normal = rh.Normal,
 					Radius = radius,
 					Point = C
 				};
@@ -134,10 +134,36 @@ public static class Sphere {
 }
 
 public readonly struct SphereHit {
-	public double Distance { get; init; }
-	public Vector3 Origin { get; init; }
-	public double Radius { get; init; }
+	/// <summary>
+	/// The point that was hit.
+	/// </summary>
 	public Vector3 Point { get; init; }
+	/// <summary>
+	/// The origin of the sphere.
+	/// </summary>
+	public Vector3 Origin { get; init; }
+	/// <summary>
+	/// The normal of the surface which was hit.
+	/// </summary>
+	public Vector3 Normal { get; init; }
+	/// <summary>
+	/// The direction from the origin to the hit point.
+	/// </summary>
+	public Vector3 Direction => ( Point - Origin ).Normalized();
+	/// <summary>
+	/// Distance from the origin to the hit point.
+	/// </summary>
+	public double Distance => ( Point - Origin ).Length;
+	/// <summary>
+	/// The size of the sphere.
+	/// </summary>
+	public double Radius { get; init; }
+	/// <summary>
+	/// The triangle of the mesh that was hit, if any.
+	/// </summary>
 	public int TrisIndex { get; init; }
+	/// <summary>
+	/// The hit collider, if any.
+	/// </summary>
 	public IHasCollider? Collider { get; init; }
 }

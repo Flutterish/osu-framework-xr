@@ -273,35 +273,35 @@ public static class Raycast {
 		else if ( t > 1 ) return to;
 		else return point;
 	}
+}
 
-	public readonly struct RaycastHit {
-		/// <summary>
-		/// The point that was hit.
-		/// </summary>
-		public Vector3 Point { get; init; }
-		/// <summary>
-		/// From where the raycast originated.
-		/// </summary>
-		public Vector3 Origin { get; init; }
-		/// <summary>
-		/// The normal of the hit surface.
-		/// </summary>
-		public Vector3 Normal { get; init; }
-		/// <summary>
-		/// The direction of the raycast.
-		/// </summary>
-		public Vector3 Direction { get; init; }
-		/// <summary>
-		/// Distance from the origin to the hit point. Might be negative if the hit happened in opposite direction.
-		/// </summary>
-		public double Distance { get; init; }
-		/// <summary>
-		/// The triangle of the mesh that was hit, if any.
-		/// </summary>
-		public int TrisIndex { get; init; }
-		/// <summary>
-		/// The hit collider, if any.
-		/// </summary>
-		public IHasCollider? Collider { get; init; }
-	}
+public readonly struct RaycastHit {
+	/// <summary>
+	/// The point that was hit.
+	/// </summary>
+	public Vector3 Point { get; init; }
+	/// <summary>
+	/// From where the raycast originated.
+	/// </summary>
+	public Vector3 Origin { get; init; }
+	/// <summary>
+	/// The normal of the surface which was hit.
+	/// </summary>
+	public Vector3 Normal { get; init; }
+	/// <summary>
+	/// The direction of the raycast.
+	/// </summary>
+	public Vector3 Direction { get; init; }
+	/// <summary>
+	/// Distance from the origin to the hit point. Can be negative to indicate the ray travelled backward with regard to <see cref="Direction"/>.
+	/// </summary>
+	public float Distance { get; init; }
+	/// <summary>
+	/// The triangle of the mesh that was hit, if any.
+	/// </summary>
+	public int TrisIndex { get; init; }
+	/// <summary>
+	/// The hit collider, if any.
+	/// </summary>
+	public IHasCollider? Collider { get; init; }
 }

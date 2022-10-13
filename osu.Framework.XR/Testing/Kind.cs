@@ -9,7 +9,7 @@ public enum Kind {
 	Default,
 
 	/// <summary>
-	/// Viotet, not editable. Result of a computation.
+	/// Violet, not editable. Result of a computation.
 	/// </summary>
 	Result,
 

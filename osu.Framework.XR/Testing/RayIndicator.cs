@@ -37,14 +37,14 @@ public class RayIndicator : CompositeDrawable {
 
 	public RayIndicator ( Scene scene ) {
 		AddRangeInternal( new Drawable[] {
-				new PointIndicator( scene ) {
-					Current = OriginCurrent,
-				},
-				new PointIndicator( scene ) {
-					Current = LookCurrent,
-					Alpha = 0.4f
-				}
-			} );
+			new PointIndicator( scene ) {
+				Current = OriginCurrent,
+			},
+			new PointIndicator( scene ) {
+				Current = LookCurrent,
+				Alpha = 0.4f
+			}
+		} );
 
 		foreach ( var i in InternalChildren.OfType<PointIndicator>() )
 			i.AllowDraggingBindable.BindTo( AllowDraggingBindable );

@@ -38,8 +38,8 @@ public class PhysicsSystem {
 	/// <summary>
 	/// Intersect a ray and a the closest collider.
 	/// </summary>
-	public bool TryHitRay ( Vector3 origin, Vector3 direction, out Raycast.RaycastHit hit, bool includeBehind = false, ulong layers = ulong.MaxValue ) {
-		Raycast.RaycastHit? closest = null;
+	public bool TryHitRay ( Vector3 origin, Vector3 direction, out RaycastHit hit, bool includeBehind = false, ulong layers = ulong.MaxValue ) {
+		RaycastHit? closest = null;
 		direction.Normalize();
 
 		foreach ( var collider in colliders.AsSpan() ) {

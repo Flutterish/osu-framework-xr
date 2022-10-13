@@ -53,9 +53,10 @@ public class CompositeDrawable3D : Drawable3D {
 	protected sealed override bool RemoveInternal ( Drawable drawable, bool disposeImmediately )
 		=> throw new InvalidOperationException( "Cannot remove a 2D drawable from a 3D container" );
 	protected virtual void RemoveInternal ( Drawable3D child, bool disposeImmediately ) {
-		if ( child.Parent == this )
-			child.Parent = null;
+		if ( child.Parent != this )
+			return;
 
+		child.Parent = null;
 		children.Remove( child );
 		base.RemoveInternal( child, disposeImmediately );
 
@@ -70,11 +71,9 @@ public class CompositeDrawable3D : Drawable3D {
 
 	protected override void ClearInternal ( bool disposeChildren = true ) {
 		while ( children.Count != 0 ) {
-			var child = children[^1];
-
-			RemoveInternal( child, disposeChildren );
-			children.RemoveAt( children.Count - 1 );
+			RemoveInternal( children[^1], disposeChildren );
 		}
+		Console.WriteLine();
 	}
 
 	/// <summary>
@@ -126,7 +125,7 @@ public class CompositeDrawable3D : Drawable3D {
 	/// <param name="child">The affected drawable</param>
 	/// <param name="parent">The containing drawable</param>
 	/// <param name="isImmediate">Whether this is a direct action (<see langword="true"/>) or a result of another modification (<see langword="false"/>)</param>
-	public delegate void HierarchyModifiedHandler ( Drawable3D child, CompositeDrawable3D? parent, bool isImmediate );
+	public delegate void HierarchyModifiedHandler ( Drawable3D child, CompositeDrawable3D parent, bool isImmediate );
 	// TODO we don't really wanna expose the subtree, but these events allow to scan it (and are more or less required for rendering).
 	// we might want to give drawables the ability to 'consent' to them or their subtrees being seen
 	// by a given type of scanner
