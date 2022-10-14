@@ -15,6 +15,7 @@
 	<ItemGroup>
 	  <None Remove="Resources\fox.obj" />
 	  <None Remove="Resources\stylus.obj" />
+	  <None Remove="Resources\Textures\susie.png" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -24,6 +25,10 @@
 	  <Content Include="Resources\stylus.obj">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Content>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Include="Resources\Textures\susie.png" />
 	</ItemGroup>
 
 	<ItemGroup>

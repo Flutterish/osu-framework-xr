@@ -2,7 +2,6 @@
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Shaders;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Framework.XR.Collections;
@@ -143,14 +142,6 @@ public partial class Scene : CompositeDrawable {
 			CreateMaterialStoreSource( deps ) ?? new NamespacedResourceStore<byte[]>( store, "Resources/Shaders" ),
 			new NamespacedResourceStore<byte[]>( new DllResourceStore( typeof(Scene).Assembly ), "Resources/Shaders" )
 		} ) );
-		var textures = new TextureStore(
-			renderer,
-			parent.Get<GameHost>().CreateTextureLoaderStore( new NamespacedResourceStore<byte[]>( store, "Resources/Textures" ) ),
-			useAtlas: true,
-			TextureFilteringMode.Nearest,
-			manualMipmaps: false,
-			scaleAdjust: 1
-		);
 		materials.AddDescriptor( MaterialNames.Unlit, new MaterialDescriptor()
 			.SetAttribute( "aPos", MeshDescriptor.Position )
 			.SetAttribute( "aUv", MeshDescriptor.UV )
@@ -183,7 +174,6 @@ public partial class Scene : CompositeDrawable {
 			} )
 		);
 		deps.Cache( materials );
-		deps.Cache( textures );
 		return base.CreateChildDependencies( deps );
 	}
 
