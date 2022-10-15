@@ -39,11 +39,15 @@ public class BasicTestScene : TestScene3D {
 	}
 
 	class TestResourcesScene : Scene {
+		protected override ResourceStore<byte[]>? CreateMeshStoreSource ( IReadOnlyDependencyContainer deps ) {
+			return new NamespacedResourceStore<byte[]>( new DllResourceStore( typeof( TestResourcesScene ).Assembly ), "Resources/Meshes" );
+		}
+
 		protected override IReadOnlyDependencyContainer CreateChildDependencies ( IReadOnlyDependencyContainer parent ) {
 			var dependencies = new DependencyContainer( parent );
 
 			var Resources = new ResourceStore<byte[]>();
-			Resources.AddStore( new NamespacedResourceStore<byte[]>( new DllResourceStore( typeof( TestResourcesScene ).Assembly ), @"Resources" ) );
+			Resources.AddStore( new NamespacedResourceStore<byte[]>( new DllResourceStore( typeof( TestResourcesScene ).Assembly ), "Resources" ) );
 			var host = parent.Get<GameHost>();
 
 			var Textures = new TextureStore(

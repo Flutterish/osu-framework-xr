@@ -1,23 +1,23 @@
 ﻿using osu.Framework.Graphics.Rendering;
 using osu.Framework.XR.Graphics;
 using osu.Framework.XR.Graphics.Meshes;
-using osu.Framework.XR.Parsing.Wavefront;
 using osuTK.Graphics.OpenGL4;
-using System.IO;
 
 namespace osu.Framework.XR.Tests.Parsing;
 
 public class TestSceneSimpleObjImport : BasicTestScene {
-	Mesh mesh;
-	public TestSceneSimpleObjImport () {
-		mesh = SimpleObjFile.Load( File.ReadAllText( "./Resources/fox.obj" ) );
+	Mesh? mesh;
+
+	protected override void LoadComplete () {
+		base.LoadComplete();
+		mesh = Scene.MeshStore.GetNew( "fox" );
 		mesh.CreateFullUnsafeUpload().Enqueue();
 
 		Scene.Add( new WireframeModel { Mesh = mesh } );
 	}
 
 	protected override void Dispose ( bool isDisposing ) {
-		mesh.Dispose();
+		mesh?.Dispose();
 		base.Dispose( isDisposing );
 	}
 

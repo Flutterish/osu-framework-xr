@@ -128,7 +128,11 @@ public partial class Scene : CompositeDrawable {
 	IShader blitShader = null!;
 
 	public MaterialStore MaterialStore { get; private set; } = null!;
+	public MeshStore MeshStore { get; private set; } = null!;
 	protected virtual ResourceStore<byte[]>? CreateMaterialStoreSource ( IReadOnlyDependencyContainer deps ) {
+		return null;
+	}
+	protected virtual ResourceStore<byte[]>? CreateMeshStoreSource ( IReadOnlyDependencyContainer deps ) {
 		return null;
 	}
 
@@ -138,8 +142,14 @@ public partial class Scene : CompositeDrawable {
 		var store = parent.Get<Game>().Resources;
 		host = parent.Get<GameHost>();
 		var renderer = parent.Get<IRenderer>();
+
+		var meshes = MeshStore = new MeshStore();
+		var meshResources = CreateMeshStoreSource( deps ) ?? new NamespacedResourceStore<byte[]>( store, "Meshes" );
+		meshes.AddStore( new ObjMeshLoaderStore( meshResources ) );
+		deps.Cache( MeshStore );
+
 		var materials = MaterialStore = new MaterialStore( new ResourceStore<byte[]>( new[] {
-			CreateMaterialStoreSource( deps ) ?? new NamespacedResourceStore<byte[]>( store, "Resources/Shaders" ),
+			CreateMaterialStoreSource( deps ) ?? new NamespacedResourceStore<byte[]>( store, "Shaders" ),
 			new NamespacedResourceStore<byte[]>( new DllResourceStore( typeof(Scene).Assembly ), "Resources/Shaders" )
 		} ) );
 		materials.AddDescriptor( MaterialNames.Unlit, new MaterialDescriptor()
@@ -173,7 +183,8 @@ public partial class Scene : CompositeDrawable {
 				m.Shader.SetUniform( "gProj", store.GetGlobalProperty<Matrix4>( "gProj" ) );
 			} )
 		);
-		deps.Cache( materials );
+		deps.Cache( MaterialStore );
+
 		return base.CreateChildDependencies( deps );
 	}
 
