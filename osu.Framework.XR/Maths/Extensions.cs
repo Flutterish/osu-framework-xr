@@ -45,7 +45,7 @@ public static class Extensions {
 	/// </summary>
 	public static Vector3 AnyOrthogonal ( this Vector3 vector ) {
 		var cross = vector.Cross( Vector3.UnitX );
-		if ( ( cross - vector ).LengthSquared < 0.0000001 )
+		if ( cross.LengthSquared < 0.0000001 )
 			cross = vector.Cross( Vector3.UnitZ );
 
 		return cross.Normalized();

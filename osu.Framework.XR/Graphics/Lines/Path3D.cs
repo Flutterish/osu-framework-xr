@@ -1,5 +1,6 @@
 ﻿using osu.Framework.Bindables;
 using osu.Framework.Caching;
+using osu.Framework.XR.Maths;
 
 namespace osu.Framework.XR.Graphics.Lines;
 
@@ -45,10 +46,10 @@ public class Path3D : BasicModel {
 				Vector3 next = Nodes[i];
 
 				var fwd = next - prev;
-				var up = Vector3.Cross( fwd, Vector3.Cross( fwd, Vector3.UnitY ) ).Normalized();
+				if ( !float.IsNormal( fwd.Length ) ) 
+					continue;
 
-				if ( !float.IsNormal( fwd.Length ) ) continue;
-				if ( !float.IsNormal( up.X ) || !float.IsNormal( up.Y ) || !float.IsNormal( up.Z ) ) up = Vector3.UnitY;
+				var up = fwd.AnyOrthogonal();
 
 				Mesh.AddQuad( origin: prev, direction: fwd.Normalized(), up, fwd.Length, PathWidth.Value );
 
