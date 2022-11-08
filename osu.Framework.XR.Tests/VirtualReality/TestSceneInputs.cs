@@ -21,11 +21,22 @@ public class TestSceneInputs : VrScene {
 			AutoSizeAxes = Framework.Graphics.Axes.Both
 		} );
 
-		VrCompositor.Initialized += vr => {
-			vr.DeviceDetected += onVrDeviceDetected;
-			foreach ( var i in vr.TrackedDevices )
-				onVrDeviceDetected( i );
-		};
+		VrCompositor.BindDeviceDetected( device => {
+			if ( device is not Controller c )
+				return;
+
+			void add<T, Tcomp> ( TestingAction action ) where T : struct where Tcomp : VrAction, IVrInputAction<T> {
+				var comp = VrCompositor.Input.GetAction<Tcomp>( action, c );
+				var text = new SpriteText();
+				flow.Add( text );
+				OnUpdate += _ => text.Text = $"{action} [{c.Role}] = {comp.Value.Value}";
+			}
+
+			add<bool, BooleanAction>( TestingAction.Boolean );
+			add<float, ScalarAction>( TestingAction.Scalar );
+			add<Vector2, Vector2Action>( TestingAction.Vector2 );
+			add<Vector3, Vector3Action>( TestingAction.Vector3 );
+		} );
 
 		VrCompositor.Input.SetActionManifest( new ActionManifest<TestingCategory, TestingAction> {
 			ActionSets = new() {
@@ -44,23 +55,6 @@ public class TestSceneInputs : VrScene {
 			var text = new SpriteText();
 			flow.Add( text );
 			OnUpdate += _ => text.Text = $"{action} [Global] = {comp.Value.Value}";
-		}
-
-		add<bool, BooleanAction>( TestingAction.Boolean );
-		add<float, ScalarAction>( TestingAction.Scalar );
-		add<Vector2, Vector2Action>( TestingAction.Vector2 );
-		add<Vector3, Vector3Action>( TestingAction.Vector3 );
-	}
-
-	void onVrDeviceDetected ( VrDevice device ) {
-		if ( device is not Controller c )
-			return;
-
-		void add<T, Tcomp> ( TestingAction action ) where T : struct where Tcomp : VrAction, IVrInputAction<T> {
-			var comp = VrCompositor.Input.GetAction<Tcomp>( action, c );
-			var text = new SpriteText();
-			flow.Add( text );
-			OnUpdate += _ => text.Text = $"{action} [{c.Role}] = {comp.Value.Value}";
 		}
 
 		add<bool, BooleanAction>( TestingAction.Boolean );

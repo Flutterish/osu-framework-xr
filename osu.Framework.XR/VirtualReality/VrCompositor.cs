@@ -33,6 +33,7 @@ public class VrCompositor : Drawable {
 
 	public VrCompositor () {
 		Input = CreateInput();
+		DeviceDetected += trackedDevices.Add;
 	}
 
 	bool ownVr;
@@ -43,10 +44,27 @@ public class VrCompositor : Drawable {
 
 	protected virtual VrInput CreateInput () => new( this );
 
+	List<VrDevice> trackedDevices = new();
+	public IEnumerable<VrDevice> TrackedDevices => trackedDevices;
+	public event Action<VrDevice>? DeviceDetected;
+
+	public void BindDeviceDetected ( Action<VrDevice> action, bool invokeOnAllImmediately = true ) {
+		DeviceDetected += action;
+		if ( invokeOnAllImmediately ) {
+			foreach ( var i in trackedDevices ) {
+				action( i );
+			}
+		}
+	}
+
+	protected void OnDeviceDetected ( VrDevice device )
+		=> DeviceDetected?.Invoke( device );
+
 	protected virtual Task<VR?> InitializeVr ( IReadOnlyDependencyContainer dependencies ) {
 		return Task.Run( () => {
-			ownVr = !dependencies.TryGet<VR>( out var vr );
+			dependencies.TryGet<VR>( out var vr );
 			vr ??= new VR();
+			vr.DeviceDetected += OnDeviceDetected;
 			var ok = vr.TryStart();
 
 			return ok ? vr : null;
@@ -58,6 +76,7 @@ public class VrCompositor : Drawable {
 
 		InitializeVr( dependencies ).ContinueWith( r => {
 			if ( r.Result is VR vr ) {
+				ownVr = !dependencies.TryGet<VR>( out var parentVr ) || vr != parentVr;
 				Schedule( () => {
 					VR = vr;
 					Initialized?.Invoke( vr );

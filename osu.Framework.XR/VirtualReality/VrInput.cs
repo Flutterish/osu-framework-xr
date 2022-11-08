@@ -155,15 +155,15 @@ public class PoseAction : VrAction<OpenVR.NET.Input.PoseAction> {
 	protected override void Loaded () { }
 
 	/// <inheritdoc cref="OpenVR.NET.Input.PoseAction.FetchData"/>
-	public PoseInput? FetchData ()
+	public virtual PoseInput? FetchData ()
 		=> Backing?.FetchData();
 
 	/// <inheritdoc cref="OpenVR.NET.Input.PoseAction.FetchDataForPrediction(float)"/>
-	public PoseInput? FetchDataForPrediction ( float secondsFromNow )
+	public virtual PoseInput? FetchDataForPrediction ( float secondsFromNow )
 		=> Backing?.FetchDataForPrediction( secondsFromNow );
 
 	/// <inheritdoc cref="OpenVR.NET.Input.PoseAction.FetchDataForNextFrame"/>
-	public PoseInput? FetchDataForNextFrame ()
+	public virtual PoseInput? FetchDataForNextFrame ()
 		=> Backing?.FetchDataForNextFrame();
 }
 
@@ -173,38 +173,38 @@ public class HandSkeletonAction : VrAction<OpenVR.NET.Input.HandSkeletonAction> 
 	protected override void Loaded () { }
 
 	/// <inheritdoc cref="OpenVR.NET.Input.HandSkeletonAction.TrackingLevel"/>
-	public EVRSkeletalTrackingLevel TrackingLevel => Backing!.TrackingLevel;
+	public virtual EVRSkeletalTrackingLevel TrackingLevel => Backing!.TrackingLevel;
 
 	/// <inheritdoc cref="OpenVR.NET.Input.HandSkeletonAction.BoneCount"/>
-	public int BoneCount => Backing!.BoneCount;
+	public virtual int BoneCount => Backing!.BoneCount;
 
 	/// <inheritdoc cref="OpenVR.NET.Input.HandSkeletonAction.GetBoneName(int)"/>
-	public string GetBoneName ( int index )
+	public virtual string GetBoneName ( int index )
 		=> Backing!.GetBoneName( index );
 
 	/// <inheritdoc cref="OpenVR.NET.Input.HandSkeletonAction.ParentBoneIndex(int)"/>
-	public int ParentBoneIndex ( int index )
+	public virtual int ParentBoneIndex ( int index )
 		=> Backing!.ParentBoneIndex( index );
 
 	/// <inheritdoc cref="OpenVR.NET.Input.HandSkeletonAction.GetBoneData(int)"/>
-	public BoneData GetBoneData ( int index )
+	public virtual BoneData GetBoneData ( int index )
 		=> Backing!.GetBoneData( index );
 
 	/// <inheritdoc cref="OpenVR.NET.Input.HandSkeletonAction.FetchData(EVRSkeletalTransformSpace, EVRSkeletalMotionRange)"/>
-	public bool FetchData (
+	public virtual bool FetchData (
 		EVRSkeletalTransformSpace transformSpace = EVRSkeletalTransformSpace.Model,
 		EVRSkeletalMotionRange motionRange = EVRSkeletalMotionRange.WithController
 	) => Backing != null && Backing.FetchData( transformSpace, motionRange );
 
 	/// <inheritdoc cref="OpenVR.NET.Input.HandSkeletonAction.FetchReferenceData(EVRSkeletalReferencePose, EVRSkeletalTransformSpace, EVRSkeletalMotionRange)"/>
-	public bool FetchReferenceData (
+	public virtual bool FetchReferenceData (
 		EVRSkeletalReferencePose referencePose,
 		EVRSkeletalTransformSpace transformSpace = EVRSkeletalTransformSpace.Model,
 		EVRSkeletalMotionRange motionRange = EVRSkeletalMotionRange.WithController
 	) => Backing != null && Backing.FetchReferenceData( referencePose, transformSpace, motionRange );
 
 	/// <inheritdoc cref="OpenVR.NET.Input.HandSkeletonAction.GetSummary(EVRSummaryType)"/>
-	public HandSkeletonSummary? GetSummary ( EVRSummaryType type )
+	public virtual HandSkeletonSummary? GetSummary ( EVRSummaryType type )
 		=> Backing?.GetSummary( type );
 }
 
@@ -214,6 +214,6 @@ public class HapticAction : VrAction<OpenVR.NET.Input.HapticAction> {
 	protected override void Loaded () { }
 
 	/// <inheritdoc cref="OpenVR.NET.Input.HapticAction.TriggerVibration(double, double, double, double)"/>
-	public bool TriggerVibration ( double duration, double frequency = 40, double amplitude = 1, double delay = 0 )
+	public virtual bool TriggerVibration ( double duration, double frequency = 40, double amplitude = 1, double delay = 0 )
 		=> Backing?.TriggerVibration( duration, frequency, amplitude, delay ) ?? false;
 }

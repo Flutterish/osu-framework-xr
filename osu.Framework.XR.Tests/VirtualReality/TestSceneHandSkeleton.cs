@@ -16,17 +16,11 @@ public class TestSceneHandSkeleton : VrScene {
 			}
 		} );
 
-		VrCompositor.Initialized += vr => {
-			vr.DeviceDetected += onVrDeviceDetected;
-			foreach ( var i in vr.TrackedDevices )
-				onVrDeviceDetected( i );
-		};
-	}
+		VrCompositor.BindDeviceDetected( device => {
+			if ( device is not Controller c )
+				return;
 
-	void onVrDeviceDetected ( VrDevice device ) {
-		if ( device is not Controller c )
-			return;
-
-		Scene.Add( new BasicHandSkeleton( c, c.Role is Valve.VR.ETrackedControllerRole.LeftHand ? TestingAction.HandLeft : TestingAction.HandRight ) );
+			Scene.Add( new BasicHandSkeleton( c, c.Role is Valve.VR.ETrackedControllerRole.LeftHand ? TestingAction.HandLeft : TestingAction.HandRight ) );
+		} );
 	}
 }
