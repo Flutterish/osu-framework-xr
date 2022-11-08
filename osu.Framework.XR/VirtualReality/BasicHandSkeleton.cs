@@ -1,22 +1,25 @@
 ﻿using OpenVR.NET.Devices;
-using OpenVR.NET.Input;
 using osu.Framework.XR.Graphics;
 using osu.Framework.XR.Maths;
 
 namespace osu.Framework.XR.VirtualReality;
 
 public class BasicHandSkeleton : BasicModel {
-	HandSkeletonAction? source;
+	HandSkeletonAction source = null!;
 	Controller controller;
+	Enum name;
 	public BasicHandSkeleton ( Controller controller, Enum name ) {
 		this.controller = controller;
-		controller.VR.BindActionsLoaded( () => {
-			source = controller.GetAction<HandSkeletonAction>( name );
-		} );
+		this.name = name;
+	}
+
+	[BackgroundDependencyLoader]
+	private void load ( VrCompositor compositor ) {
+		source = compositor.Input.GetAction<HandSkeletonAction>( name, controller );
 	}
 
 	protected override void Update () {
-		if ( source is null || !source.FetchData() ) {
+		if ( source.FetchData() != true ) {
 			if ( Mesh.Indices.Any() ) {
 				Mesh.Clear();
 				Mesh.CreateFullUpload().Enqueue();

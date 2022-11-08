@@ -6,17 +6,17 @@ namespace osu.Framework.XR.Tests.VirtualReality;
 
 public class TestSceneHandSkeleton : VrScene {
 	public TestSceneHandSkeleton () {
-		VrCompositor.Initialized += vr => {
-			vr.SetActionManifest( new ActionManifest<TestingCategory, TestingAction> {
-				ActionSets = new() {
-					new() { Name = TestingCategory.All, Type = ActionSetType.Single }
-				},
-				Actions = new() {
-					new() { Category = TestingCategory.All, Name = TestingAction.HandLeft, Type = ActionType.LeftHandSkeleton },
-					new() { Category = TestingCategory.All, Name = TestingAction.HandRight, Type = ActionType.RightHandSkeleton }
-				}
-			} );
+		VrCompositor.Input.SetActionManifest( new ActionManifest<TestingCategory, TestingAction> {
+			ActionSets = new() {
+				new() { Name = TestingCategory.All, Type = ActionSetType.Single }
+			},
+			Actions = new() {
+				new() { Category = TestingCategory.All, Name = TestingAction.HandLeft, Type = ActionType.LeftHandSkeleton },
+				new() { Category = TestingCategory.All, Name = TestingAction.HandRight, Type = ActionType.RightHandSkeleton }
+			}
+		} );
 
+		VrCompositor.Initialized += vr => {
 			vr.DeviceDetected += onVrDeviceDetected;
 			foreach ( var i in vr.TrackedDevices )
 				onVrDeviceDetected( i );

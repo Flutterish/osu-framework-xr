@@ -31,27 +31,44 @@ public class VrCompositor : Drawable {
 		}
 	}
 
+	public VrCompositor () {
+		Input = CreateInput();
+	}
+
 	bool ownVr;
 	public VR? VR { get; private set; }
+	public readonly VrInput Input;
 	public event Action? InitializationFailed;
 	public event Action<VR>? Initialized;
 
-	protected override void InjectDependencies ( IReadOnlyDependencyContainer dependencies ) {
-		base.InjectDependencies( dependencies );
+	protected virtual VrInput CreateInput () => new( this );
 
-		Task.Run( () => {
+	protected virtual Task<VR?> InitializeVr ( IReadOnlyDependencyContainer dependencies ) {
+		return Task.Run( () => {
 			ownVr = !dependencies.TryGet<VR>( out var vr );
 			vr ??= new VR();
 			var ok = vr.TryStart();
 
-			if ( ok ) {
+			return ok ? vr : null;
+		} );
+	}
+
+	protected override void InjectDependencies ( IReadOnlyDependencyContainer dependencies ) {
+		base.InjectDependencies( dependencies );
+
+		InitializeVr( dependencies ).ContinueWith( r => {
+			if ( r.Result is VR vr ) {
 				Schedule( () => {
 					VR = vr;
 					Initialized?.Invoke( vr );
+					Initialized = null;
 				} );
 			}
 			else {
-				Schedule( () => InitializationFailed?.Invoke() );
+				Schedule( () => {
+					InitializationFailed?.Invoke();
+					InitializationFailed = null;
+				} );
 			}
 		} );
 	}

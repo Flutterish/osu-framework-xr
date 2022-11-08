@@ -1,6 +1,6 @@
 ﻿namespace osu.Framework.XR.Tests.VirtualReality.TestingRig;
 
-public class TestSceneTestingRig : BasicTestScene {
+public class TestSceneTestingRig : RigTestScene {
 	public TestSceneTestingRig () {
 		Add( new Testing.VirtualReality.TestingRig( Scene ) );
 	}
