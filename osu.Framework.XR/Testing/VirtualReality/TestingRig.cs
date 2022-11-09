@@ -24,10 +24,12 @@ public class TestingRig : CompositeDrawable {
 	LineIndicator rightArm;
 	LineIndicator neck;
 
-	PointIndicator leftTarget;
-	PointIndicator rightTarget;
+	public readonly TransformIndicator LeftTarget;
+	public readonly TransformIndicator RightTarget;
 
 	TransformIndicator transform;
+
+	public readonly TransformIndicator Head;
 
 	public TestingRig ( Scene scene ) {
 		AddInternal( leftLeg = new( scene ) { Kind = Kind.Result } );
@@ -41,8 +43,9 @@ public class TestingRig : CompositeDrawable {
 		AddInternal( rightForearm = new( scene ) { Kind = Kind.Result } );
 		AddInternal( neck = new( scene ) { Kind = Kind.Result } );
 
-		AddInternal( leftTarget = new( scene ) { Kind = Kind.Control } );
-		AddInternal( rightTarget = new( scene ) { Kind = Kind.Control } );
+		AddInternal( LeftTarget = new( scene ) { Kind = Kind.Control } );
+		AddInternal( RightTarget = new( scene ) { Kind = Kind.Control } );
+		AddInternal( Head = new( scene ) { Kind = Kind.Control } );
 
 		AddInternal( transform = new( scene ) { Kind = Kind.Control } );
 
@@ -50,7 +53,7 @@ public class TestingRig : CompositeDrawable {
 		SetLeftArmTarget( -Vector3.UnitX * ShoulderSpan.Value / 2 );
 
 		bool leftLock = false;
-		leftTarget.Current.BindValueChanged( v => {
+		LeftTarget.PositionBindable.BindValueChanged( v => {
 			if ( leftLock )
 				return;
 
@@ -60,7 +63,7 @@ public class TestingRig : CompositeDrawable {
 		} );
 
 		bool rightLock = false;
-		rightTarget.Current.BindValueChanged( v => {
+		RightTarget.PositionBindable.BindValueChanged( v => {
 			if ( rightLock )
 				return;
 
@@ -75,8 +78,13 @@ public class TestingRig : CompositeDrawable {
 		} );
 
 		transform.RotationBindable.BindValueChanged( v => {
-			SetLeftArmTarget( ( v.NewValue.DecomposeAroundAxis( Vector3.UnitY ) * v.OldValue.DecomposeAroundAxis( Vector3.UnitY ).Inverted() ).Apply(leftArm.PointB.Value - transform.PositionBindable.Value) + transform.PositionBindable.Value );
-			SetRightArmTarget( ( v.NewValue.DecomposeAroundAxis( Vector3.UnitY ) * v.OldValue.DecomposeAroundAxis( Vector3.UnitY ).Inverted() ).Apply( rightArm.PointB.Value - transform.PositionBindable.Value ) + transform.PositionBindable.Value );
+			var delta = v.NewValue.DecomposeAroundAxis( Vector3.UnitY ) * v.OldValue.DecomposeAroundAxis( Vector3.UnitY ).Inverted();
+
+			SetLeftArmTarget( delta.Apply( leftArm.PointB.Value - transform.PositionBindable.Value) + transform.PositionBindable.Value );
+			SetRightArmTarget( delta.Apply( rightArm.PointB.Value - transform.PositionBindable.Value ) + transform.PositionBindable.Value );
+			LeftTarget.RotationBindable.Value = delta * LeftTarget.RotationBindable.Value;
+			RightTarget.RotationBindable.Value = delta * RightTarget.RotationBindable.Value;
+			Head.RotationBindable.Value = delta * Head.RotationBindable.Value;
 		} );
 	}
 
@@ -98,7 +106,7 @@ public class TestingRig : CompositeDrawable {
 		leftForearm.PointB.Value = leftArm.PointA.Value = elbow;
 		leftArm.PointB.Value = hand;
 
-		leftTarget.Current.Value = hand;
+		LeftTarget.PositionBindable.Value = hand;
 	}
 
 	public void SetRightArmTarget ( Vector3 position ) {
@@ -106,7 +114,7 @@ public class TestingRig : CompositeDrawable {
 		rightForearm.PointB.Value = rightArm.PointA.Value = elbow;
 		rightArm.PointB.Value = hand;
 
-		rightTarget.Current.Value = hand;
+		RightTarget.PositionBindable.Value = hand;
 	}
 
 	Vector3 apply ( Vector3 v ) {
@@ -136,5 +144,6 @@ public class TestingRig : CompositeDrawable {
 
 		SetRightArmTarget( rightArm.PointB.Value );
 		SetLeftArmTarget( leftArm.PointB.Value );
+		Head.PositionBindable.Value = neck.PointB.Value;
 	}
 }

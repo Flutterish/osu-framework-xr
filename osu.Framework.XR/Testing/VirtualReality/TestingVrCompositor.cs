@@ -15,6 +15,8 @@ public class TestingVrCompositor : VrCompositor {
 		} ) as Task<VR?>;
 	}
 
+	new public VirtualVrInput Input => (VirtualVrInput)base.Input;
+
 	protected override VrInput CreateInput () {
 		return new VirtualVrInput( this );
 	}
