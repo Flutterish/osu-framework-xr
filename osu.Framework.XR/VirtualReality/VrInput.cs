@@ -1,9 +1,9 @@
 ﻿using OpenVR.NET;
-using OpenVR.NET.Devices;
 using OpenVR.NET.Input;
 using OpenVR.NET.Manifest;
 using osu.Framework.Bindables;
 using osu.Framework.XR.Maths;
+using osu.Framework.XR.VirtualReality.Devices;
 using Valve.VR;
 
 namespace osu.Framework.XR.VirtualReality;
@@ -33,8 +33,8 @@ public class VrInput {
 		}
 		else {
 			VR.Initialized += vr => {
-				vr.SetActionManifest( manifest );
-				vr.BindActionsLoaded( callback );
+				vr.VR!.SetActionManifest( manifest );
+				vr.VR!.BindActionsLoaded( callback );
 			};
 		}
 	}
@@ -79,10 +79,10 @@ public class VrInput {
 }
 
 public abstract class VrAction {
-	public readonly Enum Name;
+	public readonly object Name;
 	public readonly Controller? Source;
 
-	public VrAction ( Enum name, Controller? source ) {
+	public VrAction ( object name, Controller? source ) {
 		Name = name;
 		Source = source;
 	}
@@ -90,10 +90,13 @@ public abstract class VrAction {
 
 public abstract class VrAction<T> : VrAction where T : OpenVR.NET.Input.Action {
 	protected T? Backing { get; private set; }
+
+	protected VrAction ( object name, Controller? source = null ) : base( name, source ) { }
 	public VrAction ( Enum name, VrInput input, Controller? source = null ) : base( name, source ) {
 		input.BindManifestLoaded( vr => {
-			Backing = vr.GetAction<T>( Name, source );
-			Loaded();
+			Backing = vr.GetAction<T>( name, source?.Source );
+			if ( Backing != null )
+				Loaded();
 		} );
 	}
 
@@ -108,6 +111,7 @@ public abstract class VrInputAction<T, TbackingType, Tbacking> : VrAction<Tbacki
 	public readonly Bindable<T> Value = new();
 	IBindable<T> IVrInputAction<T>.Value => Value;
 
+	protected VrInputAction ( object name, Controller? source = null ) : base( name, source ) { }
 	public VrInputAction ( Enum name, VrInput vr, Controller? source ) : base( name, vr, source ) { }
 
 	protected override void Loaded () {
@@ -118,6 +122,7 @@ public abstract class VrInputAction<T, TbackingType, Tbacking> : VrAction<Tbacki
 }
 
 public abstract class VrInputAction<T, Tbacking> : VrInputAction<T, T, Tbacking> where T : struct where Tbacking : InputAction<T> {
+	protected VrInputAction ( object name, Controller? source = null ) : base( name, source ) { }
 	protected VrInputAction ( Enum name, VrInput vr, Controller? source ) : base( name, vr, source ) { }
 
 	protected override T Convert ( T value ) {
@@ -126,14 +131,17 @@ public abstract class VrInputAction<T, Tbacking> : VrInputAction<T, T, Tbacking>
 }
 
 public class BooleanAction : VrInputAction<bool, OpenVR.NET.Input.BooleanAction> {
+	protected BooleanAction ( object name, Controller? source = null ) : base( name, source ) { }
 	public BooleanAction ( Enum name, VrInput vr, Controller? source ) : base( name, vr, source ) { }
 }
 
 public class ScalarAction : VrInputAction<float, OpenVR.NET.Input.ScalarAction> {
+	protected ScalarAction ( object name, Controller? source = null ) : base( name, source ) { }
 	public ScalarAction ( Enum name, VrInput vr, Controller? source ) : base( name, vr, source ) { }
 }
 
 public class Vector2Action : VrInputAction<Vector2, System.Numerics.Vector2, OpenVR.NET.Input.Vector2Action> {
+	protected Vector2Action ( object name, Controller? source = null ) : base( name, source ) { }
 	public Vector2Action ( Enum name, VrInput vr, Controller? source ) : base( name, vr, source ) { }
 
 	protected override Vector2 Convert ( System.Numerics.Vector2 value ) {
@@ -142,6 +150,7 @@ public class Vector2Action : VrInputAction<Vector2, System.Numerics.Vector2, Ope
 }
 
 public class Vector3Action : VrInputAction<Vector3, System.Numerics.Vector3, OpenVR.NET.Input.Vector3Action> {
+	protected Vector3Action ( object name, Controller? source = null ) : base( name, source ) { }
 	public Vector3Action ( Enum name, VrInput vr, Controller? source ) : base( name, vr, source ) { }
 
 	protected override Vector3 Convert ( System.Numerics.Vector3 value ) {
@@ -150,6 +159,7 @@ public class Vector3Action : VrInputAction<Vector3, System.Numerics.Vector3, Ope
 }
 
 public class PoseAction : VrAction<OpenVR.NET.Input.PoseAction> {
+	protected PoseAction ( object name, Controller? source = null ) : base( name, source ) { }
 	public PoseAction ( Enum name, VrInput vr, Controller? source = null ) : base( name, vr, source ) { }
 
 	protected override void Loaded () { }
@@ -168,6 +178,7 @@ public class PoseAction : VrAction<OpenVR.NET.Input.PoseAction> {
 }
 
 public class HandSkeletonAction : VrAction<OpenVR.NET.Input.HandSkeletonAction> {
+	protected HandSkeletonAction ( object name, Controller? source = null ) : base( name, source ) { }
 	public HandSkeletonAction ( Enum name, VrInput vr, Controller? source = null ) : base( name, vr, source ) { }
 
 	protected override void Loaded () { }
@@ -209,6 +220,7 @@ public class HandSkeletonAction : VrAction<OpenVR.NET.Input.HandSkeletonAction> 
 }
 
 public class HapticAction : VrAction<OpenVR.NET.Input.HapticAction> {
+	protected HapticAction ( object name, Controller? source = null ) : base( name, source ) { }
 	public HapticAction ( Enum name, VrInput vr, Controller? source = null ) : base( name, vr, source ) { }
 
 	protected override void Loaded () { }

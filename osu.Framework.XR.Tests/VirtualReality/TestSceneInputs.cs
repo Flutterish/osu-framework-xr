@@ -1,10 +1,10 @@
-﻿using OpenVR.NET.Devices;
-using OpenVR.NET.Manifest;
+﻿using OpenVR.NET.Manifest;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.XR.Graphics.Panels;
 using osu.Framework.XR.VirtualReality;
+using osu.Framework.XR.VirtualReality.Devices;
 using osuTK;
 using osuTK.Graphics;
 

@@ -4,6 +4,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.XR.Graphics;
 using osu.Framework.XR.Maths;
+using Controller = osu.Framework.XR.VirtualReality.Devices.Controller;
+using VrDevice = osu.Framework.XR.VirtualReality.Devices.VrDevice;
 
 namespace osu.Framework.XR.VirtualReality;
 
@@ -49,8 +51,8 @@ public class BasicVrDevice : CompositeDrawable3D {
 	}
 
 	protected override void Update () {
-		Position = Source.Position.ToOsuTk();
-		Rotation = Source.Rotation.ToOsuTk();
+		Position = Source.Position;
+		Rotation = Source.Rotation;
 	}
 
 	public class BasicVrDeviceComponent : BasicModel {
@@ -79,9 +81,9 @@ public class BasicVrDevice : CompositeDrawable3D {
 			wasVisible = isVisible;
 		}
 		protected override void Update () {
-			isVisible = Device.IsEnabled;
+			isVisible = Device.IsEnabled.Value;
 			var maybeState = ( Device as Controller )?.GetComponentState( Source );
-			if ( maybeState is not Controller.ComponentState state ) {
+			if ( maybeState is not OpenVR.NET.Devices.Controller.ComponentState state ) {
 				updateVisibility();
 				return;
 			}
@@ -119,13 +121,13 @@ public class BasicVrDevice : CompositeDrawable3D {
 					Matrix = parentMatrix;
 
 					var maybeState = ( Source.Device as Controller )?.GetComponentState( Source.Source );
-					if ( maybeState is Controller.ComponentState state ) {
+					if ( maybeState is OpenVR.NET.Devices.Controller.ComponentState state ) {
 						Matrix *= Matrix4.CreateFromQuaternion( state.Rotation.ToOsuTk() )
 								* Matrix4.CreateTranslation( state.Position.ToOsuTk() );
 					}
 
-					Matrix *= Matrix4.CreateFromQuaternion( Source.Device.RenderRotation.ToOsuTk() )
-							* Matrix4.CreateTranslation( Source.Device.RenderPosition.ToOsuTk() );
+					Matrix *= Matrix4.CreateFromQuaternion( Source.Device.RenderRotation )
+							* Matrix4.CreateTranslation( Source.Device.RenderPosition );
 				}
 				
 				base.Draw( renderer, ctx );

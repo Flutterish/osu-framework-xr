@@ -1,6 +1,6 @@
 ﻿using OpenVR.NET;
-using OpenVR.NET.Devices;
 using osu.Framework.XR.VirtualReality;
+using osu.Framework.XR.VirtualReality.Devices;
 
 namespace osu.Framework.XR.Testing.VirtualReality;
 

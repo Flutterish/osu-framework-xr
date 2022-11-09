@@ -1,10 +1,10 @@
 ﻿using OpenVR.NET;
-using OpenVR.NET.Devices;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.XR.Graphics.Rendering;
 using osu.Framework.XR.Maths;
+using osu.Framework.XR.VirtualReality.Devices;
 using System.Reflection;
 
 namespace osu.Framework.XR.VirtualReality;
@@ -37,10 +37,14 @@ public class VrCompositor : Drawable {
 	}
 
 	bool ownVr;
+	/// <summary>
+	/// The underlying VR system. If you are a consumer you should use the provided 
+	/// wrappers such as <see cref="VrInput"/>, <see cref="VrDevice"/> etc.
+	/// </summary>
 	public VR? VR { get; private set; }
 	public readonly VrInput Input;
 	public event Action? InitializationFailed;
-	public event Action<VR>? Initialized;
+	public event Action<VrCompositor>? Initialized;
 
 	protected virtual VrInput CreateInput () => new( this );
 
@@ -64,11 +68,27 @@ public class VrCompositor : Drawable {
 		return Task.Run( () => {
 			dependencies.TryGet<VR>( out var vr );
 			vr ??= new VR();
-			vr.DeviceDetected += OnDeviceDetected;
+			vr.DeviceDetected += handleDevice;
+			foreach ( var i in vr.TrackedDevices ) {
+				handleDevice( i );
+			}
 			var ok = vr.TryStart();
 
 			return ok ? vr : null;
 		} );
+	}
+
+	private void handleDevice ( OpenVR.NET.Devices.VrDevice source ) {
+		VrDevice device = source switch {
+			OpenVR.NET.Devices.Controller controller => new Controller( this, controller ),
+			OpenVR.NET.Devices.Headset d => new Headset( this, d ),
+			OpenVR.NET.Devices.DisplayRedirect d => new DisplayRedirect( this, d ),
+			OpenVR.NET.Devices.Tracker d => new Tracker( this, d ),
+			OpenVR.NET.Devices.TrackingReference d => new TrackingReference( this, d ),
+			_ => new VrDevice( this, source )
+		};
+
+		Schedule( device => OnDeviceDetected( device ), device );
 	}
 
 	protected override void InjectDependencies ( IReadOnlyDependencyContainer dependencies ) {
@@ -79,7 +99,7 @@ public class VrCompositor : Drawable {
 				ownVr = !dependencies.TryGet<VR>( out var parentVr ) || vr != parentVr;
 				Schedule( () => {
 					VR = vr;
-					Initialized?.Invoke( vr );
+					Initialized?.Invoke( this );
 					Initialized = null;
 				} );
 			}
@@ -101,6 +121,9 @@ public class VrCompositor : Drawable {
 	}
 
 	protected override void Dispose ( bool isDisposing ) {
+		if ( VR != null )
+			VR.DeviceDetected -= handleDevice;
+
 		if ( !IsDisposed ) {
 			if ( ownVr )
 				VR?.Exit();
@@ -135,7 +158,7 @@ public class VrCompositor : Drawable {
 		public override void Draw ( IRenderer renderer ) {
 			var vr = Source.VR;
 			var context = vr?.UpdateDraw();
-			if ( context is null || vr!.Headset is not Headset headset )
+			if ( context is null || vr!.Headset is not OpenVR.NET.Devices.Headset headset )
 				return;
 
 			if ( ( Source.ActivePlayer?.Root as Drawable )?.Parent is not Scene scene || scene.GetRenderPiepline() is not Scene.RenderPiepline pipeline )

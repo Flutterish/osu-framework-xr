@@ -1,6 +1,6 @@
-﻿using OpenVR.NET.Devices;
-using osu.Framework.XR.Graphics;
+﻿using osu.Framework.XR.Graphics;
 using osu.Framework.XR.Maths;
+using osu.Framework.XR.VirtualReality.Devices;
 
 namespace osu.Framework.XR.VirtualReality;
 
@@ -27,8 +27,8 @@ public class BasicHandSkeleton : BasicModel {
 			return;
 		}
 
-		Position = controller.Position.ToOsuTk();
-		Rotation = controller.Rotation.ToOsuTk();
+		Position = controller.Position;
+		Rotation = controller.Rotation;
 		var offset = Vector3.UnitY * 0.0007f;
 
 		Mesh.Clear();

@@ -34,5 +34,5 @@ public class VrScene : BasicTestScene {
 	/// This determines whether the testing will be done in VR or a simulated setup.
 	/// <see langword="true"/> for simulated setup
 	/// </summary>
-	public virtual bool USE_VR_RIG => true;
+	public virtual bool USE_VR_RIG => false;
 }

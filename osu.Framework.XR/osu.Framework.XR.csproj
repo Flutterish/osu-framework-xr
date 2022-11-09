@@ -39,6 +39,9 @@
     <Content Update="C:\Users\Charm\.nuget\packages\openvr.net\0.8.4\contentFiles\any\net6.0\openvr_api.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Update="C:\Users\Charm\.nuget\packages\openvr.net\0.8.5\contentFiles\any\net6.0\openvr_api.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>
