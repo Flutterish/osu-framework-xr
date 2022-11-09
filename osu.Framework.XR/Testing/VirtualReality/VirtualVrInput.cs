@@ -14,7 +14,17 @@ namespace osu.Framework.XR.Testing.VirtualReality;
 public class VirtualVrInput : VrInput {
 	public VirtualVrInput ( VrCompositor vr ) : base( vr ) {
 		factory = base.Factory.ToDictionary( k => k.Key, v => (Func<Enum, VrInput, Controller?, VrAction>)((a, b, c) => register( v.Value(a, b, c) )) );
-		factory[typeof(PoseAction)] = (a, b, c) => register( new VirtualPoseAction( a, this, !CreatedActions.Any( x => x is PoseAction ), c ) );
+		factory[typeof(PoseAction)] = (a, b, c) => register( createPose( a, c ) );
+	}
+
+	VirtualPoseAction createPose ( Enum name, Controller? source ) {
+		var (pos, rot) = GetPoseSource( name );
+
+		return new VirtualPoseAction( name, pos, rot, source );
+	}
+
+	protected virtual (Bindable<Vector3>, Bindable<Quaternion>) GetPoseSource ( Enum name ) {
+		return CreatedActions.Any( x => x is PoseAction ) ? ( RightHandPosition, RightHandRotation ) : ( LeftHandPosition, LeftHandRotation );
 	}
 
 	public readonly Bindable<Vector3> LeftHandPosition = new();
@@ -118,16 +128,16 @@ public class VirtualVrInput : VrInput {
 	}
 
 	class VirtualPoseAction : PoseAction {
-		VirtualVrInput input;
-		bool isLeft;
-		public VirtualPoseAction ( object name, VirtualVrInput input, bool isLeft, Controller? source = null ) : base( name, source ) {
-			this.input = input;
-			this.isLeft = isLeft;
+		Bindable<Vector3> position = new();
+		Bindable<Quaternion> rotation = new( Quaternion.Identity );
+		public VirtualPoseAction ( object name, Bindable<Vector3> pos, Bindable<Quaternion> rot, Controller? source = null ) : base( name, source ) {
+			position.BindTo( pos );
+			rotation.BindTo( rot );
 		}
 
 		public override OpenVR.NET.Input.PoseInput? FetchData () {
-			var pos = (isLeft ? input.LeftHandPosition : input.RightHandPosition).Value;
-			var rot = (isLeft ? input.LeftHandRotation : input.RightHandRotation).Value;
+			var pos = position.Value;
+			var rot = rotation.Value;
 
 			return new OpenVR.NET.Input.PoseInput {
 				Position = new( pos.X, pos.Y, pos.Z ),
