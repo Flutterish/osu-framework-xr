@@ -31,6 +31,11 @@ public class VrScene : BasicTestScene {
 			head.PositionBindable.BindTo( rig.Head.PositionBindable );
 			head.RotationBindable.BindTo( rig.Head.RotationBindable );
 
+			comp.Input.LeftHandPosition.BindTo( rig.LeftTarget.PositionBindable );
+			comp.Input.LeftHandRotation.BindTo( rig.LeftTarget.RotationBindable );
+			comp.Input.RightHandPosition.BindTo( rig.RightTarget.PositionBindable );
+			comp.Input.RightHandRotation.BindTo( rig.RightTarget.RotationBindable );
+
 			comp.AddDevice( left );
 			comp.AddDevice( right );
 			comp.AddDevice( head );
