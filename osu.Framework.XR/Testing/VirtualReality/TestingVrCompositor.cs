@@ -1,4 +1,8 @@
 ﻿using OpenVR.NET;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.XR.Graphics.Rendering;
 using osu.Framework.XR.VirtualReality;
 using osu.Framework.XR.VirtualReality.Devices;
 
@@ -23,5 +27,30 @@ public class TestingVrCompositor : VrCompositor {
 
 	public void AddDevice ( VrDevice device ) {
 		OnDeviceDetected( device );
+	}
+
+	/// <summary>
+	/// Binds inputs from a testing rig such as virtual controllers
+	/// </summary>
+	public virtual void AddRig ( TestingRig rig ) {
+		var left = new TestingController( this, Valve.VR.ETrackedControllerRole.LeftHand );
+		var right = new TestingController( this, Valve.VR.ETrackedControllerRole.RightHand );
+		var head = new TestingHeadset( this );
+
+		left.PositionBindable.BindTo( rig.LeftTarget.PositionBindable );
+		left.RotationBindable.BindTo( rig.LeftTarget.RotationBindable );
+		right.PositionBindable.BindTo( rig.RightTarget.PositionBindable );
+		right.RotationBindable.BindTo( rig.RightTarget.RotationBindable );
+		head.PositionBindable.BindTo( rig.Head.PositionBindable );
+		head.RotationBindable.BindTo( rig.Head.RotationBindable );
+
+		Input.LeftHandPosition.BindTo( rig.LeftTarget.PositionBindable );
+		Input.LeftHandRotation.BindTo( rig.LeftTarget.RotationBindable );
+		Input.RightHandPosition.BindTo( rig.RightTarget.PositionBindable );
+		Input.RightHandRotation.BindTo( rig.RightTarget.RotationBindable );
+
+		AddDevice( left );
+		AddDevice( right );
+		AddDevice( head );
 	}
 }

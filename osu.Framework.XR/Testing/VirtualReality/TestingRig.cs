@@ -1,7 +1,10 @@
 ﻿using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.XR.Graphics.Rendering;
 using osu.Framework.XR.Maths;
+using osu.Framework.XR.VirtualReality;
 
 namespace osu.Framework.XR.Testing.VirtualReality;
 
