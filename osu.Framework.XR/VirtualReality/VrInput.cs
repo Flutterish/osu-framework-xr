@@ -104,18 +104,23 @@ public abstract class VrAction<T> : VrAction where T : OpenVR.NET.Input.Action {
 }
 
 public interface IVrInputAction<T> {
-	IBindable<T> Value { get; }
+	IBindable<T> ValueBindable { get; }
+	T Value { get; set; }
 }
 
 public abstract class VrInputAction<T, TbackingType, Tbacking> : VrAction<Tbacking>, IVrInputAction<T> where TbackingType : struct where Tbacking : InputAction<TbackingType> {
-	public readonly Bindable<T> Value = new();
-	IBindable<T> IVrInputAction<T>.Value => Value;
+	public readonly Bindable<T> ValueBindable = new();
+	public T Value {
+		get => ValueBindable.Value;
+		set => ValueBindable.Value = value;
+	}
+	IBindable<T> IVrInputAction<T>.ValueBindable => ValueBindable;
 
 	protected VrInputAction ( object name, Controller? source = null ) : base( name, source ) { }
 	public VrInputAction ( Enum name, VrInput vr, Controller? source ) : base( name, vr, source ) { }
 
 	protected override void Loaded () {
-		Backing!.ValueUpdated += v => Value.Value = Convert( v );
+		Backing!.ValueUpdated += v => Value = Convert( v );
 	}
 
 	protected abstract T Convert ( TbackingType value );

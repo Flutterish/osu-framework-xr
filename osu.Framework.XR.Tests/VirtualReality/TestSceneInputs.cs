@@ -29,7 +29,7 @@ public class TestSceneInputs : VrScene {
 				var comp = VrCompositor.Input.GetAction<Tcomp>( action, c );
 				var text = new SpriteText();
 				flow.Add( text );
-				OnUpdate += _ => text.Text = $"{action} [{c.Role}] = {comp.Value.Value}";
+				OnUpdate += _ => text.Text = $"{action} [{c.Role}] = {comp.Value}";
 			}
 
 			add<bool, BooleanAction>( TestingAction.Boolean );
@@ -54,7 +54,7 @@ public class TestSceneInputs : VrScene {
 			var comp = VrCompositor.Input.GetAction<Tcomp>( action );
 			var text = new SpriteText();
 			flow.Add( text );
-			OnUpdate += _ => text.Text = $"{action} [Global] = {comp.Value.Value}";
+			OnUpdate += _ => text.Text = $"{action} [Global] = {comp.Value}";
 		}
 
 		add<bool, BooleanAction>( TestingAction.Boolean );

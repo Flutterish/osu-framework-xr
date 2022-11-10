@@ -1,8 +1,4 @@
 ﻿using OpenVR.NET;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.XR.Graphics.Rendering;
 using osu.Framework.XR.VirtualReality;
 using osu.Framework.XR.VirtualReality.Devices;
 

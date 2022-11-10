@@ -50,20 +50,20 @@ public class LegacyBooleanAction : BooleanAction {
 	public LegacyBooleanAction ( RawButton name, Controller? source = null ) : base( name.Type, source ) {
 		name.ValueUpdated += data => {
 			IsTouched.Value = data.touched;
-			Value.Value = data.pressed;
+			Value = data.pressed;
 		};
 	}
 }
 
 public class LegacyScalarAction : ScalarAction {
 	public LegacyScalarAction ( RawSingle name, Controller? source = null ) : base( name.Type, source ) {
-		name.ValueUpdated += v => Value.Value = v;
+		name.ValueUpdated += v => Value = v;
 	}
 }
 
 public class LegacyVector2Action : Vector2Action {
 	public LegacyVector2Action ( RawVector2 name, Controller? source = null ) : base( name.Type, source ) {
-		name.ValueUpdated += v => Value.Value = v.ToOsuTk();
+		name.ValueUpdated += v => Value = v.ToOsuTk();
 	}
 }
 
