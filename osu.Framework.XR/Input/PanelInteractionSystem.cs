@@ -77,6 +77,13 @@ public class PanelInteractionSystem {
 			pressedButtons.Clear();
 		}
 
+		public void ReleaseAllInput () {
+			if ( FocusedPanel is null )
+				return;
+
+			releaseInput( FocusedPanel );
+		}
+
 		public void ReleaseKeyboard () {
 			if ( FocusedPanel is null )
 				return;
