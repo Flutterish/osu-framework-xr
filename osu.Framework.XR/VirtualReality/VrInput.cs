@@ -15,6 +15,9 @@ public class VrInput {
 	}
 
 	public IActionManifest? ActionManifest { get; private set; }
+	protected Bindable<Hand> DominantHand = new( Hand.Right );
+	public IBindable<Hand> DominantHandBindable => DominantHand;
+
 	bool isManifestLoaded = false;
 	public void SetActionManifest ( IActionManifest manifest ) {
 		isManifestLoaded = false;
@@ -30,11 +33,13 @@ public class VrInput {
 		if ( VR.VR is VR vr ) {
 			vr.SetActionManifest( manifest );
 			vr.BindActionsLoaded( callback );
+			DominantHand.Value = vr.DominantHand == ETrackedControllerRole.LeftHand ? Hand.Left : Hand.Right;
 		}
 		else {
 			VR.Initialized += vr => {
 				vr.VR!.SetActionManifest( manifest );
 				vr.VR!.BindActionsLoaded( callback );
+				DominantHand.Value = vr.VR!.DominantHand == ETrackedControllerRole.LeftHand ? Hand.Left : Hand.Right;
 			};
 		}
 	}
