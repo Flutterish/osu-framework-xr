@@ -6,6 +6,7 @@ using osu.Framework.XR.Graphics.Materials;
 using osu.Framework.XR.Graphics.Meshes;
 using osu.Framework.XR.Physics;
 using osuTK.Graphics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace osu.Framework.XR.Graphics;
 
@@ -51,6 +52,7 @@ public class Model<T> : Drawable3D where T : Mesh {
 
 	T? mesh;
 	bool ownMesh = false;
+	[AllowNull]
 	public T Mesh {
 		get {
 			if ( mesh is null ) {
@@ -70,6 +72,9 @@ public class Model<T> : Drawable3D where T : Mesh {
 		}
 	}
 
+	/// <summary>
+	/// Creates a default mesh when <see cref="Mesh"/> is accessed but not set
+	/// </summary>
 	protected virtual T CreateOwnMesh () {
 		throw new InvalidOperationException( $"{GetType().ReadableName()} can not create its own mesh" );
 	}
@@ -135,14 +140,14 @@ public class Model<T> : Drawable3D where T : Mesh {
 		}
 
 		AttributeArray VAO = null!;
-		Mesh mesh = null!;
+		Mesh? mesh;
 		Material material = null!;
 		protected Matrix4 Matrix;
 		bool normalMatrixComputed;
 		Matrix3 normalMatrix;
 		ulong linkId;
 		protected override void UpdateState () {
-			mesh = Source.Mesh;
+			mesh = Source.mesh;
 			material = Source.Material;
 			Matrix = Source.Matrix;
 			normalMatrixComputed = false;
@@ -152,6 +157,9 @@ public class Model<T> : Drawable3D where T : Mesh {
 		}
 
 		public override void Draw ( IRenderer renderer, object? ctx = null ) {
+			if ( mesh is null )
+				return;
+
 			if ( VAO.Bind() || linkId > Source.linkedMaterialMeshId ) {
 				LinkAttributeArray( mesh, material );
 				Source.linkedMaterialMeshId = linkId;
