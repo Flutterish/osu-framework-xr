@@ -1,4 +1,5 @@
 ﻿using OpenVR.NET;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Textures;
@@ -33,7 +34,15 @@ public class VrCompositor : Drawable {
 
 	public VrCompositor () {
 		Input = CreateInput();
-		DeviceDetected += trackedDevices.Add;
+		DeviceDetected += device => {
+			trackedDevices.Add( device );
+			device.IsEnabled.BindValueChanged( v => {
+				if ( v.NewValue )
+					ActiveDevices.Add( device );
+				else
+					ActiveDevices.Remove( device );
+			}, true );
+		};
 	}
 
 	bool ownVr;
@@ -51,6 +60,8 @@ public class VrCompositor : Drawable {
 	List<VrDevice> trackedDevices = new();
 	public IEnumerable<VrDevice> TrackedDevices => trackedDevices;
 	public event Action<VrDevice>? DeviceDetected;
+
+	public readonly BindableList<VrDevice> ActiveDevices = new();
 
 	public void BindDeviceDetected ( Action<VrDevice> action, bool invokeOnAllImmediately = true ) {
 		DeviceDetected += action;
