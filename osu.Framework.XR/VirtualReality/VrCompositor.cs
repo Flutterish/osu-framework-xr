@@ -38,9 +38,9 @@ public class VrCompositor : Drawable {
 			trackedDevices.Add( device );
 			device.IsEnabled.BindValueChanged( v => {
 				if ( v.NewValue )
-					ActiveDevices.Add( device );
+					activeDevices.Add( device );
 				else
-					ActiveDevices.Remove( device );
+					activeDevices.Remove( device );
 			}, true );
 		};
 	}
@@ -57,16 +57,16 @@ public class VrCompositor : Drawable {
 
 	protected virtual VrInput CreateInput () => new( this );
 
-	List<VrDevice> trackedDevices = new();
-	public IEnumerable<VrDevice> TrackedDevices => trackedDevices;
 	public event Action<VrDevice>? DeviceDetected;
-
-	public readonly BindableList<VrDevice> ActiveDevices = new();
+	BindableList<VrDevice> trackedDevices = new();
+	BindableList<VrDevice> activeDevices = new();
+	public IBindableList<VrDevice> TrackedDevices => trackedDevices;
+	public IBindableList<VrDevice> ActiveDevices => activeDevices;
 
 	public void BindDeviceDetected ( Action<VrDevice> action, bool invokeOnAllImmediately = true ) {
 		DeviceDetected += action;
 		if ( invokeOnAllImmediately ) {
-			foreach ( var i in trackedDevices ) {
+			foreach ( var i in TrackedDevices ) {
 				action( i );
 			}
 		}
