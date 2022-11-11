@@ -28,10 +28,13 @@ public class TestingVrCompositor : VrCompositor {
 	/// <summary>
 	/// Binds inputs from a testing rig such as virtual controllers
 	/// </summary>
-	public virtual void AddRig ( TestingRig rig ) {
+	public virtual (TestingController left, TestingController right, TestingHeadset head) AddRig ( TestingRig rig ) {
 		var left = new TestingController( this, Valve.VR.ETrackedControllerRole.LeftHand );
+		left.IsEnabled.Value = true;
 		var right = new TestingController( this, Valve.VR.ETrackedControllerRole.RightHand );
+		right.IsEnabled.Value = true;
 		var head = new TestingHeadset( this );
+		head.IsEnabled.Value = true;
 
 		left.PositionBindable.BindTo( rig.LeftTarget.PositionBindable );
 		left.RotationBindable.BindTo( rig.LeftTarget.RotationBindable );
@@ -48,5 +51,7 @@ public class TestingVrCompositor : VrCompositor {
 		AddDevice( left );
 		AddDevice( right );
 		AddDevice( head );
+
+		return (left, right, head);
 	}
 }
