@@ -4,7 +4,7 @@ using System;
 
 namespace osu.Framework.XR.Tests.Physics.Lines;
 
-public class TestSceneClosestPoint : BasicTestScene {
+public partial class TestSceneClosestPoint : BasicTestScene {
 	LineIndicator line;
 	PointIndicator point;
 

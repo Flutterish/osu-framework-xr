@@ -7,7 +7,7 @@ using osu.Framework.XR.Maths;
 
 namespace osu.Framework.XR.Testing;
 
-public class TriangleIndicator : CompositeDrawable {
+public partial class TriangleIndicator : CompositeDrawable {
 	public readonly BindableBool AllowDraggingBindable = new BindableBool( true );
 	public bool AllowDragging {
 		get => AllowDraggingBindable.Value;

@@ -7,7 +7,7 @@ using osu.Framework.XR.Graphics.Rendering;
 
 namespace osu.Framework.XR.Testing;
 
-public class PointIndicator : CompositeDrawable {
+public partial class PointIndicator : CompositeDrawable {
 	readonly BindableWithCurrent<Vector3> current = new( Vector3.Zero );
 	public Bindable<Vector3> Current {
 		get => current;

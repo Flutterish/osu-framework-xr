@@ -3,7 +3,7 @@ using osu.Framework.XR.VirtualReality.Devices;
 
 namespace osu.Framework.XR.Tests.VirtualReality;
 
-public class TestSceneDevices : VrScene {
+public partial class TestSceneDevices : VrScene {
 	public TestSceneDevices () {
 		VrCompositor.BindDeviceDetected( device => {
 			if ( device is Headset )

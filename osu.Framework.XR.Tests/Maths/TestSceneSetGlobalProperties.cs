@@ -5,7 +5,7 @@ using osu.Framework.XR.Testing;
 
 namespace osu.Framework.XR.Tests.Maths;
 
-public class TestSceneSetGlobalProperties : BasicTestScene {
+public partial class TestSceneSetGlobalProperties : BasicTestScene {
 	TransformIndicator parentTransform;
 	TransformIndicator childTransform;
 

@@ -11,7 +11,7 @@ namespace osu.Framework.XR.Graphics.Containers;
 /// <see cref="IUnrenderable"/> so they arent drawn with the main pipeline - they will share the same
 /// <see cref="Drawable3D.RenderStage"/> as this batch, as they are drawn with it
 /// </summary>
-public abstract class BatchDrawable<Tdrawable, Tnode> : Container3D<Tdrawable> where Tdrawable : Drawable3D, IUnrenderable where Tnode : DrawNode3D {
+public abstract partial class BatchDrawable<Tdrawable, Tnode> : Container3D<Tdrawable> where Tdrawable : Drawable3D, IUnrenderable where Tnode : DrawNode3D {
 	AttributeArray VAO = new();
 	ulong subtreeUpdateID = 1;
 	protected abstract override BatchDrawNode CreateDrawNode3D ( int subtreeIndex );

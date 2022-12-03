@@ -6,7 +6,7 @@ namespace osu.Framework.XR.VirtualReality;
 /// Anchor point for <see cref="VrCompositor"/> to decide where to position the player.
 /// This is positioned at the players feet
 /// </summary>
-public class VrPlayer : Drawable3D {
+public partial class VrPlayer : Drawable3D {
 	[Resolved]
 	public VrCompositor Compositor { get; private set; } = null!;
 

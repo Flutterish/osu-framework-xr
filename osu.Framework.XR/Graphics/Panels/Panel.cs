@@ -47,7 +47,7 @@ public partial class Panel : Drawable3D, IHasCollider {
 	}
 	protected virtual RootContainer CreateRootContainer ()
 		=> new();
-	public class RootContainer : VirtualInputManager, ISafeArea, IDrawable {
+	public partial class RootContainer : VirtualInputManager, ISafeArea, IDrawable {
 		// this ensures that the panel is the "root node" for cases like buffered containers which clip their size to the root node
 		CompositeDrawable? IDrawable.Parent => null;
 

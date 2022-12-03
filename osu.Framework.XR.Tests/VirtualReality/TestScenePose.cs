@@ -8,7 +8,7 @@ using PoseAction = osu.Framework.XR.VirtualReality.PoseAction;
 
 namespace osu.Framework.XR.Tests.VirtualReality;
 
-public class TestScenePose : VrScene {
+public partial class TestScenePose : VrScene {
 	BasicModel a;
 	BasicModel b;
 

@@ -6,7 +6,7 @@ using osuTK.Graphics;
 
 namespace osu.Framework.XR.Tests.Panels;
 
-public class TestSceneFlatPanel : BasicTestScene {
+public partial class TestSceneFlatPanel : BasicTestScene {
 	public TestSceneFlatPanel () {
 		FlatPanel panel;
 		Scene.Add( panel = new FlatPanel {

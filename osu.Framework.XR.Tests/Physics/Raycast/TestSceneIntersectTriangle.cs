@@ -4,7 +4,7 @@ using osuTK;
 
 namespace osu.Framework.XR.Tests.Physics.Raycast;
 
-public class TestSceneIntersectTriangle : BasicTestScene {
+public partial class TestSceneIntersectTriangle : BasicTestScene {
 	TriangleIndicator triangle;
 	RayIndicator ray;
 	PointIndicator hit;

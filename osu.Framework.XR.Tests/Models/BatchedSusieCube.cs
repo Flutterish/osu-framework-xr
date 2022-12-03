@@ -11,7 +11,7 @@ using System;
 
 namespace osu.Framework.XR.Graphics;
 
-public class BatchedSusieCube : Drawable3D {
+public partial class BatchedSusieCube : Drawable3D {
 	public static AttributeArray VAO = new();
 	public static Mesh Mesh;
 	static BatchedSusieCube () {

@@ -5,7 +5,7 @@ using osu.Framework.XR.VirtualReality.Devices;
 
 namespace osu.Framework.XR.Tests.VirtualReality;
 
-public class TestSceneHaptics : VrScene {
+public partial class TestSceneHaptics : VrScene {
 	public TestSceneHaptics () {
 		VrCompositor.BindDeviceDetected( device => {
 			if ( device is not Controller c )

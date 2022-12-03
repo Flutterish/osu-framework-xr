@@ -3,7 +3,7 @@ using osu.Framework.XR.Graphics;
 using osu.Framework.XR.Graphics.Rendering;
 
 namespace osu.Framework.XR.Tests.Models;
-public class TestSceneBatchedCubes1k : BasicTestScene {
+public partial class TestSceneBatchedCubes1k : BasicTestScene {
 	public TestSceneBatchedCubes1k () {
 		for ( int i = 0; i < 1000; i++ ) {
 			Scene.Add( new BatchedSusieCube {

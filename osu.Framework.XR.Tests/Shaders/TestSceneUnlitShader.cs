@@ -6,7 +6,7 @@ using System;
 
 namespace osu.Framework.XR.Tests.Shaders;
 
-public class TestSceneUnlitShader : BasicTestScene {
+public partial class TestSceneUnlitShader : BasicTestScene {
 	public TestSceneUnlitShader () {
 		var rng = new Random( 457576346 );
 		for ( int i = 0;i < 5; i++ ) {

@@ -4,7 +4,7 @@ using osu.Framework.XR.Graphics.Rendering;
 
 namespace osu.Framework.XR.Tests.Models;
 
-public class TestSceneBatchDrawableCubes1k : BasicTestScene {
+public partial class TestSceneBatchDrawableCubes1k : BasicTestScene {
 	public TestSceneBatchDrawableCubes1k () {
 		var batch = new SusieCubeBatch();
 		Scene.Add( batch );

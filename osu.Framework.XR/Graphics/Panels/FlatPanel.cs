@@ -7,7 +7,7 @@ namespace osu.Framework.XR.Graphics.Panels;
 /// <summary>
 /// A <see cref="Panel"/>, which renders directly into 3D space without a frame buffer
 /// </summary>
-public class FlatPanel : Panel {
+public partial class FlatPanel : Panel {
 	protected sealed override void RegenrateMesh () {
 		base.RegenrateMesh();
 	}

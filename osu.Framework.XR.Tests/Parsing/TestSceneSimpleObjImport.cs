@@ -5,7 +5,7 @@ using osuTK.Graphics.OpenGL4;
 
 namespace osu.Framework.XR.Tests.Parsing;
 
-public class TestSceneSimpleObjImport : BasicTestScene {
+public partial class TestSceneSimpleObjImport : BasicTestScene {
 	Mesh? mesh;
 
 	protected override void LoadComplete () {
@@ -21,7 +21,7 @@ public class TestSceneSimpleObjImport : BasicTestScene {
 		base.Dispose( isDisposing );
 	}
 
-	class WireframeModel : Model {
+	partial class WireframeModel : Model {
 		protected override ModelDrawNode? CreateDrawNode3D ( int index ) {
 			return new WireframeDrawNode( this, index );
 		}

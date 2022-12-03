@@ -6,7 +6,7 @@ using osu.Framework.XR.Graphics.Rendering;
 
 namespace osu.Framework.XR.Testing;
 
-public class LineIndicator : CompositeDrawable {
+public partial class LineIndicator : CompositeDrawable {
 	public readonly BindableBool AllowDraggingBindable = new BindableBool( true );
 	public bool AllowDragging {
 		get => AllowDraggingBindable.Value;

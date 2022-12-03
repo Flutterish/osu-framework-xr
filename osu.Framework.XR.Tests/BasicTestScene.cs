@@ -10,7 +10,7 @@ using osuTK.Graphics;
 
 namespace osu.Framework.XR.Tests;
 
-public class BasicTestScene : TestScene3D {
+public partial class BasicTestScene : TestScene3D {
 	public BasicTestScene () {
 		Scene.Camera.Z = -10;
 
@@ -38,7 +38,7 @@ public class BasicTestScene : TestScene3D {
 		return new TestResourcesScene();
 	}
 
-	class TestResourcesScene : Scene {
+	public partial class TestResourcesScene : Scene {
 		protected override ResourceStore<byte[]>? CreateMeshStoreSource ( IReadOnlyDependencyContainer deps ) {
 			return new NamespacedResourceStore<byte[]>( new DllResourceStore( typeof( TestResourcesScene ).Assembly ), "Resources/Meshes" );
 		}

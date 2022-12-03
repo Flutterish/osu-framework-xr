@@ -15,7 +15,7 @@ namespace osu.Framework.XR.VirtualReality;
 /// and calls the lifetime events of VR.
 /// Only one <see cref="VrCompositor"/> should exist at one time. (TBD nesting)
 /// </summary>
-public class VrCompositor : Drawable {
+public partial class VrCompositor : Drawable {
 	public IReadOnlyList<VrPlayer> Players => players;
 
 	List<VrPlayer> players = new();

@@ -8,7 +8,7 @@ using osu.Framework.XR.Maths;
 
 namespace osu.Framework.XR.Testing;
 
-public class PlaneIndicator : CompositeDrawable {
+public partial class PlaneIndicator : CompositeDrawable {
 	public readonly BindableBool AllowDraggingBindable = new BindableBool( true );
 	public bool AllowDragging {
 		get => AllowDraggingBindable.Value;

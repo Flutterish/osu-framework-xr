@@ -12,7 +12,7 @@ using System;
 
 namespace osu.Framework.XR.Tests.Models;
 
-public class ModelSusieCube : Model {
+public partial class ModelSusieCube : Model {
 	static Mesh mesh;
 	static ModelSusieCube () {
 		ElementBuffer<uint> EBO = new();

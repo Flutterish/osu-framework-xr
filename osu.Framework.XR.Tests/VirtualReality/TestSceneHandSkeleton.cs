@@ -4,7 +4,7 @@ using osu.Framework.XR.VirtualReality.Devices;
 
 namespace osu.Framework.XR.Tests.VirtualReality;
 
-public class TestSceneHandSkeleton : VrScene {
+public partial class TestSceneHandSkeleton : VrScene {
 	public TestSceneHandSkeleton () {
 		VrCompositor.Input.SetActionManifest( new ActionManifest<TestingCategory, TestingAction> {
 			ActionSets = new() {

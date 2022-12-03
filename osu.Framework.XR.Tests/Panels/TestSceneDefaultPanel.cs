@@ -6,7 +6,7 @@ using osuTK.Graphics;
 
 namespace osu.Framework.XR.Tests.Panels;
 
-public class TestSceneDefaultPanel : BasicTestScene {
+public partial class TestSceneDefaultPanel : BasicTestScene {
 	public TestSceneDefaultPanel () {
 		Panel panel;
 		Scene.Add( panel = new Panel {

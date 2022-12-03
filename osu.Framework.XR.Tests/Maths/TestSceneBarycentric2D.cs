@@ -4,7 +4,7 @@ using osuTK;
 
 namespace osu.Framework.XR.Tests.Maths;
 
-public class TestSceneBarycentric2D : BasicTestScene {
+public partial class TestSceneBarycentric2D : BasicTestScene {
 	TriangleIndicator triangle;
 	PointIndicator point;
 	PointIndicator indicator;

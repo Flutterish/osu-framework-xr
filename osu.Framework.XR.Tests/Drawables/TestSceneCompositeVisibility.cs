@@ -4,7 +4,7 @@ using osu.Framework.XR.Graphics.Containers;
 
 namespace osu.Framework.XR.Tests.Drawables;
 
-public class TestSceneCompositeVisibility : BasicTestScene {
+public partial class TestSceneCompositeVisibility : BasicTestScene {
 	BasicModel box;
 	Container3D container;
 	public TestSceneCompositeVisibility () {

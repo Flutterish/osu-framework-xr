@@ -5,7 +5,7 @@ using osu.Framework.XR.Maths;
 
 namespace osu.Framework.XR.Testing.VirtualReality;
 
-public class TestingRig : CompositeDrawable {
+public partial class TestingRig : CompositeDrawable {
 	public readonly BindableFloat LegLength = new( 0.8f );
 	public readonly BindableFloat ArmLength = new( 0.64f );
 	public readonly BindableFloat TorsoLength = new( 0.6f );

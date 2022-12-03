@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <RootNamespace>osu.Framework.XR</RootNamespace>
 	<AssemblyName>osu.Framework.XR</AssemblyName>
-	<Version>2022.1111.1</Version>
+	<Version>2022.1203.0</Version>
 	<Authors>PeriTheGee</Authors>
 	<Description>A 3D extension of osu!framework with VR capabilities</Description>
 	<Copyright>MIT</Copyright>
@@ -33,7 +33,7 @@
 
   <ItemGroup>
     <PackageReference Include="OpenVR.NET" Version="0.8.5" />
-    <PackageReference Include="ppy.osu.Framework" Version="2022.1101.0" />
+    <PackageReference Include="ppy.osu.Framework" Version="2022.1204.0" />
   </ItemGroup>
 
   <ItemGroup>

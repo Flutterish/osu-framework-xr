@@ -9,7 +9,7 @@ using System;
 
 namespace osu.Framework.XR.Tests.Models;
 
-public class TestingScene : Scene {
+public partial class TestingScene : BasicTestScene.TestResourcesScene {
 	Material susieCubeMaterial = null!;
 	protected override RenderPiepline CreateRenderPipeline () {
 		var materials = Dependencies.Get<MaterialStore>();

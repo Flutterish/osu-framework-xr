@@ -127,7 +127,7 @@ public class VirtualVrInput : VrInput {
 
 	protected override void ApplyActionManifest ( IActionManifest manifest, Action callback ) { }
 
-	class ControlsDrawable : FillFlowContainer {
+	partial class ControlsDrawable : FillFlowContainer {
 		BindableList<VrAction> actions = new();
 		List<IBindable> bindables = new();
 		public ControlsDrawable ( BindableList<VrAction> actions ) {

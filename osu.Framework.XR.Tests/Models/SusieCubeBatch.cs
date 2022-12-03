@@ -8,7 +8,7 @@ using osuTK.Graphics;
 
 namespace osu.Framework.XR.Tests.Models;
 
-public class SusieCubeBatch : BatchDrawable<BatchDrawableSusieCube, BatchDrawableSusieCube.BatchedSusieCubeDrawNode> {
+public partial class SusieCubeBatch : BatchDrawable<BatchDrawableSusieCube, BatchDrawableSusieCube.BatchedSusieCubeDrawNode> {
 	[BackgroundDependencyLoader]
 	private void load ( MaterialStore materials, TextureStore textures ) {
 		material = materials.GetNew( MaterialNames.Unlit );

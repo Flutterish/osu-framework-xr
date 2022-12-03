@@ -9,7 +9,7 @@ using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Framework.XR.Tests.VirtualReality;
-public class TestSceneInputs : VrScene {
+public partial class TestSceneInputs : VrScene {
 	Panel panel;
 	FillFlowContainer flow;
 

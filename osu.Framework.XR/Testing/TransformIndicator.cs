@@ -6,7 +6,7 @@ using osu.Framework.XR.Maths;
 
 namespace osu.Framework.XR.Testing;
 
-public class TransformIndicator : CompositeDrawable {
+public partial class TransformIndicator : CompositeDrawable {
 	public readonly BindableBool AllowDraggingBindable = new BindableBool( true );
 	public bool AllowDragging {
 		get => AllowDraggingBindable.Value;

@@ -4,7 +4,7 @@ using osuTK.Input;
 
 namespace osu.Framework.XR.Graphics.Panels;
 
-public class VirtualInputManager : CustomInputManager {
+public partial class VirtualInputManager : CustomInputManager {
 	protected readonly VirtualMouseHandler Mouse;
 	protected readonly VirtualKeyboardHandler Keyboard;
 	protected readonly VirtualTouchHandler Touch;
@@ -116,7 +116,7 @@ public class VirtualInputManager : CustomInputManager {
 	public void TouchMove ( object source, Vector2 position )
 		=> Touch.EmulateTouchMove( source, position );
 
-	class FocusLock : Drawable {
+	partial class FocusLock : Drawable {
 		public FocusLock () {
 			AlwaysPresent = true;
 		}

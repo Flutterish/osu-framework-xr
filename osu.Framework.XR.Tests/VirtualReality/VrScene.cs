@@ -7,7 +7,7 @@ using osu.Framework.XR.VirtualReality;
 
 namespace osu.Framework.XR.Tests.VirtualReality;
 
-public class VrScene : BasicTestScene {
+public partial class VrScene : BasicTestScene {
 	[Cached(typeof(VrCompositor))]
 	public readonly VrCompositor VrCompositor;
 	[Cached]

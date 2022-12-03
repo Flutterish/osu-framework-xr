@@ -7,7 +7,7 @@ using System;
 
 namespace osu.Framework.XR.Graphics;
 
-public class BatchDrawableSusieCube : Drawable3D, IUnrenderable {
+public partial class BatchDrawableSusieCube : Drawable3D, IUnrenderable {
 	public BatchDrawableSusieCube () {
 		color = new Color4( RNG.NextSingle(), RNG.NextSingle(), RNG.NextSingle(), 1 );
 	}

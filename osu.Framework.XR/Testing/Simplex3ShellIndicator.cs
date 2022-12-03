@@ -5,7 +5,7 @@ using osu.Framework.XR.Graphics.Rendering;
 
 namespace osu.Framework.XR.Testing;
 
-public class Simplex3ShellIndicator : CompositeDrawable {
+public partial class Simplex3ShellIndicator : CompositeDrawable {
 	public readonly BindableBool AllowDraggingBindable = new BindableBool( true );
 	public bool AllowDragging {
 		get => AllowDraggingBindable.Value;

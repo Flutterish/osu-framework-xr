@@ -4,7 +4,7 @@ using osu.Framework.XR.VirtualReality.Devices;
 
 namespace osu.Framework.XR.VirtualReality;
 
-public class BasicHandSkeleton : BasicModel {
+public partial class BasicHandSkeleton : BasicModel {
 	HandSkeletonAction source = null!;
 	Controller controller;
 	Enum name;

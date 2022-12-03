@@ -5,7 +5,7 @@ using osu.Framework.XR.Graphics.Meshes;
 
 namespace osu.Framework.XR.Tests.Shaders;
 
-public class TestSceneModel : BasicTestScene {
+public partial class TestSceneModel : BasicTestScene {
 	Model model;
 
 	public TestSceneModel () {

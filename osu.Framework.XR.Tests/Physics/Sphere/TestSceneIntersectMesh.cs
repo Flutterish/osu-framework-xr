@@ -6,7 +6,7 @@ using osuTK;
 
 namespace osu.Framework.XR.Tests.Physics.Sphere;
 
-public class TestSceneIntersectMesh : BasicTestScene {
+public partial class TestSceneIntersectMesh : BasicTestScene {
 	BasicModel model;
 	SphereShellIndicator sphere;
 	PointIndicator hit;

@@ -12,7 +12,7 @@ using System;
 
 namespace osu.Framework.XR.Graphics;
 
-public class SusieCube : Drawable3D {
+public partial class SusieCube : Drawable3D {
 	AttributeArray VAO = new();
 	static Mesh mesh;
 	static SusieCube () {

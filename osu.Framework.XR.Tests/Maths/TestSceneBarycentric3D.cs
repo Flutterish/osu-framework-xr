@@ -5,7 +5,7 @@ using osuTK.Graphics;
 
 namespace osu.Framework.XR.Tests.Maths;
 
-public class TestSceneBarycentric3D : BasicTestScene {
+public partial class TestSceneBarycentric3D : BasicTestScene {
 	Simplex3ShellIndicator simplex;
 	PointIndicator point;
 	PointIndicator indicator;

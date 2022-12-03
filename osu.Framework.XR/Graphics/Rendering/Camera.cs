@@ -1,6 +1,6 @@
 ﻿namespace osu.Framework.XR.Graphics.Rendering;
 
-public class Camera : Drawable3D {
+public partial class Camera : Drawable3D {
 	public FovType FovType = FovType.Y;
 	public float FovY = MathF.PI / 2;
 	public float FovX = MathF.PI / 2;

@@ -14,7 +14,7 @@ namespace osu.Framework.XR.Graphics;
 /// A 3D drawable with a <see cref="BasicMesh"/> and a material. 
 /// Implements a collider whose cache is invalidated every frame, but is disabled by default
 /// </summary>
-public class BasicModel : Model<BasicMesh>, IHasCollider {
+public partial class BasicModel : Model<BasicMesh>, IHasCollider {
 	protected override BasicMesh CreateOwnMesh () {
 		return new();
 	}
@@ -39,13 +39,13 @@ public class BasicModel : Model<BasicMesh>, IHasCollider {
 }
 
 /// <inheritdoc cref="Model{T}"/>
-public class Model : Model<Mesh> { }
+public partial class Model : Model<Mesh> { }
 
 /// <summary>
 /// A 3D drawable with a mesh and a material
 /// </summary>
 /// <typeparam name="T">The type of mesh</typeparam>
-public class Model<T> : Drawable3D where T : Mesh {
+public partial class Model<T> : Drawable3D where T : Mesh {
 	ulong materialMeshId = 1; // update thread mutable
 	ulong linkedMaterialMeshId = 0; // 
 	AttributeArray VAO = new();     // draw thread mutable

@@ -5,7 +5,7 @@ using osu.Framework.XR.Graphics.Rendering;
 
 namespace osu.Framework.XR.Testing;
 
-public class SphereShellIndicator : PointIndicator {
+public partial class SphereShellIndicator : PointIndicator {
 	public readonly Bindable<float> RadiusBindable = new( 0.4f );
 	public float Radius {
 		get => RadiusBindable.Value;

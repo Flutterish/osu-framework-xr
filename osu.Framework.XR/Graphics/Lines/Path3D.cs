@@ -4,7 +4,7 @@ using osu.Framework.XR.Maths;
 
 namespace osu.Framework.XR.Graphics.Lines;
 
-public class Path3D : BasicModel {
+public partial class Path3D : BasicModel {
 	private Cached isPathValid = new();
 	public readonly BindableFloat PathWidth = new( 0.05f );
 

@@ -3,7 +3,7 @@ using System.ComponentModel;
 
 namespace osu.Framework.XR.Graphics;
 
-public class CompositeDrawable3D : Drawable3D {
+public partial class CompositeDrawable3D : Drawable3D {
 	List<Drawable3D> children = new();
 	IReadOnlyList<Drawable3D> internalChildren;
 	new protected IReadOnlyList<Drawable3D> InternalChildren {

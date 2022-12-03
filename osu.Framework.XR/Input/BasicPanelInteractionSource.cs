@@ -10,7 +10,7 @@ namespace osu.Framework.XR.Input;
 /// <summary>
 /// A system which allows pointer and keyboard interaction with panels contained within a scene
 /// </summary>
-public class BasicPanelInteractionSource : Drawable {
+public partial class BasicPanelInteractionSource : Drawable {
 	protected readonly PhysicsSystem Physics;
 	protected readonly Scene Scene;
 

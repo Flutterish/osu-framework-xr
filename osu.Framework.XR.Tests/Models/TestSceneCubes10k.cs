@@ -4,7 +4,7 @@ using osu.Framework.XR.Graphics.Rendering;
 
 namespace osu.Framework.XR.Tests.Models;
 
-public class TestSceneCubes10k : BasicTestScene {
+public partial class TestSceneCubes10k : BasicTestScene {
 	public TestSceneCubes10k () {
 		for ( int i = 0; i < 10000; i++ ) {
 			Scene.Add( new SusieCube {

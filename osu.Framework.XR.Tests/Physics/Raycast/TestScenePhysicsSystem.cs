@@ -7,7 +7,7 @@ using osuTK;
 
 namespace osu.Framework.XR.Tests.Physics.Raycast;
 
-public class TestScenePhysicsSystem : BasicTestScene {
+public partial class TestScenePhysicsSystem : BasicTestScene {
 	PhysicsSystem physics;
 
 	RayIndicator ray;

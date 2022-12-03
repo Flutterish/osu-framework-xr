@@ -5,7 +5,7 @@ using osu.Framework.XR.Input;
 
 namespace osu.Framework.XR.Testing;
 
-public abstract class TestScene3D : TestScene {
+public abstract partial class TestScene3D : TestScene {
 	protected readonly Scene Scene;
 	protected readonly BasicSceneMovementSystem MovementSystem;
 

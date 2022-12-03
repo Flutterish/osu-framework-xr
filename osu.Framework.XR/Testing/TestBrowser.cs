@@ -9,7 +9,7 @@ using osu.Framework.Platform;
 
 namespace osu.Framework.XR.Testing;
 
-public class TestBrowser : Game {
+public partial class TestBrowser : Game {
 	[Cached]
 	private VR VR = new();
 

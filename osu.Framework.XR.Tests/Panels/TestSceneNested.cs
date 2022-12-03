@@ -3,7 +3,7 @@ using osuTK.Graphics;
 
 namespace osu.Framework.XR.Tests.Panels;
 
-public class TestSceneNested : TestScenePanelInput {
+public partial class TestSceneNested : TestScenePanelInput {
 	public TestSceneNested () {
 		Panel.Content.Clear();
 

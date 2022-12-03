@@ -2,9 +2,9 @@
 
 namespace osu.Framework.XR.Graphics.Containers;
 
-public class Container3D : Container3D<Drawable3D> { }
+public partial class Container3D : Container3D<Drawable3D> { }
 
-public class Container3D<T> : CompositeDrawable3D where T : Drawable3D {
+public partial class Container3D<T> : CompositeDrawable3D where T : Drawable3D {
 	protected virtual Container3D<T> Content => this;
 	public IReadOnlyList<T> Children {
 		get => Content == this ? internalChildrenAsT : Content.Children;

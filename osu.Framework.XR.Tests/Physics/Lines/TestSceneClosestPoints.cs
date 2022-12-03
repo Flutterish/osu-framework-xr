@@ -4,7 +4,7 @@ using osuTK.Graphics;
 
 namespace osu.Framework.XR.Tests.Physics.Lines;
 
-public class TestSceneClosestPoints : BasicTestScene {
+public partial class TestSceneClosestPoints : BasicTestScene {
 	RayIndicator rayA;
 	RayIndicator rayB;
 	PointIndicator pointA;

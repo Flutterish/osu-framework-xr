@@ -5,7 +5,7 @@ using osu.Framework.XR.Graphics.Rendering;
 
 namespace osu.Framework.XR.Testing;
 
-public class DashedLineVisual : CompositeDrawable {
+public partial class DashedLineVisual : CompositeDrawable {
 	private BindableWithCurrent<Vector3> a = new BindableWithCurrent<Vector3>();
 	private BindableWithCurrent<Vector3> b = new BindableWithCurrent<Vector3>();
 

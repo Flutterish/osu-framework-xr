@@ -9,7 +9,7 @@ using VrDevice = osu.Framework.XR.VirtualReality.Devices.VrDevice;
 
 namespace osu.Framework.XR.VirtualReality;
 
-public class BasicVrDevice : CompositeDrawable3D {
+public partial class BasicVrDevice : CompositeDrawable3D {
 	List<BasicVrDeviceComponent> components = new();
 	List<BasicVrDeviceComponent> references = new();
 	public IReadOnlyList<BasicVrDeviceComponent> Components => components;
@@ -55,7 +55,7 @@ public class BasicVrDevice : CompositeDrawable3D {
 		Rotation = Source.Rotation;
 	}
 
-	public class BasicVrDeviceComponent : BasicModel {
+	public partial class BasicVrDeviceComponent : BasicModel {
 		public readonly ComponentModel Source;
 		public readonly VrDevice Device;
 		public BasicVrDeviceComponent ( VrDevice device, ComponentModel source ) {

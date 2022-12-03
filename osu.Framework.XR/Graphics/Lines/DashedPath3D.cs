@@ -1,6 +1,6 @@
 ﻿namespace osu.Framework.XR.Graphics.Lines;
 
-public class DashedPath3D : Path3D {
+public partial class DashedPath3D : Path3D {
 	protected override void RegenerateMesh () {
 		if ( Nodes.Count == 0 ) return;
 		else if ( Nodes.Count == 1 ) {

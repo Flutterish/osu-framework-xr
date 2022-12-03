@@ -6,7 +6,7 @@ using osuTK;
 
 namespace osu.Framework.XR.Tests.Physics.Raycast;
 
-public class TestSceneIntersectMesh : BasicTestScene {
+public partial class TestSceneIntersectMesh : BasicTestScene {
 	BasicModel model;
 	RayIndicator ray;
 	PointIndicator hit;

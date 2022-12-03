@@ -8,7 +8,7 @@ using osu.Framework.Graphics;
 
 namespace osu.Framework.XR.Tests.Maths;
 
-public class TestSceneGlobalProperties : BasicTestScene {
+public partial class TestSceneGlobalProperties : BasicTestScene {
 	TransformIndicator parentTransform;
 	TransformIndicator childTransform;
 	TransformIndicator resultTransform;

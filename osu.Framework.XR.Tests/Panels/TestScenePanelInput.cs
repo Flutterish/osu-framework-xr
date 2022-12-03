@@ -15,7 +15,7 @@ using System;
 
 namespace osu.Framework.XR.Tests.Panels;
 
-public class TestScenePanelInput : BasicTestScene, IRequireHighFrequencyMousePosition {
+public partial class TestScenePanelInput : BasicTestScene, IRequireHighFrequencyMousePosition {
 	bool useTouch;
 	protected readonly Panel Panel;
 	public TestScenePanelInput () {

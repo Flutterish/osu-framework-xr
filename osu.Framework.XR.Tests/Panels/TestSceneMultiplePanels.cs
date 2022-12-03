@@ -12,7 +12,7 @@ using osu.Framework.XR.Input;
 
 namespace osu.Framework.XR.Tests.Panels;
 
-public class TestSceneMultiplePanels : TestScene3D {
+public partial class TestSceneMultiplePanels : TestScene3D {
 	PhysicsSystem physics = new();
 	BasicPanelInteractionSource interactionSystem;
 
