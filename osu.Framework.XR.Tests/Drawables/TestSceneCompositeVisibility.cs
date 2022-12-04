@@ -11,6 +11,8 @@ public partial class TestSceneCompositeVisibility : BasicTestScene {
 		Scene.Add( container = new() { Child = box = new BasicModel { Mesh = BasicMesh.UnitCube } } );
 
 		AddToggleStep( "Toggle Container Visibility", v => container.IsVisible = v );
+		AddSliderStep( "Container Alpha", 0, 1, 1f, v => container.Alpha = v );
 		AddToggleStep( "Toggle Box Visibility", v => box.IsVisible = v );
+		AddSliderStep( "Box Alpha", 0, 1, 1f, v => box.Alpha = v );
 	}
 }

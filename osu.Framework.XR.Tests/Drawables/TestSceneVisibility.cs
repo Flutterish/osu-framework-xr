@@ -9,5 +9,6 @@ public partial class TestSceneVisibility : BasicTestScene {
 		Scene.Add( box = new BasicModel { Mesh = BasicMesh.UnitCube } );
 
 		AddToggleStep( "Toggle Visibility", v => box.IsVisible = v );
+		AddSliderStep( "Alpha", 0, 1, 1f, v => box.Alpha = v );
 	}
 }
