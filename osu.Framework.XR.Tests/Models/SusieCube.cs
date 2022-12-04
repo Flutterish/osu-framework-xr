@@ -75,7 +75,6 @@ public partial class SusieCube : Drawable3D {
 	protected override void Dispose ( bool isDisposing ) {
 		if ( !IsDisposed ) {
 			VAO.Dispose();
-			mesh.Dispose();
 		}
 		base.Dispose( isDisposing );
 	}
