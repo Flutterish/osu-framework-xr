@@ -113,6 +113,10 @@ public partial class Model<T> : Drawable3D where T : Mesh {
 			Invalidate( Invalidation.DrawNode );
 		}
 	}
+	new public float Alpha {
+		get => Colour.A;
+		set => Colour = Colour with { A = value };
+	}
 
 	protected override void Dispose ( bool isDisposing ) {
 		if ( !IsDisposed ) {
@@ -142,14 +146,12 @@ public partial class Model<T> : Drawable3D where T : Mesh {
 		bool normalMatrixComputed;
 		Matrix3 normalMatrix;
 		ulong linkId;
-		float alpha;
 		protected override void UpdateState () {
 			mesh = Source.mesh;
 			material = Source.Material;
 			Matrix = Source.Matrix;
 			normalMatrixComputed = false;
 			linkId = Source.materialMeshId;
-			alpha = Source.EffectiveAlpha;
 
 			material.UpdateProperties( nodeIndex );
 		}
@@ -165,7 +167,6 @@ public partial class Model<T> : Drawable3D where T : Mesh {
 
 			material.Bind( nodeIndex );
 			material.Shader.SetUniform( "mMatrix", ref Matrix );
-			material.Shader.SetUniform( "mAlpha", ref alpha );
 			if ( material.Shader.TryGetUniform<Matrix3>( "mNormal", out var mNormal ) ) {
 				if ( !normalMatrixComputed ) {
 					var mat = Matrix.Inverted();

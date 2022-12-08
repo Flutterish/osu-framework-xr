@@ -18,7 +18,6 @@ out vec4 FragColor;
 uniform sampler2D tex;
 uniform vec4 subImage;
 uniform vec4 tint;
-uniform float mAlpha;
 
 // unlit is an opaque shader, therefore we use dithering for transparency
 const float dither[16] = float[](
@@ -37,7 +36,7 @@ float ditherLimit ( vec4 color ) {
 
 void main ()
 {
-	vec4 color = texture( tex, uv * subImage.zw + subImage.xy ) * tint * vec4(1,1,1, mAlpha);
+	vec4 color = texture( tex, uv * subImage.zw + subImage.xy ) * tint;
 	if ( useGamma )
 		color = toSRGB( color );
 

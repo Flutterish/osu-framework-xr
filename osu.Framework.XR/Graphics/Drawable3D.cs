@@ -76,43 +76,11 @@ public partial class Drawable3D : CompositeDrawable {
 		}
 	}
 
-	float supertreeAlpha = 1;
-	/// <summary>
-	/// <see cref="EffectiveAlpha"/> of the <see cref="Parent"/>
-	/// </summary>
-	public virtual float SupertreeAlpha {
-		get => supertreeAlpha;
-		[Friend( typeof( CompositeDrawable3D ) )]
-		internal set {
-			var prev = IsRendered;
-			supertreeAlpha = value;
-			if ( prev != IsRendered )
-				VisibilityChanged?.Invoke( this, IsRendered );
-			Invalidate( Invalidation.DrawNode );
-		}
-	}
-	/// <summary>
-	/// Multiplicative alpha factor applied on top of <see cref="SupertreeAlpha"/> and existing alpha channel(s)
-	/// </summary>
-	new public virtual float Alpha {
-		get => base.Alpha;
-		set {
-			var prev = IsRendered;
-			base.Alpha = value;
-			if ( prev != IsRendered )
-				VisibilityChanged?.Invoke( this, IsRendered );
-			Invalidate( Invalidation.DrawNode );
-		}
-	}
-	public float EffectiveAlpha => SupertreeAlpha * Alpha;
-
-
 	/// <summary>
 	/// Whether this drawable is being rendered. 
 	/// This is only true when this <see cref="IsVisible"/> and <see cref="IsSupertreeVisible"/> are both <see langword="true"/>
-	/// and <see cref="EffectiveAlpha"/> is not 0
 	/// </summary>
-	public bool IsRendered => isVisible && IsSupertreeVisible && EffectiveAlpha != 0;
+	public bool IsRendered => isVisible && IsSupertreeVisible;
 
 	/// <summary>
 	/// Render layer expressed as a bitfield (or custom via the given render pipeline).

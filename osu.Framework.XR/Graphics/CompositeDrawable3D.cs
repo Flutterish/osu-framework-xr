@@ -37,7 +37,6 @@ public partial class CompositeDrawable3D : Drawable3D {
 		children.Add( child );
 		base.AddInternal( child );
 		child.IsSupertreeVisible = IsRendered;
-		child.SupertreeAlpha = EffectiveAlpha;
 		if ( !ShouldUpdateChildrenLife )
 			MakeChildAlive( child );
 
@@ -112,34 +111,6 @@ public partial class CompositeDrawable3D : Drawable3D {
 			base.IsSupertreeVisible = value;
 			foreach ( var i in children ) {
 				i.IsSupertreeVisible = IsRendered;
-			}
-		}
-	}
-
-	public override float Alpha { 
-		get => base.Alpha; 
-		set {
-			if ( base.Alpha == value )
-				return;
-
-			base.Alpha = value;
-			var alpha = EffectiveAlpha;
-			foreach ( var i in children ) {
-				i.SupertreeAlpha = alpha;
-			}
-		}
-	}
-
-	public override float SupertreeAlpha { 
-		get => base.SupertreeAlpha; 
-		internal set {
-			if ( base.SupertreeAlpha == value )
-				return;
-
-			base.SupertreeAlpha = value;
-			var alpha = EffectiveAlpha;
-			foreach ( var i in children ) {
-				i.SupertreeAlpha = alpha;
 			}
 		}
 	}

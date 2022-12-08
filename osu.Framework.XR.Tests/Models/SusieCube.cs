@@ -92,10 +92,8 @@ public partial class SusieCube : Drawable3D {
 
 		Material material;
 		Matrix4 matrix;
-		float alpha;
 		protected override void UpdateState () {
 			matrix = Source.Matrix;
-			alpha = Source.EffectiveAlpha;
 		}
 
 		public override void Draw ( IRenderer renderer, object? ctx = null ) {
@@ -105,7 +103,6 @@ public partial class SusieCube : Drawable3D {
 
 			material.BindUniforms();
 			material.Shader.SetUniform( "mMatrix", ref matrix );
-			material.Shader.SetUniform( "mAlpha", ref alpha );
 			mesh.Draw();
 		}
 	}

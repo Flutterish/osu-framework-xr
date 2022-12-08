@@ -38,7 +38,6 @@ public partial class Panel {
 		protected Matrix4 Matrix;
 		protected Vector2 Size;
 		protected readonly int SubtreeIndex;
-		float alpha;
 		public PanelDrawNode ( Panel source, int index ) : base( source ) {
 			VAO = source.VAO;
 			Mesh = source.Mesh;
@@ -49,7 +48,6 @@ public partial class Panel {
 		protected override void UpdateState () {
 			Matrix = Source.Matrix;
 			Size = Source.ContentDrawSize;
-			alpha = Source.EffectiveAlpha;
 
 			Material.UpdateProperties( SubtreeIndex );
 			SourceDrawNode = GenerateDrawNodeSubtree( Source.Content, Source.frameId++, SubtreeIndex, false );
@@ -98,7 +96,6 @@ public partial class Panel {
 			Material.Bind( SubtreeIndex );
 			Material.Shader.SetUniform( "tex", FrameBuffer.Texture );
 			Material.Shader.SetUniform( "mMatrix", ref Matrix );
-			Material.Shader.SetUniform( "mAlpha", ref alpha );
 			Mesh.Draw();
 		}
 	}

@@ -72,10 +72,8 @@ public partial class BatchedSusieCube : Drawable3D {
 
 		Color4 color;
 		Matrix4 matrix;
-		float alpha;
 		protected override void UpdateState () {
 			matrix = Source.Matrix;
-			alpha = Source.EffectiveAlpha;
 		}
 
 		public override void Draw ( IRenderer renderer, object? ctx = null ) {
@@ -83,7 +81,6 @@ public partial class BatchedSusieCube : Drawable3D {
 
 			shader.SetUniform( "mMatrix", ref matrix );
 			shader.SetUniform( "tint", ref color );
-			shader.SetUniform( "mAlpha", ref alpha );
 		}
 	}
 }

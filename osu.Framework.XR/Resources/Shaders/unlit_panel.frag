@@ -5,7 +5,6 @@ in vec2 uv;
 out vec4 FragColor;
 
 uniform vec4 tint;
-uniform float mAlpha;
 uniform sampler2D tex;
 
 lowp float toSRGB ( lowp float color ) {
@@ -34,7 +33,7 @@ float ditherLimit ( vec4 color ) {
 
 void main()
 {
-    vec4 color = toSRGB( texture( tex, uv ) * tint * vec4(1,1,1, mAlpha) );
+    vec4 color = toSRGB( texture( tex, uv ) * tint );
 
 	if ( color.a < ditherLimit( color ) )
 		discard;
