@@ -1,5 +1,6 @@
 ﻿using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.XR.Graphics.Buffers;
 using osu.Framework.XR.Graphics.Materials;
@@ -102,7 +103,11 @@ public partial class Model<T> : Drawable3D where T : Mesh {
 	}
 
 	Color4? colour = null;
-	new public Color4 Colour {
+	override public ColourInfo Colour {
+		get => Tint;
+		set => Tint = value.TopLeft.Linear;
+	}
+	public Color4 Tint {
 		get => Material?.Get<Color4>( "tint" ) ?? colour ?? Color4.White;
 		set {
 			if ( Colour == value )
@@ -113,9 +118,9 @@ public partial class Model<T> : Drawable3D where T : Mesh {
 			Invalidate( Invalidation.DrawNode );
 		}
 	}
-	new public float Alpha {
-		get => Colour.A;
-		set => Colour = Colour with { A = value };
+	override public float Alpha {
+		get => Tint.A;
+		set => Tint = Tint with { A = value };
 	}
 
 	protected override void Dispose ( bool isDisposing ) {

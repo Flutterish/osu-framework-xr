@@ -1,4 +1,5 @@
 ﻿using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Shaders;
@@ -6,8 +7,10 @@ using osu.Framework.XR.Graphics.Buffers;
 using osu.Framework.XR.Graphics.Materials;
 using osu.Framework.XR.Graphics.Meshes;
 using osu.Framework.XR.Graphics.Shaders;
+using osuTK.Graphics;
 using System.ComponentModel;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace osu.Framework.XR.Graphics;
 
@@ -81,6 +84,37 @@ public partial class Drawable3D : CompositeDrawable {
 	/// This is only true when this <see cref="IsVisible"/> and <see cref="IsSupertreeVisible"/> are both <see langword="true"/>
 	/// </summary>
 	public bool IsRendered => isVisible && IsSupertreeVisible;
+
+	/// <summary>
+	/// Opacity value, meaning might depend on the implementer, and does not necessarily propagate down
+	/// </summary>
+	new public virtual float Alpha {
+		[MethodImpl( MethodImplOptions.AggressiveInlining )]
+		get => base.Alpha;
+		[MethodImpl( MethodImplOptions.AggressiveInlining )]
+		set => base.Alpha = value;
+	}
+
+	/// <summary>
+	/// Colour value, meaning might depend on the implementer, and does not necessarily propagate down.
+	/// It is <see cref="ColourInfo"/> for compatibility with transforms, you should use the <see cref="Color4"/> <see cref="Tint"/> instead
+	/// </summary>
+	new public virtual ColourInfo Colour {
+		[MethodImpl( MethodImplOptions.AggressiveInlining )]
+		get => base.Colour;
+		[MethodImpl( MethodImplOptions.AggressiveInlining )]
+		set => base.Colour = value;
+	}
+
+	/// <summary>
+	/// Colour value, meaning might depend on the implementer, and does not necessarily propagate down
+	/// </summary>
+	public virtual Color4 Tint {
+		[MethodImpl( MethodImplOptions.AggressiveInlining )]
+		get => Colour.TopLeft.Linear;
+		[MethodImpl( MethodImplOptions.AggressiveInlining )]
+		set => Colour = value;
+	}
 
 	/// <summary>
 	/// Render layer expressed as a bitfield (or custom via the given render pipeline).

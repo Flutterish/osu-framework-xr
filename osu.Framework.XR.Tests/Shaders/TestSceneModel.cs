@@ -13,8 +13,8 @@ public partial class TestSceneModel : BasicTestScene {
 		model.Mesh = BasicMesh.UnitCube;
 
 		AddSliderStep( "Alpha", 0, 1, 1f, v => model.Alpha = v );
-		AddStep( "Random Color", () => model.Colour = new( RNG.NextSingle(), RNG.NextSingle(), RNG.NextSingle(), model.Alpha ) );
-		AddStep( "White", () => model.Colour = new( 1, 1, 1, model.Alpha ) );
+		AddStep( "Random Color", () => model.Tint = new( RNG.NextSingle(), RNG.NextSingle(), RNG.NextSingle(), model.Alpha ) );
+		AddStep( "White", () => model.Tint = new( 1, 1, 1, model.Alpha ) );
 		AddLabel( "Material" );
 		foreach ( var mat in new[] { MaterialNames.Unlit, MaterialNames.Blit } ) {
 			AddStep( mat, () => model.Material = Scene.MaterialStore.GetNew( mat ) );

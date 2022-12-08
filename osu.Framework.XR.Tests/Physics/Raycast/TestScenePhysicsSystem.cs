@@ -23,7 +23,7 @@ public partial class TestScenePhysicsSystem : BasicTestScene {
 		for ( int i = 0; i < 10; i++ ) {
 			BasicModel model = new BasicModel {
 				Mesh = BasicMesh.UnitCube,
-				Colour = new( rng.NextSingle(), rng.NextSingle(), rng.NextSingle(), 1 ),
+				Tint = new( rng.NextSingle(), rng.NextSingle(), rng.NextSingle(), 1 ),
 				Position = new( rng.NextSingle( -5, 5 ), rng.NextSingle( -5, 5 ), rng.NextSingle( -5, 5 ) ),
 				IsColliderEnabled = true
 			};
