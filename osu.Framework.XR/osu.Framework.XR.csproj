@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <RootNamespace>osu.Framework.XR</RootNamespace>
 	<AssemblyName>osu.Framework.XR</AssemblyName>
-	<Version>2022.1203.0</Version>
+	<Version>2022.1209.0</Version>
 	<Authors>PeriTheGee</Authors>
 	<Description>A 3D extension of osu!framework with VR capabilities</Description>
 	<Copyright>MIT</Copyright>
@@ -16,6 +16,7 @@
 	<IncludeSymbols>True</IncludeSymbols>
 	<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 	<GenerateDocumentationFile>True</GenerateDocumentationFile>
+	<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
 	
   <ItemGroup>

@@ -3,6 +3,8 @@ using osu.Framework.XR.Maths;
 
 namespace osu.Framework.XR.Physics;
 
+// it works. its fine.
+#pragma warning disable CS9093 // This ref-assigns a value that can only escape the current method through a return statement.
 public static class Raycast {
 	[ThreadStatic]
 	static RaycastHit swapHit; // used for temp values with ref swapping
@@ -181,7 +183,7 @@ public static class Raycast {
 			face.C = transform.Apply( face.C );
 			if ( TryHitPrenormalized( origin, direction, face, ref swap, includeBehind ) && ( !hasResult || Math.Abs( closest.Distance ) > Math.Abs( swap.Distance ) ) ) {
 				ref RaycastHit temp = ref closest;
-				closest = ref swap;
+				unsafe { closest = ref swap; }
 				swap = ref temp;
 				closest.TrisIndex = i;
 				hasResult = true;
@@ -222,7 +224,7 @@ public static class Raycast {
 			var face = mesh.GetTriangleFace( i );
 			if ( TryHitPrenormalized( origin, direction, face, ref swap, includeBehind ) && ( !hasResult || Math.Abs( closest.Distance ) > Math.Abs( swap.Distance ) ) ) {
 				ref RaycastHit temp = ref closest;
-				closest = ref swap;
+				unsafe { closest = ref swap; }
 				swap = ref temp;
 				closest.TrisIndex = i;
 				hasResult = true;

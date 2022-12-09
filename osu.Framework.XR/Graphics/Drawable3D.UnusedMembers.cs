@@ -29,4 +29,12 @@ public partial class Drawable3D {
 
 	public sealed override bool Contains ( Vector2 screenSpacePos )
 		=> false;
+
+	/// <summary>
+	/// Determines whether this <see cref="Drawable3D"/> is present and eligible for game logic updates.
+	/// </summary>
+	/// <remarks>
+	/// This is always <see langword="true"/> by default, but implementers should ensure to consider the <see cref="Drawable.AlwaysPresent"/> value.
+	/// </remarks>
+	public override bool IsPresent => true;
 }

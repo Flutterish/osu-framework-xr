@@ -3,6 +3,8 @@ using osu.Framework.XR.Maths;
 
 namespace osu.Framework.XR.Physics;
 
+// it works. its fine.
+#pragma warning disable CS9093 // This ref-assigns a value that can only escape the current method through a return statement.
 public static class Sphere {
 	[ThreadStatic]
 	static SphereHit swapHit; // used for temp values with ref swapping
@@ -81,7 +83,7 @@ public static class Sphere {
 			if ( TryHit( origin, radius, face, ref swap ) && ( !hasResult || closest.Distance > swap.Distance ) ) {
 				ref SphereHit temp = ref closest;
 				closest = ref swap;
-				swap = ref temp;
+				unsafe { swap = ref temp; }
 				closest.TrisIndex = i;
 				hasResult = true;
 			}
@@ -112,7 +114,7 @@ public static class Sphere {
 			if ( TryHit( origin, radius, face, ref swap ) && ( !hasResult || closest.Distance > swap.Distance ) ) {
 				ref SphereHit temp = ref closest;
 				closest = ref swap;
-				swap = ref temp;
+				unsafe { swap = ref temp; }
 				closest.TrisIndex = i;
 				hasResult = true;
 			}
