@@ -116,7 +116,7 @@ public partial class Panel : Drawable3D, IHasCollider {
 	Color4? colour = null;
 	override public ColourInfo Colour {
 		get => Tint;
-		set => Tint = value.TopLeft.Linear;
+		set => Tint = value.TopLeft;
 	}
 	public override Color4 Tint {
 		get => Material?.Get<Color4>( "tint" ) ?? colour ?? Color4.White;

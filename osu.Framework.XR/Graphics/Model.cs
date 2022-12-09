@@ -105,7 +105,7 @@ public partial class Model<T> : Drawable3D where T : Mesh {
 	Color4? colour = null;
 	override public ColourInfo Colour {
 		get => Tint;
-		set => Tint = value.TopLeft.Linear;
+		set => Tint = value.TopLeft;
 	}
 	public Color4 Tint {
 		get => Material?.Get<Color4>( "tint" ) ?? colour ?? Color4.White;
