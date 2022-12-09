@@ -139,6 +139,9 @@ public partial class Panel : Drawable3D, IHasCollider {
 		colliderMesh.InvalidateMatrix();
 	}
 
+	// shared data
+	ulong meshId;
+	ulong linkedMeshId;
 	protected override void UpdateAfterChildren () {
 		base.UpdateAfterChildren();
 
@@ -148,6 +151,7 @@ public partial class Panel : Drawable3D, IHasCollider {
 			colliderMesh.InvalidateAll();
 			Mesh.CreateFullUpload().Enqueue();
 			MeshCache.Validate();
+			meshId++;
 		}
 
 		if ( lastContentDrawSize != ContentDrawSize ) {

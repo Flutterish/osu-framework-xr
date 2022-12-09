@@ -38,6 +38,7 @@ public partial class Panel {
 		protected Matrix4 Matrix;
 		protected Vector2 Size;
 		protected readonly int SubtreeIndex;
+		ulong meshId;
 		public PanelDrawNode ( Panel source, int index ) : base( source ) {
 			VAO = source.VAO;
 			Mesh = source.Mesh;
@@ -51,6 +52,7 @@ public partial class Panel {
 
 			Material.UpdateProperties( SubtreeIndex );
 			SourceDrawNode = GenerateDrawNodeSubtree( Source.Content, Source.frameId++, SubtreeIndex, false );
+			meshId = Source.meshId;
 		}
 
 		public override void Draw ( IRenderer renderer, object? ctx = null ) {
@@ -89,8 +91,9 @@ public partial class Panel {
 			renderer.PopMaskingInfo();
 			FrameBuffer.Unbind();
 
-			if ( VAO.Bind() ) {
+			if ( VAO.Bind() || meshId > Source.linkedMeshId ) {
 				LinkAttributeArray( Mesh, Material );
+				Source.linkedMeshId = meshId;
 			}
 
 			Material.Bind( SubtreeIndex );

@@ -21,8 +21,12 @@ public interface IAttributeArray : IDisposable {
 	/// When binding this attribute array again, the linked buffers will be automatically bound too
 	/// </summary>
 	/// <returns>Whether the <see cref="IAttributeArray"/> requires initialisation</returns>
-	bool Bind (); 
-	// TODO method to clear all attributes
+	bool Bind ();
+
+	/// <summary>
+	/// Clear everything from this <see cref="IAttributeArray"/>
+	/// </summary>
+	void Clear ();
 }
 
 /// <inheritdoc cref="IAttributeArray"/>
@@ -39,9 +43,17 @@ public class AttributeArray : IAttributeArray {
 		return false;
 	}
 
+	public void Clear () {
+		if ( Handle == 0 )
+			return;
+
+		GL.DeleteVertexArray( Handle );
+		Handle = 0;
+	}
+
 	public void Dispose () {
-		DisposeScheduler.Enqueue( this, v => {
-			GL.DeleteVertexArray( Handle );
+		DisposeScheduler.Enqueue( this, static v => {
+			GL.DeleteVertexArray( v.Handle );
 			v.Handle = 0;
 		} );
 		GC.SuppressFinalize( this );

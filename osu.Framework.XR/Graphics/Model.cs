@@ -47,9 +47,12 @@ public partial class Model : Model<Mesh> { }
 /// </summary>
 /// <typeparam name="T">The type of mesh</typeparam>
 public partial class Model<T> : Drawable3D where T : Mesh {
-	ulong materialMeshId = 1; // update thread mutable
-	ulong linkedMaterialMeshId = 0; // 
-	AttributeArray VAO = new();     // draw thread mutable
+	// shared data
+	ulong materialMeshId = 1;
+	ulong linkedMaterialMeshId = 0; 
+	ulong meshId = 0;
+	ulong linkedMeshId = 0;
+	AttributeArray VAO = new();
 
 	T? mesh;
 	bool ownMesh = false;
@@ -70,6 +73,8 @@ public partial class Model<T> : Drawable3D where T : Mesh {
 				materialMeshId++;
 			mesh = value;
 			ownMesh = false;
+			meshId++;
+			Invalidate( Invalidation.DrawNode );
 		}
 	}
 
@@ -150,13 +155,16 @@ public partial class Model<T> : Drawable3D where T : Mesh {
 		protected Matrix4 Matrix;
 		bool normalMatrixComputed;
 		Matrix3 normalMatrix;
+
 		ulong linkId;
+		ulong meshId;
 		protected override void UpdateState () {
 			mesh = Source.mesh;
 			material = Source.Material;
 			Matrix = Source.Matrix;
 			normalMatrixComputed = false;
 			linkId = Source.materialMeshId;
+			meshId = Source.meshId;
 
 			material.UpdateProperties( nodeIndex );
 		}
@@ -165,9 +173,14 @@ public partial class Model<T> : Drawable3D where T : Mesh {
 			if ( mesh is null )
 				return;
 
-			if ( VAO.Bind() || linkId > Source.linkedMaterialMeshId ) {
-				LinkAttributeArray( mesh, material );
+			if ( linkId > Source.linkedMaterialMeshId ) {
+				VAO.Clear();
 				Source.linkedMaterialMeshId = linkId;
+			}
+
+			if ( VAO.Bind() || meshId > Source.linkedMeshId ) {
+				LinkAttributeArray( mesh, material );
+				Source.linkedMeshId = meshId;
 			}
 
 			material.Bind( nodeIndex );
