@@ -1,6 +1,7 @@
 ﻿using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Primitives;
@@ -113,10 +114,14 @@ public partial class Panel : Drawable3D, IHasCollider {
 	}
 
 	Color4? colour = null;
-	new public Color4 Colour {
+	override public ColourInfo Colour {
+		get => Tint;
+		set => Tint = value.TopLeft.Linear;
+	}
+	public override Color4 Tint {
 		get => Material?.Get<Color4>( "tint" ) ?? colour ?? Color4.White;
 		set {
-			if ( Colour == value )
+			if ( Tint == value )
 				return;
 
 			colour = value;
@@ -124,9 +129,9 @@ public partial class Panel : Drawable3D, IHasCollider {
 			Invalidate( Invalidation.DrawNode );
 		}
 	}
-	new public float Alpha {
-		get => Colour.A;
-		set => Colour = Colour with { A = value };
+	override public float Alpha {
+		get => Tint.A;
+		set => Tint = Tint with { A = value };
 	}
 
 	protected override void InvalidateMatrix () {

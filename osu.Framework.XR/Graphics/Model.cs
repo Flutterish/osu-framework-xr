@@ -110,7 +110,7 @@ public partial class Model<T> : Drawable3D where T : Mesh {
 	public Color4 Tint {
 		get => Material?.Get<Color4>( "tint" ) ?? colour ?? Color4.White;
 		set {
-			if ( Colour == value )
+			if ( Tint == value )
 				return;
 
 			colour = value;
