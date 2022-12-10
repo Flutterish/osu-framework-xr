@@ -1,10 +1,7 @@
-﻿using OpenVR.NET.Input;
-using OpenVR.NET.Manifest;
+﻿using OpenVR.NET.Manifest;
 using osu.Framework.XR.Graphics;
 using osu.Framework.XR.Graphics.Meshes;
-using osu.Framework.XR.Maths;
 using osu.Framework.XR.VirtualReality;
-using PoseAction = osu.Framework.XR.VirtualReality.PoseAction;
 
 namespace osu.Framework.XR.Tests.VirtualReality;
 
@@ -31,14 +28,14 @@ public partial class TestScenePose : VrScene {
 
 		a.OnUpdate += _ => {
 			if ( poseA.FetchData() is PoseInput pose ) {
-				a.Position = pose.Position.ToOsuTk();
-				a.Rotation = pose.Rotation.ToOsuTk();
+				a.Position = pose.Position;
+				a.Rotation = pose.Rotation;
 			}
 		};
 		b.OnUpdate += _ => {
 			if ( poseB.FetchData() is PoseInput pose ) {
-				b.Position = pose.Position.ToOsuTk();
-				b.Rotation = pose.Rotation.ToOsuTk();
+				b.Position = pose.Position;
+				b.Rotation = pose.Rotation;
 			}
 		};
 	}

@@ -19,6 +19,9 @@ public partial class BasicVrDevice : CompositeDrawable3D {
 		Source = source;
 	}
 
+	[Resolved]
+	VrCompositor compositor { get; set; } = null!;
+
 	public readonly BindableBool UseRealtimePosition = new( true );
 
 	[BackgroundDependencyLoader]
@@ -51,8 +54,8 @@ public partial class BasicVrDevice : CompositeDrawable3D {
 	}
 
 	protected override void Update () {
-		Position = Source.Position;
-		Rotation = Source.Rotation;
+		Position = compositor.ActivePlayer?.InGlobalSpace( Source.Position ) ?? Source.Position;
+		Rotation = compositor.ActivePlayer?.InGlobalSpace( Source.Rotation ) ?? Source.Rotation;
 	}
 
 	public partial class BasicVrDeviceComponent : BasicModel {
@@ -70,7 +73,10 @@ public partial class BasicVrDevice : CompositeDrawable3D {
 			Material.Set( "useGamma", true );
 		}
 
-		public readonly BindableBool UseRealtimePosition = new( true );
+		[Resolved]
+		VrCompositor compositor { get; set; } = null!;
+
+		public readonly BindableBool UseRealtimePosition = new( false );
 
 		bool wasVisible = false;
 		bool isVisible;
@@ -107,10 +113,14 @@ public partial class BasicVrDevice : CompositeDrawable3D {
 				parentMatrix = source.Parent!.Parent?.Matrix ?? Matrix4.Identity;
 			}
 
+			Vector3 positionOffset;
+			Quaternion rotationOffset;
 			protected override void UpdateState () {
 				base.UpdateState();
 				isVisible = Source.isVisible;
 				isRealtime = Source.UseRealtimePosition.Value;
+				positionOffset = Source.compositor.ActivePlayer?.PositionOffset ?? Vector3.Zero;
+				rotationOffset = Source.compositor.ActivePlayer?.RotationOffset ?? Quaternion.Identity;
 			}
 
 			public override void Draw ( IRenderer renderer, object? ctx = null ) {
@@ -126,8 +136,8 @@ public partial class BasicVrDevice : CompositeDrawable3D {
 								* Matrix4.CreateTranslation( state.Position.ToOsuTk() );
 					}
 
-					Matrix *= Matrix4.CreateFromQuaternion( Source.Device.RenderRotation )
-							* Matrix4.CreateTranslation( Source.Device.RenderPosition );
+					Matrix *= Matrix4.CreateFromQuaternion( rotationOffset * Source.Device.RenderRotation )
+							* Matrix4.CreateTranslation( rotationOffset.Apply( Source.Device.RenderPosition ) + positionOffset );
 				}
 				
 				base.Draw( renderer, ctx );

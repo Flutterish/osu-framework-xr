@@ -58,7 +58,7 @@ public partial class VrScene : BasicTestScene {
 		}
 
 		Add( VrCompositor );
-		Scene.Add( player = new TrackedVrPlayer() );	
+		Scene.Add( player = new TrackedVrPlayer() );
 	}
 
 	public partial class TrackedVrPlayer : VrPlayer {

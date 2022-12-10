@@ -230,17 +230,17 @@ public class VirtualVrInput : VrInput {
 			rotation.BindTo( rot );
 		}
 
-		public override OpenVR.NET.Input.PoseInput? FetchData () {
+		public override PoseInput? FetchData () {
 			var pos = position.Value;
 			var rot = rotation.Value;
 
-			return new OpenVR.NET.Input.PoseInput {
-				Position = new( pos.X, pos.Y, pos.Z ),
-				Rotation = new( rot.X, rot.Y, rot.Z, rot.W )
+			return new PoseInput {
+				Position = pos,
+				Rotation = rot
 			};
 		}
 
-		public override OpenVR.NET.Input.PoseInput? FetchDataForNextFrame () => FetchData();
-		public override OpenVR.NET.Input.PoseInput? FetchDataForPrediction ( float secondsFromNow ) => FetchData();
+		public override PoseInput? FetchDataForNextFrame () => FetchData();
+		public override PoseInput? FetchDataForPrediction ( float secondsFromNow ) => FetchData();
 	}
 }

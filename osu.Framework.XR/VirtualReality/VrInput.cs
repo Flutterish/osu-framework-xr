@@ -168,23 +168,51 @@ public class Vector3Action : VrInputAction<Vector3, System.Numerics.Vector3, Ope
 	}
 }
 
+public struct PoseInput {
+	/// <inheritdoc cref="Devices.VrDevice.Position"/>
+	public Vector3 Position;
+	/// <inheritdoc cref="Devices.VrDevice.Rotation"/>
+	public Quaternion Rotation;
+	/// <inheritdoc cref="Devices.VrDevice.Velocity"/>
+	public Vector3 Velocity;
+	/// <inheritdoc cref="Devices.VrDevice.AngularVelocity"/>
+	public Vector3 AngularVelocity;
+
+	public static PoseInput? FromOffset ( OpenVR.NET.Input.PoseInput? source, Vector3? positionOffset, Quaternion? rotationOffset ) {
+		if ( source is null )
+			return null;
+
+		var pos = positionOffset ?? Vector3.Zero;
+		var rot = rotationOffset ?? Quaternion.Identity;
+
+		return new() {
+			Position = rot.Apply( source.Value.Position.ToOsuTk() ) + pos,
+			Rotation = rot * source.Value.Rotation.ToOsuTk(),
+			Velocity = rot.Apply( source.Value.Velocity.ToOsuTk() ),
+			AngularVelocity = rot.Apply( source.Value.AngularVelocity.ToOsuTk() )
+		};
+	}
+}
 public class PoseAction : VrAction<OpenVR.NET.Input.PoseAction> {
 	protected PoseAction ( object name, Controller? source = null ) : base( name, source ) { }
-	public PoseAction ( Enum name, VrInput vr, Controller? source = null ) : base( name, vr, source ) { }
+	VrCompositor? compositor;
+	public PoseAction ( Enum name, VrInput vr, Controller? source = null ) : base( name, vr, source ) {
+		compositor = vr.VR;
+	}
 
 	protected override void Loaded () { }
 
 	/// <inheritdoc cref="OpenVR.NET.Input.PoseAction.FetchData"/>
 	public virtual PoseInput? FetchData ()
-		=> Backing?.FetchData();
+		=> PoseInput.FromOffset( Backing?.FetchData(), compositor?.ActivePlayer?.PositionOffset, compositor?.ActivePlayer?.RotationOffset );
 
 	/// <inheritdoc cref="OpenVR.NET.Input.PoseAction.FetchDataForPrediction(float)"/>
 	public virtual PoseInput? FetchDataForPrediction ( float secondsFromNow )
-		=> Backing?.FetchDataForPrediction( secondsFromNow );
+		=> PoseInput.FromOffset( Backing?.FetchDataForPrediction( secondsFromNow ), compositor?.ActivePlayer?.PositionOffset, compositor?.ActivePlayer?.RotationOffset );
 
 	/// <inheritdoc cref="OpenVR.NET.Input.PoseAction.FetchDataForNextFrame"/>
 	public virtual PoseInput? FetchDataForNextFrame ()
-		=> Backing?.FetchDataForNextFrame();
+		=> PoseInput.FromOffset( Backing?.FetchDataForNextFrame(), compositor?.ActivePlayer?.PositionOffset, compositor?.ActivePlayer?.RotationOffset );
 }
 
 public class HandSkeletonAction : VrAction<OpenVR.NET.Input.HandSkeletonAction> {

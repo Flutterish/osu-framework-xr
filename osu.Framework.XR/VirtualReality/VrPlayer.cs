@@ -1,4 +1,5 @@
 ﻿using osu.Framework.XR.Graphics;
+using osu.Framework.XR.Maths;
 
 namespace osu.Framework.XR.VirtualReality;
 
@@ -12,6 +13,13 @@ public partial class VrPlayer : CompositeDrawable3D {
 
 	public Vector3 PositionOffset;
 	public Quaternion RotationOffset = Quaternion.Identity;
+
+	public Vector3 InGlobalSpace ( Vector3 local ) {
+		return RotationOffset.Apply( local ) + PositionOffset;
+	}
+	public Quaternion InGlobalSpace ( Quaternion local ) {
+		return RotationOffset * local;
+	}
 
 	protected override void LoadComplete () {
 		Compositor.RegisterPlayer( this );

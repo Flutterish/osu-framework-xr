@@ -13,8 +13,11 @@ public partial class BasicHandSkeleton : BasicModel {
 		this.name = name;
 	}
 
+	[Resolved]
+	VrCompositor compositor { get; set; } = null!;
+
 	[BackgroundDependencyLoader]
-	private void load ( VrCompositor compositor ) {
+	private void load () {
 		source = compositor.Input.GetAction<HandSkeletonAction>( name, controller );
 	}
 
@@ -27,8 +30,8 @@ public partial class BasicHandSkeleton : BasicModel {
 			return;
 		}
 
-		Position = controller.Position;
-		Rotation = controller.Rotation;
+		Position = compositor.ActivePlayer?.InGlobalSpace( controller.Position ) ?? controller.Position;
+		Rotation = compositor.ActivePlayer?.InGlobalSpace( controller.Rotation ) ?? controller.Rotation;
 		var offset = Vector3.UnitY * 0.0007f;
 
 		Mesh.Clear();
