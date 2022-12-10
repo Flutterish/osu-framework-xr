@@ -2,6 +2,8 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.XR.Graphics;
+using osu.Framework.XR.Graphics.Meshes;
 using osu.Framework.XR.Testing.VirtualReality;
 using osu.Framework.XR.VirtualReality;
 
@@ -46,7 +48,13 @@ public partial class VrScene : BasicTestScene {
 		}
 
 		Add( VrCompositor );
-		Scene.Add( new VrPlayer() );	
+		Scene.Add( new TrackedVrPlayer() );	
+	}
+
+	public partial class TrackedVrPlayer : VrPlayer {
+		public TrackedVrPlayer () {
+			AddInternal( new BasicModel { Mesh = BasicMesh.UnitCube, Scale = new(0.1f) } );
+		}
 	}
 
 	protected override void Dispose ( bool isDisposing ) {

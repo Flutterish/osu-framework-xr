@@ -129,6 +129,11 @@ public partial class VrCompositor : Drawable {
 
 		VR.Update();
 		VR.UpdateInput(); // TODO when input events get timestamps, we might want to move this to another thread
+
+		if ( activePlayer is VrPlayer player && VR.Headset is OpenVR.NET.Devices.Headset headset ) {
+			player.Position = headset.Position.ToOsuTk() with { Y = 0 };
+			player.Rotation = headset.Rotation.ToOsuTk().DecomposeAroundAxis( Vector3.UnitY );
+		}
 	}
 
 	protected override void Dispose ( bool isDisposing ) {

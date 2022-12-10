@@ -1,4 +1,5 @@
 ﻿using OpenVR.NET;
+using osu.Framework.XR.Maths;
 using osu.Framework.XR.VirtualReality;
 using osu.Framework.XR.VirtualReality.Devices;
 
@@ -42,6 +43,14 @@ public partial class TestingVrCompositor : VrCompositor {
 		right.RotationBindable.BindTo( rig.RightTarget.RotationBindable );
 		head.PositionBindable.BindTo( rig.Head.PositionBindable );
 		head.RotationBindable.BindTo( rig.Head.RotationBindable );
+		head.PositionBindable.BindValueChanged( v => {
+			if ( ActivePlayer is VrPlayer player )
+				player.Position = v.NewValue with { Y = 0 };
+		} );
+		head.RotationBindable.BindValueChanged( v => {
+			if ( ActivePlayer is VrPlayer player )
+				player.Rotation = v.NewValue.DecomposeAroundAxis( Vector3.UnitY );
+		} );
 
 		Input.LeftHandPosition.BindTo( rig.LeftTarget.PositionBindable );
 		Input.LeftHandRotation.BindTo( rig.LeftTarget.RotationBindable );
