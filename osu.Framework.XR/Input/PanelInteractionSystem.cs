@@ -70,7 +70,7 @@ public class PanelInteractionSystem {
 		public bool IsPressed ( MouseButton button )
 			=> pressedButtons.Contains( button );
 
-		HashSet <Key> pressedKeys = new();
+		HashSet<Key> pressedKeys = new();
 		HashSet<MouseButton> pressedButtons = new();
 		void releaseInput ( Panel panel ) {
 			panel.Content.TouchUp( this );

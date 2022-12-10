@@ -96,6 +96,7 @@ public partial class Panel {
 				Source.linkedMeshId = meshId;
 			}
 
+			renderer.SetBlend( BlendingParameters.None );
 			Material.Bind( SubtreeIndex );
 			Material.Shader.SetUniform( "tex", FrameBuffer.Texture );
 			Material.Shader.SetUniform( "mMatrix", ref Matrix );
