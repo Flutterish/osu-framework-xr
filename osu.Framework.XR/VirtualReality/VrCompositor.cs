@@ -131,8 +131,8 @@ public partial class VrCompositor : Drawable {
 		VR.UpdateInput(); // TODO when input events get timestamps, we might want to move this to another thread
 
 		if ( activePlayer is VrPlayer player && VR.Headset is OpenVR.NET.Devices.Headset headset ) {
-			player.Position = headset.Position.ToOsuTk() with { Y = 0 };
-			player.Rotation = headset.Rotation.ToOsuTk().DecomposeAroundAxis( Vector3.UnitY );
+			player.Position = player.PositionOffset + player.RotationOffset.Apply(headset.Position.ToOsuTk() with { Y = 0 });
+			player.Rotation = player.RotationOffset * headset.Rotation.ToOsuTk().DecomposeAroundAxis( Vector3.UnitY );
 		}
 	}
 
@@ -177,9 +177,8 @@ public partial class VrCompositor : Drawable {
 			if ( context is null || vr!.Headset is not OpenVR.NET.Devices.Headset headset )
 				return;
 
-			if ( ( Source.ActivePlayer?.Root as Drawable )?.Parent is not Scene scene || scene.GetRenderPiepline() is not Scene.RenderPiepline pipeline )
+			if ( Source.ActivePlayer is not VrPlayer player || ( player?.Root as Drawable )?.Parent is not Scene scene || scene.GetRenderPiepline() is not Scene.RenderPiepline pipeline )
 				return;
-
 
 			left ??= renderer.CreateFrameBuffer( new[] { RenderBufferFormat.D32S8 } ); // TODO these should be anti-aliased
 			right ??= renderer.CreateFrameBuffer( new[] { RenderBufferFormat.D32S8 } );
@@ -188,8 +187,8 @@ public partial class VrCompositor : Drawable {
 			left.Size = size;
 			right.Size = size;
 
-			Matrix4 headTransform = Matrix4.CreateFromQuaternion( headset.RenderRotation.ToOsuTk() ) 
-				* Matrix4.CreateTranslation( headset.RenderPosition.ToOsuTk() );
+			Matrix4 headTransform = Matrix4.CreateFromQuaternion( player.RotationOffset * headset.RenderRotation.ToOsuTk() ) 
+				* Matrix4.CreateTranslation( player.RotationOffset.Apply( headset.RenderPosition.ToOsuTk() ) + player.PositionOffset );
 
 			var lEye = context.GetEyeToHeadMatrix( Valve.VR.EVREye.Eye_Left ).ToOsuTk().Inverted();
 			var lProj = context.GetProjectionMatrix( Valve.VR.EVREye.Eye_Left, 0.01f, 1000f ).ToOsuTk();

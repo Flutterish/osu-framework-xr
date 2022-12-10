@@ -10,6 +10,9 @@ public partial class VrPlayer : CompositeDrawable3D {
 	[Resolved]
 	public VrCompositor Compositor { get; private set; } = null!;
 
+	public Vector3 PositionOffset;
+	public Quaternion RotationOffset = Quaternion.Identity;
+
 	protected override void LoadComplete () {
 		Compositor.RegisterPlayer( this );
 

@@ -6,6 +6,7 @@ using osu.Framework.XR.Graphics;
 using osu.Framework.XR.Graphics.Meshes;
 using osu.Framework.XR.Testing.VirtualReality;
 using osu.Framework.XR.VirtualReality;
+using osuTK;
 
 namespace osu.Framework.XR.Tests.VirtualReality;
 
@@ -15,6 +16,7 @@ public partial class VrScene : BasicTestScene {
 	[Cached]
 	public readonly VrResourceStore VrResources = new();
 
+	protected readonly TrackedVrPlayer player;
 	public VrScene () {
 		if ( USE_VR_RIG ) {
 			var comp = new TestingVrCompositor();
@@ -45,10 +47,18 @@ public partial class VrScene : BasicTestScene {
 		}
 		else {
 			VrCompositor = new();
+			AddLabel( "Vr Player" );
+			AddSliderStep( "Player Offset X", -4f, 4, 0, v => player!.PositionOffset = player.PositionOffset with { X = v } );
+			AddSliderStep( "Player Offset Y", -4f, 4, 0, v => player!.PositionOffset = player.PositionOffset with { Y = v } );
+			AddSliderStep( "Player Offset Z", -4f, 4, 0, v => player!.PositionOffset = player.PositionOffset with { Z = v } );
+			AddSliderStep( "Player Euler X (Exclusive)", -4f, 4, 0, v => player!.RotationOffset = Quaternion.FromEulerAngles( v, 0, 0 ) );
+			AddSliderStep( "Player Euler Y (Exclusive)", -4f, 4, 0, v => player!.RotationOffset = Quaternion.FromEulerAngles( 0, v, 0 ) );
+			AddSliderStep( "Player Euler Z (Exclusive)", -4f, 4, 0, v => player!.RotationOffset = Quaternion.FromEulerAngles( 0, 0, v ) );
+			AddLabel( "Test" );
 		}
 
 		Add( VrCompositor );
-		Scene.Add( new TrackedVrPlayer() );	
+		Scene.Add( player = new TrackedVrPlayer() );	
 	}
 
 	public partial class TrackedVrPlayer : VrPlayer {
@@ -66,5 +76,5 @@ public partial class VrScene : BasicTestScene {
 	/// This determines whether the testing will be done in VR or a simulated setup.
 	/// <see langword="true"/> for simulated setup
 	/// </summary>
-	public virtual bool USE_VR_RIG => true;
+	public virtual bool USE_VR_RIG => false;
 }
