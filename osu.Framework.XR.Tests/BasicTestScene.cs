@@ -15,19 +15,19 @@ public partial class BasicTestScene : TestScene3D {
 		Scene.Camera.Z = -10;
 
 		Scene.Add( new BasicModel() {
-			Mesh = BasicMesh.UnitCube,
+			Mesh = BasicMesh.UnitCornerCube,
 			Colour = Color4.Red,
 			Scale = new( 10, 0.03f, 0.03f ),
 			Origin = new( -1, 0, 0 )
 		} );
 		Scene.Add( new BasicModel() {
-			Mesh = BasicMesh.UnitCube,
+			Mesh = BasicMesh.UnitCornerCube,
 			Colour = Color4.Green,
 			Scale = new( 0.03f, 10, 0.03f ),
 			Origin = new( 0, -1, 0 )
 		} );
 		Scene.Add( new BasicModel() {
-			Mesh = BasicMesh.UnitCube,
+			Mesh = BasicMesh.UnitCornerCube,
 			Colour = Color4.Blue,
 			Scale = new( 0.03f, 0.03f, 10 ),
 			Origin = new( 0, 0, -1 )

@@ -13,7 +13,7 @@ public partial class TestSceneIntersectMesh : BasicTestScene {
 	TransformIndicator transform;
 
 	public TestSceneIntersectMesh () {
-		Scene.Add( model = new BasicModel { Mesh = BasicMesh.UnitCube } );
+		Scene.Add( model = new BasicModel { Mesh = BasicMesh.UnitCornerCube } );
 		Add( ray = new RayIndicator( Scene ) { Kind = Kind.Control } );
 		Add( hit = new PointIndicator( Scene ) { Kind = Kind.Result } );
 		Add( transform = new TransformIndicator( Scene ) { Kind = Kind.Control } );

@@ -12,7 +12,7 @@ public partial class TestSceneDefaultPanel : BasicTestScene {
 		Scene.Add( panel = new Panel {
 			ContentAutoSizeAxes = Axes.Both
 		} );
-
+		
 		Box rotatingBox;
 		panel.Content.Add( new Box { Size = new( 500 ), Colour = Color4.Green } );
 		panel.Content.Add( new Box { Size = new( 250 ), Colour = Color4.Red } );

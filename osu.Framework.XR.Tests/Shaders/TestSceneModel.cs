@@ -10,7 +10,7 @@ public partial class TestSceneModel : BasicTestScene {
 
 	public TestSceneModel () {
 		Scene.Add( model = new() );
-		model.Mesh = BasicMesh.UnitCube;
+		model.Mesh = BasicMesh.UnitCornerCube;
 
 		AddSliderStep( "Alpha", 0, 1, 1f, v => model.Alpha = v );
 		AddStep( "Random Color", () => model.Tint = new( RNG.NextSingle(), RNG.NextSingle(), RNG.NextSingle(), model.Alpha ) );

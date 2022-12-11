@@ -63,7 +63,7 @@ public partial class VrScene : BasicTestScene {
 
 	public partial class TrackedVrPlayer : VrPlayer {
 		public TrackedVrPlayer () {
-			AddInternal( new BasicModel { Mesh = BasicMesh.UnitCube, Scale = new(0.1f) } );
+			AddInternal( new BasicModel { Mesh = BasicMesh.UnitCornerCube, Scale = new(0.1f) } );
 		}
 	}
 

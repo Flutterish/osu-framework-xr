@@ -16,7 +16,7 @@ public partial class TestSceneSetGlobalProperties : BasicTestScene {
 		Add( parentTransform = new( Scene ) { Kind = Kind.Control } );
 		Add( childTransform = new( Scene ) { Kind = Kind.Control } );
 
-		Scene.Add( container = new() { Child = box = new BasicModel { Mesh = BasicMesh.UnitCube } } );
+		Scene.Add( container = new() { Child = box = new BasicModel { Mesh = BasicMesh.UnitCornerCube } } );
 
 		(parentTransform.PositionBindable, parentTransform.RotationBindable).BindValuesChanged( ( pos, rot ) => {
 			(container.Position, container.Rotation) = (pos, rot);

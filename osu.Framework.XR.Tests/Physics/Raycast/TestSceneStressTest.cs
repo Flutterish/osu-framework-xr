@@ -32,7 +32,7 @@ public partial class TestSceneStressTest : BasicTestScene {
 
 		for ( int i = 0; i < count; i++ ) {
 			BasicModel model = new BasicModel {
-				Mesh = BasicMesh.UnitCube,
+				Mesh = BasicMesh.UnitCornerCube,
 				Tint = new( rng.NextSingle(), rng.NextSingle(), rng.NextSingle(), 1 ),
 				Position = new( 0, 0, i ),
 				Scale = new( 0.4f ),

@@ -10,8 +10,8 @@ public partial class TestScenePose : VrScene {
 	BasicModel b;
 
 	public TestScenePose () {
-		Scene.Add( a = new() { Mesh = BasicMesh.UnitCube, Scale = new( 0.05f ) } );
-		Scene.Add( b = new() { Mesh = BasicMesh.UnitCube, Scale = new( 0.05f ) } );
+		Scene.Add( a = new() { Mesh = BasicMesh.UnitCornerCube, Scale = new( 0.05f ) } );
+		Scene.Add( b = new() { Mesh = BasicMesh.UnitCornerCube, Scale = new( 0.05f ) } );
 
 		VrCompositor.Input.SetActionManifest( new ActionManifest<TestingCategory, TestingAction> {
 			ActionSets = new() {

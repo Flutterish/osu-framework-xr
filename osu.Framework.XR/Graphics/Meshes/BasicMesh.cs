@@ -151,9 +151,11 @@ public class BasicMesh : Mesh, ITriangleMesh {
 		}
 	}
 
-	static BasicMesh () {
-		UnitCube = new();
-		UnitCube.Indices.AddRange( new uint[] {
+	public static BasicMesh MakeCube ( float sidelength ) {
+		var v = sidelength / 2;
+
+		BasicMesh cube = new();
+		cube.Indices.AddRange( new uint[] {
 			0,  1,  2,  2,  3,  0,
 			4,  5,  6,  6,  7,  4,
 			8,  9,  10, 10, 4,  8,
@@ -161,36 +163,64 @@ public class BasicMesh : Mesh, ITriangleMesh {
 			10, 14, 5,  5,  4,  10,
 			3,  2,  11, 11, 15, 3
 		} );
-		UnitCube.Vertices.AddRange( new TexturedNormal[] {
-			new() { Position = new( -1, -1, -1 ), UV = new( 0, 0 ) },
-			new() { Position = new(  1, -1, -1 ), UV = new( 1, 0 ) },
-			new() { Position = new(  1,  1, -1 ), UV = new( 1, 1 ) },
-			new() { Position = new( -1,  1, -1 ), UV = new( 0, 1 ) },
-			new() { Position = new( -1, -1,  1 ), UV = new( 0, 0 ) },
-			new() { Position = new(  1, -1,  1 ), UV = new( 1, 0 ) },
-			new() { Position = new(  1,  1,  1 ), UV = new( 1, 1 ) },
-			new() { Position = new( -1,  1,  1 ), UV = new( 0, 1 ) },
-			new() { Position = new( -1,  1,  1 ), UV = new( 1, 0 ) },
-			new() { Position = new( -1,  1, -1 ), UV = new( 1, 1 ) },
-			new() { Position = new( -1, -1, -1 ), UV = new( 0, 1 ) },
-			new() { Position = new(  1,  1,  1 ), UV = new( 1, 0 ) },
-			new() { Position = new(  1, -1, -1 ), UV = new( 0, 1 ) },
-			new() { Position = new(  1, -1,  1 ), UV = new( 0, 0 ) },
-			new() { Position = new(  1, -1, -1 ), UV = new( 1, 1 ) },
-			new() { Position = new( -1,  1,  1 ), UV = new( 0, 0 ) }
+		cube.Vertices.AddRange( new TexturedNormal[] {
+			new() { Position = new( -v, -v, -v ), UV = new( 0, 0 ) },
+			new() { Position = new(  v, -v, -v ), UV = new( 1, 0 ) },
+			new() { Position = new(  v,  v, -v ), UV = new( 1, 1 ) },
+			new() { Position = new( -v,  v, -v ), UV = new( 0, 1 ) },
+			new() { Position = new( -v, -v,  v ), UV = new( 0, 0 ) },
+			new() { Position = new(  v, -v,  v ), UV = new( 1, 0 ) },
+			new() { Position = new(  v,  v,  v ), UV = new( 1, 1 ) },
+			new() { Position = new( -v,  v,  v ), UV = new( 0, 1 ) },
+			new() { Position = new( -v,  v,  v ), UV = new( 1, 0 ) },
+			new() { Position = new( -v,  v, -v ), UV = new( 1, 1 ) },
+			new() { Position = new( -v, -v, -v ), UV = new( 0, 1 ) },
+			new() { Position = new(  v,  v,  v ), UV = new( 1, 0 ) },
+			new() { Position = new(  v, -v, -v ), UV = new( 0, 1 ) },
+			new() { Position = new(  v, -v,  v ), UV = new( 0, 0 ) },
+			new() { Position = new(  v, -v, -v ), UV = new( 1, 1 ) },
+			new() { Position = new( -v,  v,  v ), UV = new( 0, 0 ) }
 		} );
-		UnitCube.CreateFullUnsafeUpload().Enqueue();
+		cube.CreateFullUnsafeUpload().Enqueue();
 
-		UnitQuad = new();
-		UnitQuad.AddQuad( new Quad3(
-			new Vector3(  1, -1, 0 ),
-			new Vector3( -1, -1, 0 ),
-			new Vector3(  1,  1, 0 ),
-			new Vector3( -1,  1, 0 )
-		) );
-		UnitQuad.CreateFullUnsafeUpload().Enqueue();
+		return cube;
 	}
 
-	public static readonly BasicMesh UnitCube;
-	public static readonly BasicMesh UnitQuad;
+	public static BasicMesh MakeQuad ( float sidelength ) {
+		var v = sidelength / 2;
+
+		BasicMesh quad = new();
+		quad.AddQuad( new Quad3(
+			new Vector3(  v, -v, 0 ),
+			new Vector3( -v, -v, 0 ),
+			new Vector3(  v,  v, 0 ),
+			new Vector3( -v,  v, 0 )
+		) );
+		quad.CreateFullUnsafeUpload().Enqueue();
+		return quad;
+	}
+
+	static Dictionary<int, BasicMesh> staticMeshes = new();
+	static BasicMesh getLazy ( int index, Func<BasicMesh> f ) {
+		if ( !staticMeshes.TryGetValue( index, out var mesh ) )
+			staticMeshes[index] = mesh = f();
+		return mesh;
+	}
+
+	/// <summary>
+	/// A cube whose corner coordinates are 1 or -1 ~ this means its slidelength is 2
+	/// </summary>
+	public static BasicMesh UnitCornerCube => getLazy( 0, () => MakeCube(2) );
+	/// <summary>
+	/// A quad (facing Z+) whose corner coordinates are 1 or -1 ~ this means its slidelength is 2
+	/// </summary>
+	public static BasicMesh UnitCornerQuad => getLazy( 1, () => MakeQuad(2) );
+	/// <summary>
+	/// A cube whose sidelength is 1
+	/// </summary>
+	public static BasicMesh UnitCube => getLazy( 2, () => MakeCube(1) );
+	/// <summary>
+	/// A quad (facing Z+) whose sidelength is 1
+	/// </summary>
+	public static BasicMesh UnitQuad => getLazy( 3, () => MakeQuad(1) );
 }

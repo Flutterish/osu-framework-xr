@@ -22,8 +22,8 @@ public partial class TestSceneGlobalProperties : BasicTestScene {
 		Add( childTransform = new( Scene ) { Kind = Kind.Control } );
 		Add( resultTransform = new( Scene ) { Kind = Kind.Result } );
 
-		Scene.Add( resultBox = new BasicModel { Mesh = BasicMesh.UnitCube, Colour = Colour4.Red, Alpha = 0.5f, Scale = new(1.1f) } );
-		Scene.Add( container = new() { Child = box = new BasicModel { Mesh = BasicMesh.UnitCube } } );
+		Scene.Add( resultBox = new BasicModel { Mesh = BasicMesh.UnitCornerCube, Colour = Colour4.Red, Alpha = 0.5f, Scale = new(1.1f) } );
+		Scene.Add( container = new() { Child = box = new BasicModel { Mesh = BasicMesh.UnitCornerCube } } );
 
 		parentTransform.RotationBindable.Value = Vector3.UnitX.LookRotation();
 		childTransform.PositionBindable.Value = Vector3.UnitX;
