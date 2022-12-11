@@ -180,7 +180,17 @@ public class BasicMesh : Mesh, ITriangleMesh {
 			new() { Position = new( -1,  1,  1 ), UV = new( 0, 0 ) }
 		} );
 		UnitCube.CreateFullUnsafeUpload().Enqueue();
+
+		UnitQuad = new();
+		UnitQuad.AddQuad( new Quad3(
+			new Vector3(  1, -1, 0 ),
+			new Vector3( -1, -1, 0 ),
+			new Vector3(  1,  1, 0 ),
+			new Vector3( -1,  1, 0 )
+		) );
+		UnitQuad.CreateFullUnsafeUpload().Enqueue();
 	}
 
 	public static readonly BasicMesh UnitCube;
+	public static readonly BasicMesh UnitQuad;
 }
