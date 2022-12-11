@@ -19,19 +19,19 @@ public partial class BasicModel : Model<BasicMesh>, IHasCollider {
 
 	protected override void InvalidateMatrix () {
 		base.InvalidateMatrix();
-		colliderMesh?.InvalidateMatrix();
+		ColliderMesh?.InvalidateMatrix();
 	}
 
 	protected override void Update () {
 		base.Update();
-		if ( colliderMesh != null ) {
-			colliderMesh.Mesh = Mesh;
-			colliderMesh.InvalidateAll();
+		if ( ColliderMesh != null && IsColliderEnabled ) {
+			ColliderMesh.Mesh = Mesh;
+			ColliderMesh.InvalidateAll();
 		}
 	}
 
-	TransformedBasicMesh? colliderMesh;
-	public ITriangleMesh ColliderMesh => colliderMesh ??= new( Mesh, () => Matrix );
+	protected TransformedBasicMesh? ColliderMesh { get; private set; }
+	ITriangleMesh IHasCollider.ColliderMesh => ColliderMesh ??= new( Mesh, () => Matrix );
 	public bool IsColliderEnabled { get; set; } = false;
 	public ulong PhysicsLayer { get; set; } = 1;
 }
@@ -75,7 +75,7 @@ public partial class Model<T> : MeshRenderer<T> where T : Mesh {
 		set => Tint = Tint with { A = value };
 	}
 
-	protected override ModelDrawNode? CreateDrawNode3D ( int index )
+	protected override MeshRendererDrawNode? CreateDrawNode3D ( int index )
 		=> new ModelDrawNode( this, index );
 
 	protected class ModelDrawNode : MeshRendererDrawNode {

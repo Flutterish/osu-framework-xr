@@ -6,12 +6,17 @@ namespace osu.Framework.XR.Graphics.Meshes;
 public class TransformedBasicMesh : TransformedTriangleMesh<BasicMesh> {
 	public TransformedBasicMesh ( BasicMesh mesh, Func<Matrix4> matrixGetter ) : base(
 		mesh,
-		m => m.TriangleCount,
-		m => (uint)m.Vertices.Count,
-		(m, i) => m.GetTriangleIndices( i ),
-		(m, i) => m.Vertices[(int)i].Position,
+		getTriangleCount,
+		getVertexCount,
+		getTriangle,
+		getVertex,
 		matrixGetter
 	) { }
+
+	static Func<BasicMesh, int> getTriangleCount = m => m.TriangleCount;
+	static Func<BasicMesh, uint> getVertexCount = m => (uint)m.Vertices.Count;
+	static Func<BasicMesh, int, (uint indexA, uint indexB, uint indexC)> getTriangle = (m, i) => m.GetTriangleIndices( i );
+	static Func<BasicMesh, uint, Vector3> getVertex = (m, i) => m.Vertices[(int)i].Position;
 }
 
 /// <summary>
