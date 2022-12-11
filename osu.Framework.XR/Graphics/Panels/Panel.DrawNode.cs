@@ -55,6 +55,10 @@ public partial class Panel {
 			meshId = Source.meshId;
 		}
 
+		protected virtual void BeforeBlit ( IRenderer renderer, object? ctx = null ) {
+			renderer.SetBlend( BlendingParameters.Mixture );
+		}
+
 		public override void Draw ( IRenderer renderer, object? ctx = null ) {
 			SwitchTo2DContext( renderer );
 			Vector2I size = new( (int)Size.X, (int)Size.Y );
@@ -96,10 +100,10 @@ public partial class Panel {
 				Source.linkedMeshId = meshId;
 			}
 
-			renderer.SetBlend( BlendingParameters.None );
 			Material.Bind( SubtreeIndex );
 			Material.Shader.SetUniform( "tex", FrameBuffer.Texture );
 			Material.Shader.SetUniform( "mMatrix", ref Matrix );
+			BeforeBlit( renderer, ctx );
 			Mesh.Draw();
 		}
 	}
