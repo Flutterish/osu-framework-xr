@@ -29,6 +29,12 @@ public partial class Panel : Drawable3D, IHasCollider {
 		set => Content.Size = value;
 	}
 
+	/// <inheritdoc cref="ContentSize"/>
+	public override Vector2 Size { 
+		get => ContentSize; 
+		set => ContentSize = value; 
+	}
+
 	/// <summary>
 	/// The auto size axes of the contained 2D drawable content.
 	/// </summary>
@@ -37,8 +43,38 @@ public partial class Panel : Drawable3D, IHasCollider {
 		set => Content.AutoSizeAxes = value;
 	}
 
+	/// <inheritdoc cref="ContentAutoSizeAxes"/>
+	new public Axes AutoSizeAxes { 
+		get => ContentAutoSizeAxes; 
+		set => ContentAutoSizeAxes = value;
+	}
+
+	/// <summary>
+	/// The 2D children
+	/// </summary>
+	public IReadOnlyList<Drawable> Children {
+		get => Content.Children;
+		set => Content.Children = value;
+	}
+
+	/// <summary>
+	/// Gets or sets the only 2D child
+	/// </summary>
+	public Drawable Child {
+		get => Content.Child;
+		set => Content.Child = value;
+	}
+
+	/// <summary>
+	/// Sets all 2D children to elements contained in the enumerable
+	/// </summary>
+	public IEnumerable<Drawable> ChildrenEnumerable {
+		set => Content.ChildrenEnumerable = value;
+	}
+
 	Vector2 lastContentDrawSize;
 	public Vector2 ContentDrawSize => Content.DrawSize;
+	new public Vector2 DrawSize => ContentDrawSize;
 
 	[Cached( type: typeof( ISafeArea ) )]
 	public readonly RootContainer Content;
