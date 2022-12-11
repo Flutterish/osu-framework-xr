@@ -139,6 +139,18 @@ public partial class Drawable3D : CompositeDrawable {
 	/// <inheritdoc cref="DrawNode3D"/>
 	protected virtual DrawNode3D? CreateDrawNode3D ()
 		=> null;
+
+	protected override void Dispose ( bool isDisposing ) {
+		if ( !IsDisposed ) {
+			DisposeScheduler.Enqueue( this, d => {
+				d.subtreeNodes[0]?.Dispose();
+				d.subtreeNodes[1]?.Dispose();
+				d.subtreeNodes[2]?.Dispose();
+			} );
+		}
+
+		base.Dispose( isDisposing );
+	}
 }
 
 public enum InvalidRenderStage { None = -1 }
@@ -153,7 +165,7 @@ public enum InvalidRenderStage { None = -1 }
 /// The data shared this way should be small, like uniforms, textures and matrices as there is essentially 3 duplicates of it.
 /// Big data, such as meshes or GPU buffers should be updated with a scheduled <see cref="Allocation.IUpload"/>
 /// </remarks>
-public abstract class DrawNode3D {
+public abstract class DrawNode3D : IDisposable {
 	public Drawable3D Source { get; }
 	public long InvalidationID { get; private set; }
 
@@ -273,4 +285,6 @@ public abstract class DrawNode3D {
 		(renderer as Renderer)!.BindShader( getDummyShader( renderer ) );
 		(renderer as Renderer)!.UnbindShader( getDummyShader( renderer ) );
 	}
+
+	public virtual void Dispose () { }
 }
