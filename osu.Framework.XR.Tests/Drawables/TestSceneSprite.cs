@@ -5,7 +5,6 @@ using osu.Framework.XR.Graphics;
 using osu.Framework.XR.Graphics.Meshes;
 using osuTK.Graphics;
 using System;
-using System.Linq;
 
 namespace osu.Framework.XR.Tests.Drawables;
 
@@ -14,7 +13,7 @@ public partial class TestSceneSprite : BasicTestScene {
 	BasicModel fillbox;
 	BasicModel fillboxBorder;
 	public TestSceneSprite () {
-		Scene.Add( sprite = new() { EulerY = MathF.PI } );
+		Scene.Add( sprite = new() { /*EulerY = MathF.PI*/ } );
 		Scene.Add( fillbox = new() { Mesh = BasicMesh.UnitQuad, Tint = Color4.Blue, Z = 0.01f } );
 		Scene.Add( fillboxBorder = new() { Mesh = BasicMesh.UnitQuad, Tint = Color4.Red, Z = 0.015f } );
 
@@ -26,14 +25,13 @@ public partial class TestSceneSprite : BasicTestScene {
 		AddSliderStep( "Aspect Ratio", 0.1f, 10f, 1f, v => sprite.FillAspectRatio = v );
 		AddSliderStep( "FillBox X", 0.1f, 10f, 1f, v => sprite.Width = v );
 		AddSliderStep( "FillBox Y", 0.1f, 10f, 1f, v => sprite.Height = v );
-		AddLabel( "FillBox Anchor" );
-		foreach ( var i in Enum.GetValues<Anchor>().Where( x => x.ToString().Length != 2 && x != Anchor.Custom ) ) {
-			AddStep( $"{i}", () => sprite.FillBoxAnchor = i );
-		}
-		AddLabel( "Origin" );
-		foreach ( var i in Enum.GetValues<Anchor>().Where( x => x.ToString().Length != 2 && x != Anchor.Custom ) ) {
-			AddStep( $"{i}", () => sprite.Origin = i );
-		}
+
+		AddSliderStep( "FillBox Anchor X", -1f, 1f, 0, v => sprite.FillBoxAnchorPosition = sprite.FillBoxAnchorPosition with { X = v } );
+		AddSliderStep( "FillBox Anchor Y", -1f, 1f, 0, v => sprite.FillBoxAnchorPosition = sprite.FillBoxAnchorPosition with { Y = v } );
+		AddSliderStep( "Anchor X", -1f, 1f, 0, v => sprite.AnchorPosition = sprite.AnchorPosition with { X = v } );
+		AddSliderStep( "Anchor Y", -1f, 1f, 0, v => sprite.AnchorPosition = sprite.AnchorPosition with { Y = v } );
+		AddSliderStep( "Origin X", -1f, 1f, 0, v => sprite.OriginPosition = sprite.OriginPosition with { X = v } );
+		AddSliderStep( "Origin Y", -1f, 1f, 0, v => sprite.OriginPosition = sprite.OriginPosition with { Y = v } );
 		AddLabel( "FillMode" );
 		foreach ( var i in Enum.GetValues<FillMode>() ) {
 			AddStep( $"{i}", () => sprite.FillMode = i );
@@ -42,22 +40,8 @@ public partial class TestSceneSprite : BasicTestScene {
 
 	protected override void Update () {
 		base.Update();
-		fillbox.Scale = new( sprite.Width / 2, sprite.Height / 2, 1 );
-		if ( sprite.FillBoxAnchor.HasFlag( Anchor.x0 ) )
-			fillbox.OriginX = -1;
-		else if ( sprite.FillBoxAnchor.HasFlag( Anchor.x2 ) )
-			fillbox.OriginX = 1;
-		else
-			fillbox.OriginX = 0;
-
-		if ( sprite.FillBoxAnchor.HasFlag( Anchor.y0 ) )
-			fillbox.OriginY = 1;
-		else if ( sprite.FillBoxAnchor.HasFlag( Anchor.y2 ) )
-			fillbox.OriginY = -1;
-		else
-			fillbox.OriginY = 0;
-
-		fillboxBorder.Origin = fillbox.Origin;
+		fillboxBorder.Origin = fillbox.Origin = new osuTK.Vector3( sprite.FillBoxAnchorPosition.X, sprite.FillBoxAnchorPosition.Y, 0 ) / 2;
+		fillbox.Scale = new( sprite.Width, sprite.Height, 1 );
 		fillboxBorder.Scale = fillbox.Scale + new osuTK.Vector3( 0.02f, 0.02f, 0 );
 	}
 }

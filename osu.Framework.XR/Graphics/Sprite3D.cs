@@ -55,7 +55,7 @@ public partial class Sprite3D : Model<BasicMesh> {
 
 	Anchor origin = Anchor.BottomCentre;
 	/// <summary>
-	/// Controls which point of the <see cref="Sprite3D"/> is attached to the <see cref="FillBoxAnchor"/>.
+	/// Controls which point of the <see cref="Sprite3D"/> is attached to the <see cref="Anchor"/>.
 	/// It is <see cref="Anchor.BottomCentre"/> by default
 	/// </summary>
 	new public Anchor Origin {
@@ -70,13 +70,42 @@ public partial class Sprite3D : Model<BasicMesh> {
 		}
 	}
 	/// <summary>
-	/// Controls which point of the <see cref="Sprite3D"/> is attached to the <see cref="FillBoxAnchor"/> in range [-1;1]
+	/// Controls which point of the <see cref="Sprite3D"/> is attached to the <see cref="Anchor"/> in range [-1;1]
 	/// </summary>
 	public override Vector2 OriginPosition {
 		get => base.OriginPosition;
 		set {
 			base.OriginPosition = value;
 			origin = Anchor.Custom;
+			updateAnchor();
+		}
+	}
+
+	Anchor anchor = Anchor.BottomCentre;
+	/// <summary>
+	/// Controls which point of the Fill Box <see cref="Origin"/> is attached to
+	/// It is <see cref="Anchor.BottomCentre"/> by default
+	/// </summary>
+	new public Anchor Anchor {
+		get => anchor;
+		set {
+			anchor = value;
+			anchorPosition = new() {
+				X = value.HasFlag( Anchor.x0 ) ? -1 : value.HasFlag( Anchor.x2 ) ? 1 : 0,
+				Y = value.HasFlag( Anchor.y0 ) ? 1 : value.HasFlag( Anchor.y2 ) ? -1 : 0
+			};
+			updateAnchor();
+		}
+	}
+	Vector2 anchorPosition = new( 0, -1 );
+	/// <summary>
+	/// Controls which point of the Fill Box <see cref="Origin"/> is attached to in range [-1;1]
+	/// </summary>
+	new public Vector2 AnchorPosition {
+		get => anchorPosition;
+		set {
+			anchorPosition = value;
+			anchor = Anchor.Custom;
 			updateAnchor();
 		}
 	}
@@ -112,11 +141,8 @@ public partial class Sprite3D : Model<BasicMesh> {
 	}
 
 	void updateAnchor () {
-		base.Origin = new( fillBoxAnchorPosition.X, fillBoxAnchorPosition.Y, 0 );
-		var free = Size - new Vector2( ScaleX, ScaleY ) * 2;
-		Vector2 offset = free * (OriginPosition + Vector2.One) * fillBoxAnchorPosition / 2;
-
-		base.Origin += Vector3.Divide( new Vector3( offset.X, offset.Y, 0 ), Scale );
+		Vector2 offset = (OriginPosition + Size * (fillBoxAnchorPosition - anchorPosition)) / 2;
+		base.Origin = Vector3.Divide( new Vector3( offset.X, offset.Y, 0 ), Scale );
 	}
 
 	Axes autoSizeAxes = Axes.Both;
@@ -235,8 +261,8 @@ public partial class Sprite3D : Model<BasicMesh> {
 		if ( !autoSizeAxes.HasFlag( Axes.Y ) )
 			size.Y = this.Size.Y;
 
-		ScaleX = size.X / 2;
-		ScaleY = size.Y / 2;
+		ScaleX = size.X;
+		ScaleY = size.Y;
 
 		updateAnchor();
 	}
