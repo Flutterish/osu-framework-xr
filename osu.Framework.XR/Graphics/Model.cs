@@ -1,13 +1,10 @@
-﻿using osu.Framework.Extensions.TypeExtensions;
-using osu.Framework.Graphics;
+﻿using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Rendering;
-using osu.Framework.XR.Graphics.Buffers;
 using osu.Framework.XR.Graphics.Materials;
 using osu.Framework.XR.Graphics.Meshes;
 using osu.Framework.XR.Physics;
 using osuTK.Graphics;
-using System.Diagnostics.CodeAnalysis;
 
 namespace osu.Framework.XR.Graphics;
 
@@ -43,68 +40,18 @@ public partial class BasicModel : Model<BasicMesh>, IHasCollider {
 public partial class Model : Model<Mesh> { }
 
 /// <summary>
-/// A 3D drawable with a mesh and a material
+/// A 3D drawable with a mesh and a material which renders a single mesh
 /// </summary>
 /// <typeparam name="T">The type of mesh</typeparam>
-public partial class Model<T> : Drawable3D where T : Mesh {
-	// shared data
-	ulong materialMeshId = 1;
-	ulong linkedMaterialMeshId = 0; 
-	ulong meshId = 0;
-	ulong linkedMeshId = 0;
-	AttributeArray VAO = new();
-
-	T? mesh;
-	bool ownMesh = false;
-	[AllowNull]
-	public T Mesh {
-		get {
-			if ( mesh is null ) {
-				mesh = CreateOwnMesh();
-				ownMesh = true;
-			}
-			return mesh;
-		}
-		set {
-			if ( ownMesh )
-				mesh!.Dispose();
-
-			if ( mesh?.Descriptor != value?.Descriptor )
-				materialMeshId++;
-			mesh = value;
-			ownMesh = false;
-			meshId++;
-			Invalidate( Invalidation.DrawNode );
-		}
-	}
-
-	/// <summary>
-	/// Creates a default mesh when <see cref="Mesh"/> is accessed but not set
-	/// </summary>
-	protected virtual T CreateOwnMesh () {
-		throw new InvalidOperationException( $"{GetType().ReadableName()} can not create its own mesh" );
-	}
-
-	Material? material;
-	public Material Material {
-		get => material!;
-		set {
-			material = value;
-			if ( material.Shader != value.Shader )
-				materialMeshId++;
-			Invalidate( Invalidation.DrawNode );
-		}
-	}
-
-	protected virtual Material CreateDefaultMaterial ( MaterialStore materials ) {
+public partial class Model<T> : MeshRenderer<T> where T : Mesh {
+	protected override Material CreateDefaultMaterial ( MaterialStore materials ) {
 		return materials.GetNew( MaterialNames.Unlit );
 	}
 
-	[BackgroundDependencyLoader]
-	private void load ( MaterialStore materials ) {
-		material ??= CreateDefaultMaterial( materials );
+	protected override void LoadComplete () {
+		base.LoadComplete();
 		if ( colour is Color4 color )
-			material.SetIfDefault( "tint", color );
+			Material.SetIfDefault( "tint", color );
 	}
 
 	Color4? colour = null;
@@ -128,64 +75,29 @@ public partial class Model<T> : Drawable3D where T : Mesh {
 		set => Tint = Tint with { A = value };
 	}
 
-	protected override void Dispose ( bool isDisposing ) {
-		if ( !IsDisposed ) {
-			if ( ownMesh )
-				mesh!.Dispose();
-			VAO.Dispose();
-		}
-
-		base.Dispose( isDisposing );
-	}
-
 	protected override ModelDrawNode? CreateDrawNode3D ( int index )
 		=> new ModelDrawNode( this, index );
 
-	protected class ModelDrawNode : DrawNode3D {
+	protected class ModelDrawNode : MeshRendererDrawNode {
 		new protected Model<T> Source => (Model<T>)base.Source;
-		int nodeIndex;
-		public ModelDrawNode ( Model<T> source, int index ) : base( source ) {
-			nodeIndex = index;
-			VAO = source.VAO;
-		}
+		public ModelDrawNode ( Model<T> source, int index ) : base( source, index ) { }
 
-		AttributeArray VAO = null!;
-		Mesh? mesh;
-		Material material = null!;
-		protected Matrix4 Matrix;
 		bool normalMatrixComputed;
 		Matrix3 normalMatrix;
 
-		ulong linkId;
-		ulong meshId;
 		protected override void UpdateState () {
-			mesh = Source.mesh;
-			material = Source.Material;
-			Matrix = Source.Matrix;
+			base.UpdateState();
 			normalMatrixComputed = false;
-			linkId = Source.materialMeshId;
-			meshId = Source.meshId;
-
-			material.UpdateProperties( nodeIndex );
 		}
 
 		public override void Draw ( IRenderer renderer, object? ctx = null ) {
-			if ( mesh is null )
+			if ( Mesh is null )
 				return;
 
-			if ( linkId > Source.linkedMaterialMeshId ) {
-				VAO.Clear();
-				Source.linkedMaterialMeshId = linkId;
-			}
+			Bind();
 
-			if ( VAO.Bind() || meshId > Source.linkedMeshId ) {
-				LinkAttributeArray( mesh, material );
-				Source.linkedMeshId = meshId;
-			}
-
-			material.Bind( nodeIndex );
-			material.Shader.SetUniform( "mMatrix", ref Matrix );
-			if ( material.Shader.TryGetUniform<Matrix3>( "mNormal", out var mNormal ) ) {
+			Material.Shader.SetUniform( "mMatrix", ref Matrix );
+			if ( Material.Shader.TryGetUniform<Matrix3>( "mNormal", out var mNormal ) ) {
 				if ( !normalMatrixComputed ) {
 					var mat = Matrix.Inverted();
 					mat.Transpose();
@@ -195,7 +107,7 @@ public partial class Model<T> : Drawable3D where T : Mesh {
 
 				mNormal.UpdateValue( ref normalMatrix );
 			}
-			mesh.Draw();
+			Mesh.Draw();
 		}
 	}
 }
