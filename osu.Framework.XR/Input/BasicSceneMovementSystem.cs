@@ -62,7 +62,8 @@ public partial class BasicSceneMovementSystem : Drawable {
 	}
 
 	protected override bool OnScroll ( ScrollEvent e ) {
-		if ( ControlType is ControlType.Orbit ) 			Scene.Camera.Position = cameraOrigin + ( Scene.Camera.Position - cameraOrigin ) * ( 1 + e.ScrollDelta.Y / 10 );
+		if ( ControlType is ControlType.Orbit ) 
+			Scene.Camera.Position = cameraOrigin + ( Scene.Camera.Position - cameraOrigin ) * ( 1 + e.ScrollDelta.Y / 10 );
 
 		return base.OnScroll( e );
 	}
