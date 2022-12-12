@@ -7,6 +7,16 @@ public class PhysicsSystem {
 	HashList<IHasCollider> colliders = new();
 	Dictionary<CompositeDrawable3D, SubtreeModifiedSubscription> subscriptions = new();
 
+	/// <summary>
+	/// Sets the single target. Clears all previous targets if there were any
+	/// </summary>
+	public CompositeDrawable3D Target {
+		set {
+			Clear();
+			AddSubtree( value );
+		}
+	}
+
 	public void AddSubtree ( CompositeDrawable3D root ) {
 		if ( subscriptions.ContainsKey( root ) )
 			return;

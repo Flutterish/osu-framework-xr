@@ -12,7 +12,7 @@ namespace osu.Framework.XR.Input;
 /// </summary>
 public partial class BasicPanelInteractionSource : Drawable {
 	protected readonly PhysicsSystem Physics;
-	protected readonly Scene Scene;
+	protected readonly Scene Target;
 
 	public readonly Bindable<Panel?> FocusedPanelBindable = new();
 	public Panel? FocusedPanel {
@@ -28,9 +28,9 @@ public partial class BasicPanelInteractionSource : Drawable {
 	}
 
 	PanelInteractionSystem.Source source;
-	public BasicPanelInteractionSource ( Scene scene, PhysicsSystem physics, PanelInteractionSystem system ) {
+	public BasicPanelInteractionSource ( Scene target, PhysicsSystem physics, PanelInteractionSystem system ) {
 		Physics = physics;
-		Scene = scene;
+		Target = target;
 		source = system.GetSource( this );
 
 		FocusedPanelBindable.BindTo( source.FocusedPanelBindable );
@@ -45,7 +45,7 @@ public partial class BasicPanelInteractionSource : Drawable {
 	}
 
 	protected Panel? TryHit ( Vector2 e, out Vector2 pos ) {
-		if ( Physics.TryHitRay( Scene.Camera.Position, Scene.Camera.DirectionOf( e, Scene.DrawWidth, Scene.DrawHeight ), out var hit ) && hit.Collider is Panel panel ) {
+		if ( Physics.TryHitRay( Target.Camera.Position, Target.Camera.DirectionOf( e, Target.DrawWidth, Target.DrawHeight ), out var hit ) && hit.Collider is Panel panel ) {
 			pos = panel.GlobalSpaceContentPositionAt( hit.TrisIndex, hit.Point );
 			return panel;
 		}
@@ -55,7 +55,7 @@ public partial class BasicPanelInteractionSource : Drawable {
 	}
 
 	protected override bool OnMouseMove ( MouseMoveEvent e ) {
-		e.Target = Scene;
+		e.Target = Target;
 		if ( UseTouch ) {
 			if ( touchDown && TryHit( e.MousePosition, out var pos ) == FocusedPanel ) {
 				source.TouchMove( pos );
@@ -71,7 +71,7 @@ public partial class BasicPanelInteractionSource : Drawable {
 	}
 
 	protected override bool OnDragStart ( DragStartEvent e ) {
-		e.Target = Scene;
+		e.Target = Target;
 		if ( TryHit( e.MouseDownPosition, out _ ) != null ) 			
 			return false;
 
@@ -79,7 +79,7 @@ public partial class BasicPanelInteractionSource : Drawable {
 	}
 
 	protected override bool OnMouseDown ( MouseDownEvent e ) {
-		e.Target = Scene;
+		e.Target = Target;
 		if ( TryHit( e.MouseDownPosition, out var pos ) is Panel panel ) {
 			FocusedPanel = panel;
 
@@ -112,7 +112,7 @@ public partial class BasicPanelInteractionSource : Drawable {
 	}
 
 	protected override bool OnScroll ( ScrollEvent e ) {
-		e.Target = Scene;
+		e.Target = Target;
 		if ( TryHit( e.MousePosition, out _ ) is Panel panel ) {
 			panel.Content.Scroll += e.ScrollDelta;
 			return true;
@@ -122,7 +122,7 @@ public partial class BasicPanelInteractionSource : Drawable {
 	}
 
 	protected override bool OnKeyDown ( KeyDownEvent e ) {
-		e.Target = Scene;
+		e.Target = Target;
 		if ( FocusedPanel != null ) {
 			source.Press( e.Key );
 			return true;
@@ -132,7 +132,7 @@ public partial class BasicPanelInteractionSource : Drawable {
 	}
 
 	protected override void OnKeyUp ( KeyUpEvent e ) {
-		e.Target = Scene;
+		e.Target = Target;
 		if ( FocusedPanel != null ) {
 			source.Release( e.Key );
 			return;
