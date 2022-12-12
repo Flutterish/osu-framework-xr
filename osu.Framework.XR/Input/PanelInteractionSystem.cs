@@ -38,7 +38,7 @@ public class PanelInteractionSystem {
 	Dictionary<object, Source> sources = new();
 	public Source GetSource ( object source ) {
 		if ( !sources.TryGetValue( source, out var v ) )
-			sources.Add( source, v = new( this ) );
+			sources.Add( source, v = new( source, this ) );
 
 		return v;
 	}
@@ -46,22 +46,27 @@ public class PanelInteractionSystem {
 	public event Action<Panel>? PanelFocused;
 	public event Action<Panel>? PanelBlurred;
 
-	public class Source {
+	public class Source : IDisposable {
 		public readonly Bindable<Panel?> FocusedPanelBindable = new();
 		public Panel? FocusedPanel {
 			get => FocusedPanelBindable.Value;
 			set => FocusedPanelBindable.Value = value;
 		}
 
-		public Source ( PanelInteractionSystem system ) {
+		PanelInteractionSystem system;
+		object source;
+		[Friend(typeof( PanelInteractionSystem ) )]
+		internal Source ( object source, PanelInteractionSystem system ) {
+			this.system = system;
+			this.source = source;
 			FocusedPanelBindable.BindValueChanged( v => {
 				if ( v.OldValue is Panel old ) {
 					releaseInput( old );
-					system.blur( this, old );
+					this.system.blur( this, old );
 				}
 
 				if ( v.NewValue is Panel panel )
-					system.focus( this, panel );
+					this.system.focus( this, panel );
 			} );
 		}
 
@@ -154,6 +159,12 @@ public class PanelInteractionSystem {
 		}
 		public void TouchUp () {
 			FocusedPanel?.Content.TouchUp( this );
+		}
+
+		public void Dispose () {
+			FocusedPanel = null;
+			system.sources.Remove( source );
+			system = null!;
 		}
 	}
 }
