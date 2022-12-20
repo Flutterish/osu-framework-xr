@@ -65,6 +65,7 @@ public partial class Model<T> : MeshRenderer<T> where T : Mesh {
 			if ( Tint == value )
 				return;
 
+			base.Tint = value; // NOTE this is here for fade colour transforms which sample colour from Drawable directly
 			colour = value;
 			Material?.Set( "tint", value );
 			Invalidate( Invalidation.DrawNode );
