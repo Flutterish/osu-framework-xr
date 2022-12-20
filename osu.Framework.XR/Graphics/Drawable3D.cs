@@ -101,9 +101,9 @@ public partial class Drawable3D : CompositeDrawable {
 	/// </summary>
 	new public virtual ColourInfo Colour {
 		[MethodImpl( MethodImplOptions.AggressiveInlining )]
-		get => base.Colour;
+		get => Tint;
 		[MethodImpl( MethodImplOptions.AggressiveInlining )]
-		set => base.Colour = value;
+		set => Tint = value;
 	}
 
 	/// <summary>
@@ -111,9 +111,9 @@ public partial class Drawable3D : CompositeDrawable {
 	/// </summary>
 	public virtual Color4 Tint {
 		[MethodImpl( MethodImplOptions.AggressiveInlining )]
-		get => Colour.TopLeft;
+		get => base.Colour.TopLeft;
 		[MethodImpl( MethodImplOptions.AggressiveInlining )]
-		set => Colour = value;
+		set => base.Colour = value;
 	}
 
 	/// <summary>

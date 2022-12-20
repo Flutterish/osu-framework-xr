@@ -48,8 +48,8 @@ public partial class Model<T> : MeshRenderer<T> where T : Mesh {
 		return materials.GetNew( MaterialNames.Unlit );
 	}
 
-	protected override void LoadComplete () {
-		base.LoadComplete();
+	[BackgroundDependencyLoader]
+	private void load () {
 		if ( colour is Color4 color )
 			Material.SetIfDefault( "tint", color );
 	}
@@ -59,7 +59,7 @@ public partial class Model<T> : MeshRenderer<T> where T : Mesh {
 		get => Tint;
 		set => Tint = value.TopLeft;
 	}
-	public Color4 Tint {
+	public override Color4 Tint {
 		get => Material?.Get<Color4>( "tint" ) ?? colour ?? Color4.White;
 		set {
 			if ( Tint == value )
