@@ -13,6 +13,7 @@ using osu.Framework.XR.Graphics.Meshes;
 using osu.Framework.XR.Maths;
 using osu.Framework.XR.Physics;
 using osuTK.Graphics;
+using System.Collections;
 
 namespace osu.Framework.XR.Graphics.Panels;
 
@@ -20,7 +21,7 @@ namespace osu.Framework.XR.Graphics.Panels;
 /// A 3D panel on which 2D content can be rendered and interacted with through virtual input.
 /// You need to manually set the size of content, or set its auto size axes
 /// </summary>
-public partial class Panel : Drawable3D, IHasCollider {
+public partial class Panel : Drawable3D, IHasCollider, IEnumerable<Drawable> {
 	/// <summary>
 	/// The size of the contained 2D drawable content.
 	/// </summary>
@@ -70,6 +71,56 @@ public partial class Panel : Drawable3D, IHasCollider {
 	/// </summary>
 	public IEnumerable<Drawable> ChildrenEnumerable {
 		set => Content.ChildrenEnumerable = value;
+	}
+
+	/// <summary>
+	/// Adds a child to 2D content
+	/// </summary>
+	public void Add ( Drawable drawable ) {
+		Content.Add( drawable );
+	}
+
+	/// <summary>
+	/// Adds a range of children to 2D content
+	/// </summary>
+	public void AddRange ( IEnumerable<Drawable> range ) {
+		Content.AddRange( range );
+	}
+
+	/// <summary>
+	/// Removes a given child from 2D content
+	/// </summary>
+	public bool Remove ( Drawable drawable, bool disposeImmediately ) {
+		return Content.Remove( drawable, disposeImmediately );
+	}
+
+	/// <summary>
+	/// Removes a range of children from 2D content
+	/// </summary>
+	public void RemoveRange ( IEnumerable<Drawable> range, bool disposeImmediately ) {
+		Content.RemoveRange( range, disposeImmediately );
+	}
+
+	/// <summary>
+	/// Removes all children from 2D content
+	/// </summary>
+	public void Clear ( bool disposeChildren ) {
+		Content.Clear( disposeChildren );
+	}
+
+	/// <summary>
+	/// Removes all children from 2D content
+	/// </summary>
+	public void Clear () {
+		Content.Clear();
+	}
+
+	public IEnumerator<Drawable> GetEnumerator () {
+		return ( (IEnumerable<Drawable>)Content ).GetEnumerator();
+	}
+
+	IEnumerator IEnumerable.GetEnumerator () {
+		return ( (IEnumerable)Content ).GetEnumerator();
 	}
 
 	Vector2 lastContentDrawSize;
