@@ -4,6 +4,7 @@ using osu.Framework.Graphics.Rendering;
 using osu.Framework.XR.Graphics.Buffers;
 using osu.Framework.XR.Graphics.Materials;
 using osu.Framework.XR.Graphics.Meshes;
+using osu.Framework.XR.Graphics.Shaders;
 using osuTK.Graphics;
 using System.Reflection;
 
@@ -101,8 +102,8 @@ public partial class Panel {
 			}
 
 			Material.Bind( SubtreeIndex );
-			Material.Shader.SetUniform( "tex", FrameBuffer.Texture );
-			Material.Shader.SetUniform( "mMatrix", ref Matrix );
+			Material.Shader.SetUniform( Material.StandardTextureName, FrameBuffer.Texture );
+			Material.Shader.SetUniform( Shader.StandardLocalMatrixName, ref Matrix );
 			BeforeBlit( renderer, ctx );
 			Mesh.Draw();
 		}

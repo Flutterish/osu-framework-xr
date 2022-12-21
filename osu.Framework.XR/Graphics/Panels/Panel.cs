@@ -197,7 +197,7 @@ public partial class Panel : Drawable3D, IHasCollider, IEnumerable<Drawable> {
 	private void load ( MaterialStore materials ) {
 		Material ??= GetDefaultMaterial( materials );
 		if ( colour is Color4 color )
-			Material.SetIfDefault( "tint", color );
+			Material.SetIfDefault( Material.StandardTintName, color );
 	}
 
 	Color4? colour = null;
@@ -206,13 +206,13 @@ public partial class Panel : Drawable3D, IHasCollider, IEnumerable<Drawable> {
 		set => Tint = value.TopLeft;
 	}
 	public override Color4 Tint {
-		get => Material?.Get<Color4>( "tint" ) ?? colour ?? Color4.White;
+		get => Material?.Get<Color4>( Material.StandardTintName ) ?? colour ?? Color4.White;
 		set {
 			if ( Tint == value )
 				return;
 
 			colour = value;
-			Material?.Set( "tint", value );
+			Material?.Set( Material.StandardTintName, value );
 			Invalidate( Invalidation.DrawNode );
 		}
 	}

@@ -18,7 +18,7 @@ public class MaterialStore {
 	}
 
 	Dictionary<string, object?> globalProperties = new();
-	public void SetGlobalProperty<T> ( string name, T value ) {
+	public void SetGlobalProperty<T> ( string name, T value ) { // TODO check if any-Enum based names are better (perf-wise)
 		globalProperties[name] = value;
 	}
 	public T GetGlobalProperty<T> ( string name )

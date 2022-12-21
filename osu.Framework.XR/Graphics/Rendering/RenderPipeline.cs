@@ -3,6 +3,8 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.XR.Graphics.Materials;
+using osu.Framework.XR.Graphics.Shaders;
+using osu.Framework.XR.Maths;
 
 namespace osu.Framework.XR.Graphics.Rendering;
 
@@ -48,7 +50,6 @@ partial class Scene {
 			DisposeScheduler.Execute();
 
 			frameBuffer ??= renderer.CreateFrameBuffer( new[] { RenderBufferFormat.D32S8 } );
-			MaterialStore.SetGlobalProperty( "viewPos", Source.Camera.Position ); // TODO do this better
 			frameBuffer.Size = size;
 			Draw( renderer, frameBuffer, projectionMatrix );
 
@@ -81,7 +82,8 @@ partial class Scene {
 				renderer.Clear( new( depth: 1 ) );
 
 			renderer.PushProjectionMatrix( projectionMatrix );
-			MaterialStore.SetGlobalProperty( "gProj", projectionMatrix );
+			MaterialStore.SetGlobalProperty( Shader.StandardGlobalProjectionName, projectionMatrix );
+			MaterialStore.SetGlobalProperty( "viewPos", projectionMatrix.ExtractCameraPosition() );
 			using ( var read = Source.tripleBuffer.GetForRead() ) {
 				Draw( renderer, read.Index, projectionMatrix );
 			}

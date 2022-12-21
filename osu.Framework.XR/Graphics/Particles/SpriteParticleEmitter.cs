@@ -1,6 +1,7 @@
 ﻿using osu.Framework.Graphics.Rendering;
 using osu.Framework.XR.Graphics.Materials;
 using osu.Framework.XR.Graphics.Meshes;
+using osu.Framework.XR.Graphics.Shaders;
 using osu.Framework.XR.Maths;
 
 namespace osu.Framework.XR.Graphics.Particles;
@@ -26,7 +27,7 @@ public abstract partial class SpriteParticleEmitter<T> : ParticleEmitter<T, Basi
 			var translation = Matrix4.CreateTranslation( position );
 			var scale = Matrix4.CreateScale( baseMatrix.ExtractScale() );
 			var look = Matrix4.CreateFromQuaternion( ( renderer.ProjectionMatrix.ExtractCameraPosition() - position ).LookRotation() );
-			Material.Shader.SetUniform( "mMatrix", scale * look * translation );
+			Material.Shader.SetUniform( Shader.StandardLocalMatrixName, scale * look * translation );
 			Mesh!.Draw();
 		}
 	}

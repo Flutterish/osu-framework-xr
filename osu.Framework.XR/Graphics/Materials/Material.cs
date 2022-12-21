@@ -23,6 +23,16 @@ public class Material {
 	public readonly MaterialDescriptor? Descriptor;
 	readonly MaterialDataBuffer dataBuffer;
 
+	public const string StandardPositionAttributeName = "aPos";
+	public const string StandardUvAttributeName = "aUv";
+	public const string StandardNormalAttributeName = "aNorm";
+	public const string StandardVertexColourAttributeName = "aColour";
+
+	public const string StandardTintName = "tint";
+	public const string StandardUseGammaName = "useGamma";
+	public const string StandardTextureName = "tex";
+	public const string StandardTextureRectName = "subImage";
+
 	public Material ( Shader shader, MaterialDescriptor? descriptor = null, MaterialStore? store = null ) {
 		dataBuffer = new( this );
 		Shader = shader;
@@ -64,8 +74,11 @@ public class Material {
 		}
 
 		uniformArray = uniforms.Values.ToArray();
+		LoadComplete();
 		IsLoaded = true;
 	}
+
+	protected virtual void LoadComplete () { }
 
 	/// <summary>
 	/// Enumerates all uniforms.
@@ -142,7 +155,7 @@ public class Material {
 	/// <summary>
 	/// Sets a uniform sampler2D and its subimage rect
 	/// </summary>
-	public void SetTextureUniform ( Texture value, string name, string subImage = "subImage" ) {
+	public void SetTextureUniform ( Texture value, string name = StandardTextureName, string subImage = StandardTextureRectName ) {
 		var mat = GetUniform<Texture>( name );
 		mat.Value = value;
 		var mat2 = GetUniform<RectangleF>( subImage );
@@ -182,7 +195,7 @@ public class Material {
 	/// Sets a texture and its subimage rect
 	/// </summary>
 	[MethodImpl( MethodImplOptions.AggressiveInlining )]
-	public void SetTexture ( string name, Texture value, string subImageName = "subImage" ) {
+	public void SetTexture ( string name, Texture value, string subImageName = StandardTextureRectName ) {
 		Set( name, value );
 		Set( subImageName, value.GetTextureRect() );
 	}
@@ -227,7 +240,7 @@ public class Material {
 	/// Sets uniforms to the values defined by this material.
 	/// </summary>
 	/// <param name="index">The triple buffer index</param>
-	public void Bind ( int index ) {
+	public void Bind ( int index ) { // TODO perhaps it would be possible to move the index from draw nodes to the scene
 		if ( boundMaterial == this )
 			return;
 

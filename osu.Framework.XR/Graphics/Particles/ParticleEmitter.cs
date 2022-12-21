@@ -3,6 +3,7 @@ using osu.Framework.Graphics;
 using osu.Framework.XR.Allocation;
 using osu.Framework.XR.Collections;
 using osu.Framework.XR.Graphics.Meshes;
+using osu.Framework.XR.Graphics.Shaders;
 
 namespace osu.Framework.XR.Graphics.Particles;
 
@@ -54,7 +55,7 @@ public abstract partial class ParticleEmitter<T, Tmesh> : MeshRenderer<Tmesh> wh
 		}
 
 		protected virtual void Draw ( in T particle, IRenderer renderer, object? ctx = null ) {
-			Material.Shader.SetUniform( "mMatrix", particle.Matrix * Matrix );
+			Material.Shader.SetUniform( Shader.StandardLocalMatrixName, particle.Matrix * Matrix );
 			Mesh!.Draw();
 		}
 

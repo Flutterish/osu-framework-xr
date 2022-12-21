@@ -3,6 +3,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.XR.Graphics;
+using osu.Framework.XR.Graphics.Materials;
 using osu.Framework.XR.Maths;
 using Controller = osu.Framework.XR.VirtualReality.Devices.Controller;
 using VrDevice = osu.Framework.XR.VirtualReality.Devices.VrDevice;
@@ -37,8 +38,7 @@ public partial class BasicVrDevice : CompositeDrawable3D {
 
 					if ( tx != null ) {
 						child.OnLoadComplete += c => {
-							child.Material.SetTexture( "tex", tx );
-							child.Material.Set( "useGamma", true );
+							child.Material.SetTexture( UnlitMaterial.Texture, tx );
 						};
 					}
 					Schedule( () => {
@@ -66,11 +66,6 @@ public partial class BasicVrDevice : CompositeDrawable3D {
 			Device = device;
 
 			UseRealtimePosition.BindValueChanged( v => Invalidate( Invalidation.DrawNode ) );
-		}
-
-		protected override void LoadComplete () {
-			base.LoadComplete();
-			Material.Set( "useGamma", true );
 		}
 
 		[Resolved]

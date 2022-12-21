@@ -1,4 +1,5 @@
-﻿using osu.Framework.Extensions.TypeExtensions;
+﻿using HidSharp.Reports.Units;
+using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Rendering;
@@ -9,6 +10,7 @@ using osu.Framework.XR.Collections;
 using osu.Framework.XR.Graphics.Containers;
 using osu.Framework.XR.Graphics.Materials;
 using osu.Framework.XR.Graphics.Meshes;
+using osu.Framework.XR.Graphics.Shaders;
 using osuTK.Graphics;
 
 namespace osu.Framework.XR.Graphics.Rendering;
@@ -158,13 +160,14 @@ public partial class Scene : CompositeDrawable {
 			new NamespacedResourceStore<byte[]>( new DllResourceStore( typeof(Scene).Assembly ), "Resources/Shaders" )
 		} ) );
 		materials.AddDescriptor( MaterialNames.Unlit, new MaterialDescriptor()
-			.SetAttribute( "aPos", MeshDescriptor.Position )
-			.SetAttribute( "aUv", MeshDescriptor.UV )
-			.SetUniform( "tex", renderer.WhitePixel )
-			.SetUniform( "subImage", renderer.WhitePixel.GetTextureRect() )
-			.SetUniform( "tint", Color4.White )
+			.SetAttribute( UnlitMaterial.Position, MeshDescriptor.Position )
+			.SetAttribute( UnlitMaterial.UV, MeshDescriptor.UV )
+			.SetUniform( UnlitMaterial.Texture, renderer.WhitePixel )
+			.SetUniform( UnlitMaterial.TextureRect, renderer.WhitePixel.GetTextureRect() )
+			.SetUniform( UnlitMaterial.Tint, Color4.White )
+			.SetUniform( UnlitMaterial.UseGamma, true )
 			.SetOnBind( ( m, store ) => {
-				m.Shader.SetUniform( "gProj", store.GetGlobalProperty<Matrix4>( "gProj" ) );
+				m.Shader.SetUniform( Shader.StandardGlobalProjectionName, store.GetGlobalProperty<Matrix4>( Shader.StandardGlobalProjectionName ) );
 			} )
 		);
 		materials.AddDescriptor( MaterialNames.Blit, new MaterialDescriptor( materials.GetDescriptor( MaterialNames.Unlit ) ) );
@@ -181,11 +184,11 @@ public partial class Scene : CompositeDrawable {
 			} )
 		);
 		materials.AddDescriptor( MaterialNames.UnlitPanel, new MaterialDescriptor()
-			.SetAttribute( "aPos", MeshDescriptor.Position )
-			.SetAttribute( "aUv", MeshDescriptor.UV )
-			.SetUniform( "tint", Color4.White )
+			.SetAttribute( UnlitPanelMaterial.Position, MeshDescriptor.Position )
+			.SetAttribute( UnlitPanelMaterial.UV, MeshDescriptor.UV )
+			.SetUniform( UnlitPanelMaterial.Tint, Color4.White )
 			.SetOnBind( ( m, store ) => {
-				m.Shader.SetUniform( "gProj", store.GetGlobalProperty<Matrix4>( "gProj" ) );
+				m.Shader.SetUniform( Shader.StandardGlobalProjectionName, store.GetGlobalProperty<Matrix4>( Shader.StandardGlobalProjectionName ) );
 			} )
 		);
 		deps.Cache( MaterialStore );

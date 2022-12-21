@@ -17,6 +17,10 @@ public class Shader {
 		upload.Enqueue();
 	}
 
+	public const string StandardGlobalProjectionName = "gProj";
+	public const string StandardLocalMatrixName = "mMatrix";
+	public const string StandardNormalMatrixName = "mNormal";
+
 	public GlHandle Handle { get; private set; }
 	public bool IsCompiled { get; private set; }
 

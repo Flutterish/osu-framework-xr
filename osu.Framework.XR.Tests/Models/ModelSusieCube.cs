@@ -61,7 +61,7 @@ public partial class ModelSusieCube : Model {
 	[BackgroundDependencyLoader]
 	private void load ( TextureStore textures ) {
 		var texture = textures.Get( "susie", WrapMode.ClampToEdge, WrapMode.ClampToEdge );
-		Material.SetTexture( "tex", texture );
-		Material.Set( "tint", new Color4( RNG.NextSingle(), RNG.NextSingle(), RNG.NextSingle(), 1 ) );
+		Material.SetTexture( UnlitMaterial.Texture, texture );
+		Material.Set( UnlitMaterial.Tint, new Color4( RNG.NextSingle(), RNG.NextSingle(), RNG.NextSingle(), 1 ) );
 	}
 }

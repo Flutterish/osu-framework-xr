@@ -3,6 +3,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.XR.Graphics.Materials;
 using osu.Framework.XR.Graphics.Meshes;
+using osu.Framework.XR.Graphics.Shaders;
 using osu.Framework.XR.Physics;
 using osuTK.Graphics;
 
@@ -51,7 +52,7 @@ public partial class Model<T> : MeshRenderer<T> where T : Mesh {
 	[BackgroundDependencyLoader]
 	private void load () {
 		if ( colour is Color4 color )
-			Material.SetIfDefault( "tint", color );
+			Material.SetIfDefault( Material.StandardTintName, color );
 	}
 
 	Color4? colour = null;
@@ -60,14 +61,14 @@ public partial class Model<T> : MeshRenderer<T> where T : Mesh {
 		set => Tint = value.TopLeft;
 	}
 	public override Color4 Tint {
-		get => Material?.Get<Color4>( "tint" ) ?? colour ?? Color4.White;
+		get => Material?.Get<Color4>( Material.StandardTintName ) ?? colour ?? Color4.White;
 		set {
 			if ( Tint == value )
 				return;
 
 			base.Tint = value; // NOTE this is here for fade colour transforms which sample colour from Drawable directly
 			colour = value;
-			Material?.Set( "tint", value );
+			Material?.Set( Material.StandardTintName, value );
 			Invalidate( Invalidation.DrawNode );
 		}
 	}
@@ -97,8 +98,8 @@ public partial class Model<T> : MeshRenderer<T> where T : Mesh {
 
 			Bind();
 
-			Material.Shader.SetUniform( "mMatrix", ref Matrix );
-			if ( Material.Shader.TryGetUniform<Matrix3>( "mNormal", out var mNormal ) ) {
+			Material.Shader.SetUniform( Shader.StandardLocalMatrixName, ref Matrix );
+			if ( Material.Shader.TryGetUniform<Matrix3>( Shader.StandardNormalMatrixName, out var mNormal ) ) {
 				if ( !normalMatrixComputed ) {
 					var mat = Matrix.Inverted();
 					mat.Transpose();

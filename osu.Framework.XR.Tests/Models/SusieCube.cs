@@ -61,9 +61,9 @@ public partial class SusieCube : Drawable3D {
 		texture = textures.Get( "susie", WrapMode.ClampToEdge, WrapMode.ClampToEdge );
 
 		material.CreateUpload( m => {
-			m.SetUniform( "tex", texture );
-			m.SetUniform( "tint", new Color4( RNG.NextSingle(), RNG.NextSingle(), RNG.NextSingle(), 1 ) );
-			m.SetUniform( "subImage", texture.GetTextureRect() );
+			m.SetUniform( UnlitMaterial.Texture, texture );
+			m.SetUniform( UnlitMaterial.Tint, new Color4( RNG.NextSingle(), RNG.NextSingle(), RNG.NextSingle(), 1 ) );
+			m.SetUniform( UnlitMaterial.TextureRect, texture.GetTextureRect() );
 		} ).Enqueue();
 	}
 	Material material = null!;

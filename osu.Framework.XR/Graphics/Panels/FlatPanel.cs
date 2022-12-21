@@ -1,5 +1,6 @@
 ﻿using osu.Framework.Graphics.Rendering;
 using osu.Framework.XR.Graphics.Materials;
+using osu.Framework.XR.Graphics.Shaders;
 using osuTK.Graphics;
 
 namespace osu.Framework.XR.Graphics.Panels;
@@ -29,8 +30,8 @@ public partial class FlatPanel : Panel {
 			}
 
 			Material.BindUniforms();
-			Material.Shader.SetUniform( "tint", Color4.Transparent );
-			Material.Shader.SetUniform( "mMatrix", Matrix );
+			Material.Shader.SetUniform( BlitMaterial.Tint, Color4.Transparent );
+			Material.Shader.SetUniform( Shader.StandardLocalMatrixName, Matrix );
 
 			renderer.PushStencilInfo( new( true ) );
 			Mesh.Draw();
@@ -53,8 +54,8 @@ public partial class FlatPanel : Panel {
 
 			VAO.Bind();
 			Material.BindUniforms();
-			Material.Shader.SetUniform( "tint", Color4.Transparent );
-			Material.Shader.SetUniform( "mMatrix", Matrix );
+			Material.Shader.SetUniform( BlitMaterial.Tint, Color4.Transparent );
+			Material.Shader.SetUniform( Shader.StandardLocalMatrixName, Matrix );
 
 			renderer.PushStencilInfo( new( true, testValue: 0 ) );
 			Mesh.Draw();

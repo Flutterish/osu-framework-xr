@@ -3,6 +3,7 @@ using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.XR.Graphics.Materials;
 using osu.Framework.XR.Graphics.Meshes;
+using osu.Framework.XR.Graphics.Shaders;
 using osu.Framework.XR.Maths;
 
 namespace osu.Framework.XR.Graphics;
@@ -212,7 +213,7 @@ public partial class Sprite3D : Model<BasicMesh> {
 	/// <see cref="Drawable.FillAspectRatio"/> is automatically set to the aspect ratio of the given texture
 	/// </summary>
 	public virtual Texture Texture {
-		get => Material.Get<Texture>( "tex" ) ?? texture!;
+		get => Material.Get<Texture>( Material.StandardTextureName ) ?? texture!;
 		set {
 			if ( value == texture )
 				return;
@@ -220,7 +221,7 @@ public partial class Sprite3D : Model<BasicMesh> {
 			texture?.Dispose();
 			texture = value;
 			if ( Material != null )
-				Material.SetTexture( "tex", value );
+				Material.SetTexture( Material.StandardTextureName, value );
 
 			automaticFillAspectRatio = (float)texture.Width / texture.Height;
 			if ( AutomaticAspectRatio ) {
@@ -235,7 +236,7 @@ public partial class Sprite3D : Model<BasicMesh> {
 	protected override void LoadComplete () {
 		base.LoadComplete();
 		if ( texture != null )
-			Material.SetTexture( "tex", texture );
+			Material.SetTexture( Material.StandardTextureName, texture );
 	}
 
 	void updateSize () {
@@ -307,10 +308,10 @@ public partial class Sprite3D : Model<BasicMesh> {
 			Bind();
 			if ( faceCamera ) {
 				var look = Matrix4.CreateFromQuaternion( ( renderer.ProjectionMatrix.ExtractCameraPosition() - position ).LookRotation() );
-				Material.Shader.SetUniform( "mMatrix", scale * look * translation );
+				Material.Shader.SetUniform( Shader.StandardLocalMatrixName, scale * look * translation );
 			}
 			else {
-				Material.Shader.SetUniform( "mMatrix", Matrix );
+				Material.Shader.SetUniform( Shader.StandardLocalMatrixName, Matrix );
 			}
 
 			Mesh.Draw();
