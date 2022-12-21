@@ -162,7 +162,7 @@ public class VirtualGameHost : GameHost {
 		=> throw new NotSupportedException( "Nested game host does not support this operation" );
 	protected override ThreadRunner CreateThreadRunner ( InputThread mainThread )
 		=> throw new NotSupportedException( "Nested game host does not support this operation" );
-	protected override IWindow CreateWindow ()
+	protected override IWindow CreateWindow ( GraphicsSurfaceType preferredSurface )
 		=> throw new NotSupportedException( "Nested game host does not support this operation" );
 	protected override void DrawFrame ()
 		=> throw new NotSupportedException( "Nested game host does not support this operation" );

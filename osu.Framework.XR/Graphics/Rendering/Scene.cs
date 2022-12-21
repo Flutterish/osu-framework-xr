@@ -1,4 +1,5 @@
-﻿using osu.Framework.Graphics;
+﻿using osu.Framework.Extensions.TypeExtensions;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Shaders;
@@ -122,7 +123,11 @@ public partial class Scene : CompositeDrawable {
 	}
 
 	[BackgroundDependencyLoader]
-	private void load ( ShaderManager shaders ) {
+	private void load ( ShaderManager shaders, IRenderer renderer ) {
+		if ( !renderer.GetType().Name.Contains( "GL" ) ) { // TODO currently we only work with OpenGL, we need to support other targets too
+			throw new InvalidOperationException( $"osu.Framework.XR currently only supports OpenGL, but the renderer type was {renderer.GetType().ReadableName()}" );
+		}
+
 		blitShader = shaders.Load( VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE );
 	}
 	IShader blitShader = null!;
