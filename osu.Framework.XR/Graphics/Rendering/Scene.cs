@@ -1,5 +1,4 @@
-﻿using HidSharp.Reports.Units;
-using osu.Framework.Extensions.TypeExtensions;
+﻿using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Rendering;
@@ -11,6 +10,7 @@ using osu.Framework.XR.Graphics.Containers;
 using osu.Framework.XR.Graphics.Materials;
 using osu.Framework.XR.Graphics.Meshes;
 using osu.Framework.XR.Graphics.Shaders;
+using osu.Framework.XR.Parsing.Wavefront;
 using osuTK.Graphics;
 
 namespace osu.Framework.XR.Graphics.Rendering;
@@ -136,29 +136,22 @@ public partial class Scene : CompositeDrawable {
 
 	public MaterialStore MaterialStore { get; private set; } = null!;
 	public MeshStore MeshStore { get; private set; } = null!;
-	protected virtual ResourceStore<byte[]>? CreateMaterialStoreSource ( IReadOnlyDependencyContainer deps ) {
-		return null;
-	}
-	protected virtual ResourceStore<byte[]>? CreateMeshStoreSource ( IReadOnlyDependencyContainer deps ) {
-		return null;
-	}
-
-	GameHost? host;
-	protected override IReadOnlyDependencyContainer CreateChildDependencies ( IReadOnlyDependencyContainer parent ) {
-		var deps = new DependencyContainer( parent );
-		var store = parent.Get<Game>().Resources;
-		host = parent.Get<GameHost>();
-		var renderer = parent.Get<IRenderer>();
-
-		var meshes = MeshStore = new MeshStore();
-		var meshResources = CreateMeshStoreSource( deps ) ?? new NamespacedResourceStore<byte[]>( store, "Meshes" );
-		meshes.AddStore( new ObjMeshLoaderStore( meshResources ) );
-		deps.Cache( MeshStore );
-
-		var materials = MaterialStore = new MaterialStore( new ResourceStore<byte[]>( new[] {
-			CreateMaterialStoreSource( deps ) ?? new NamespacedResourceStore<byte[]>( store, "Shaders" ),
+	/// <summary>
+	/// Creates a material store
+	/// </summary>
+	protected virtual MaterialStore CreateMaterialStore ( IReadOnlyDependencyContainer dependencies ) {
+		return new MaterialStore( new ResourceStore<byte[]>( new[] {
+			new NamespacedResourceStore<byte[]>( dependencies.Get<Game>().Resources, "Shaders" ),
 			new NamespacedResourceStore<byte[]>( new DllResourceStore( typeof(Scene).Assembly ), "Resources/Shaders" )
 		} ) );
+	}
+
+	/// <summary>
+	/// Adds material descriptors to the material store
+	/// </summary>
+	protected virtual void CreateMaterialDescriptors ( MaterialStore materials, IReadOnlyDependencyContainer dependencies ) {
+		var renderer = dependencies.Get<IRenderer>();
+
 		materials.AddDescriptor( MaterialNames.Unlit, new MaterialDescriptor()
 			.SetAttribute( UnlitMaterial.Position, MeshDescriptor.Position )
 			.SetAttribute( UnlitMaterial.UV, MeshDescriptor.UV )
@@ -191,7 +184,33 @@ public partial class Scene : CompositeDrawable {
 				m.Shader.SetUniform( Shader.StandardGlobalProjectionName, store.GetGlobalProperty<Matrix4>( Shader.StandardGlobalProjectionName ) );
 			} )
 		);
-		deps.Cache( MaterialStore );
+	}
+
+	/// <summary>
+	/// Creates a mesh store
+	/// </summary>
+	protected virtual MeshStore CreateMeshStore ( IReadOnlyDependencyContainer dependencies ) {
+		return new MeshStore();
+	}
+
+	/// <summary>
+	/// Adds loader stores to the mesh store
+	/// </summary>
+	protected virtual void CreateMeshStoreSources ( MeshStore meshes, IReadOnlyDependencyContainer dependencies ) {
+		var resources = new NamespacedResourceStore<byte[]>( dependencies.Get<Game>().Resources, "Meshes" );
+		meshes.AddStore( new SingleObjMeshStore( resources ) );
+		meshes.AddStore( new ObjMeshCollectionStore( resources ) );
+	}
+
+	GameHost? host;
+	protected override IReadOnlyDependencyContainer CreateChildDependencies ( IReadOnlyDependencyContainer parent ) {
+		var deps = new DependencyContainer( parent );
+		host = parent.Get<GameHost>();
+
+		deps.Cache( MeshStore = CreateMeshStore( deps ) );
+		CreateMeshStoreSources( MeshStore, deps );
+		deps.Cache( MaterialStore = CreateMaterialStore( deps ) );
+		CreateMaterialDescriptors( MaterialStore, deps );
 
 		return base.CreateChildDependencies( deps );
 	}

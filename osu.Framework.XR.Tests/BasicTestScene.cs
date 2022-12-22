@@ -5,6 +5,7 @@ using osu.Framework.Platform;
 using osu.Framework.XR.Graphics;
 using osu.Framework.XR.Graphics.Meshes;
 using osu.Framework.XR.Graphics.Rendering;
+using osu.Framework.XR.Parsing.Wavefront;
 using osu.Framework.XR.Testing;
 using osuTK.Graphics;
 
@@ -39,8 +40,10 @@ public partial class BasicTestScene : TestScene3D {
 	}
 
 	public partial class TestResourcesScene : Scene {
-		protected override ResourceStore<byte[]>? CreateMeshStoreSource ( IReadOnlyDependencyContainer deps ) {
-			return new NamespacedResourceStore<byte[]>( new DllResourceStore( typeof( TestResourcesScene ).Assembly ), "Resources/Meshes" );
+		protected override void CreateMeshStoreSources ( MeshStore meshes, IReadOnlyDependencyContainer dependencies ) {
+			var resources = new NamespacedResourceStore<byte[]>( new DllResourceStore( typeof( TestResourcesScene ).Assembly ), "Resources/Meshes" );
+			meshes.AddStore( new SingleObjMeshStore( resources ) );
+			meshes.AddStore( new ObjMeshCollectionStore( resources ) );
 		}
 
 		protected override IReadOnlyDependencyContainer CreateChildDependencies ( IReadOnlyDependencyContainer parent ) {
