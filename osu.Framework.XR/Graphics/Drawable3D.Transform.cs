@@ -83,25 +83,31 @@ public partial class Drawable3D : IHasMatrix {
 				return;
 
 			rotation = value;
+			euler = null;
 			TryInvalidateMatrix();
 		}
 	}
 
+	Vector3? euler;
 	public Vector3 EulerRotation {
-		get => rotation.ToEuler();
-		set => Rotation = Quaternion.FromEulerAngles( value );
+		get => euler ??= rotation.ToEuler();
+		set {
+			euler = value;
+			rotation = Quaternion.FromEulerAngles( value );
+			TryInvalidateMatrix();
+		}
 	}
 	public float EulerX {
 		get => EulerRotation.X;
-		set => Rotation = Quaternion.FromEulerAngles( EulerRotation with { X = value } );
+		set => EulerRotation = EulerRotation with { X = value };
 	}
 	public float EulerY {
 		get => EulerRotation.Y;
-		set => Rotation = Quaternion.FromEulerAngles( EulerRotation with { Y = value } );
+		set => EulerRotation = EulerRotation with { Y = value };
 	}
 	public float EulerZ {
 		get => EulerRotation.Z;
-		set => Rotation = Quaternion.FromEulerAngles( EulerRotation with { Z = value } );
+		set => EulerRotation = EulerRotation with { Z = value };
 	}
 
 	Vector3 origin;
