@@ -6,11 +6,24 @@ using osuTK.Graphics;
 namespace osu.Framework.XR.Graphics.Panels;
 
 /// <summary>
-/// A <see cref="Panel"/>, which renders directly into 3D space without a frame buffer
+/// A <see cref="Panel"/>, which renders directly into 3D space without a frame buffer.
+/// This uses a stencil buffer
 /// </summary>
 public partial class FlatPanel : Panel {
 	protected sealed override void RegenrateMesh () {
+		boundinbgBox = RegenrateMeshWithBounds();
+	}
+
+	Box2 boundinbgBox;
+	/// <summary>
+	/// Regenrate mesh after it's been invalidated though <see cref="Panel.InvalidateMesh()"/>.
+	/// </summary>
+	/// <returns>
+	/// The bounding box of the mesh
+	/// </returns>
+	protected virtual Box2 RegenrateMeshWithBounds () {
 		base.RegenrateMesh();
+		return new() { Bottom = -1, Top = 1, Left = -1, Right = 1 };
 	}
 
 	protected override Material GetDefaultMaterial ( MaterialStore materials )
@@ -23,6 +36,12 @@ public partial class FlatPanel : Panel {
 		public FlatPanelDrawNode ( FlatPanel source, int index ) : base( source, index ) { }
 
 		new protected FlatPanel Source => (FlatPanel)base.Source;
+
+		Box2 boundinbgBox;
+		protected override void UpdateState () {
+			base.UpdateState();
+			boundinbgBox = Source.boundinbgBox;
+		}
 
 		public override void Draw ( IRenderer renderer, object? ctx = null ) {
 			if ( VAO.Bind() ) {
@@ -42,8 +61,8 @@ public partial class FlatPanel : Panel {
 			renderer.PushDepthInfo( new( true, false, BufferTestFunction.Always ) );
 
 			renderer.PushProjectionMatrix( Matrix4.CreateTranslation( 0, 0, -1 ) 
-				* Matrix4.CreateScale( 2 / Size.X, -2 / Size.Y, 1 )
-				* Matrix4.CreateTranslation( -1, 1, 0 )
+				* Matrix4.CreateScale( boundinbgBox.Width / Size.X, -boundinbgBox.Height / Size.Y, 1 )
+				* Matrix4.CreateTranslation( boundinbgBox.Left, boundinbgBox.Top, 0 )
 				* Matrix
 				* renderer.ProjectionMatrix 
 			);

@@ -188,7 +188,8 @@ public partial class Panel : Drawable3D, IHasCollider, IEnumerable<Drawable> {
 	}
 
 	public readonly BasicMesh Mesh = new();
-	protected readonly Cached MeshCache = new();
+	readonly Cached meshCache = new();
+	protected void InvalidateMesh () => meshCache.Invalidate();
 	protected Material Material { get; private set; } = null!;
 	protected virtual Material GetDefaultMaterial ( MaterialStore materials )
 		=> materials.GetNew( MaterialNames.UnlitPanel );
@@ -229,15 +230,17 @@ public partial class Panel : Drawable3D, IHasCollider, IEnumerable<Drawable> {
 	// shared data
 	ulong meshId;
 	ulong linkedMeshId;
+	protected virtual bool ClearMeshOnInvalidate => true;
 	protected override void UpdateAfterChildren () {
 		base.UpdateAfterChildren();
 
-		if ( !MeshCache.IsValid ) {
-			Mesh.Clear();
+		if ( !meshCache.IsValid ) {
+			if ( ClearMeshOnInvalidate ) 
+				Mesh.Clear();
 			RegenrateMesh();
 			colliderMesh.InvalidateAll();
 			Mesh.CreateFullUpload().Enqueue();
-			MeshCache.Validate();
+			meshCache.Validate();
 			meshId++;
 		}
 
@@ -249,7 +252,7 @@ public partial class Panel : Drawable3D, IHasCollider, IEnumerable<Drawable> {
 	}
 
 	/// <summary>
-	/// Regenrate mesh after it's been invalidated though <see cref="MeshCache.Invalidate()"/>
+	/// Regenrate mesh after it's been invalidated though <see cref="InvalidateMesh()"/>
 	/// </summary>
 	/// <remarks>
 	/// Note that <see cref="ContentDrawSize"/> might be a fractional value, while 
