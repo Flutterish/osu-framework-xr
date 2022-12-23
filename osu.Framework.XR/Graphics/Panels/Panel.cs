@@ -131,7 +131,7 @@ public partial class Panel : Drawable3D, IHasCollider, IEnumerable<Drawable> {
 	public readonly RootContainer Content;
 	public Panel () {
 		AddInternal( Content = CreateRootContainer() );
-		colliderMesh = new TransformedBasicMesh( Mesh, () => Matrix );
+		colliderMesh = new TransformedTriangleMesh( Mesh, () => Matrix );
 	}
 	protected virtual RootContainer CreateRootContainer ()
 		=> new();
@@ -323,7 +323,7 @@ public partial class Panel : Drawable3D, IHasCollider, IEnumerable<Drawable> {
 		}
 	}
 
-	TransformedBasicMesh colliderMesh;
+	TransformedTriangleMesh colliderMesh;
 	public ITriangleMesh ColliderMesh => colliderMesh;
 	public bool IsColliderEnabled { get; set; } = true;
 	public ulong PhysicsLayer { get; set; } = 1;

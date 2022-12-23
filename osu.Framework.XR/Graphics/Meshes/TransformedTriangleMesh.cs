@@ -3,8 +3,8 @@
 namespace osu.Framework.XR.Graphics.Meshes;
 
 /// <inheritdoc/>
-public class TransformedBasicMesh : TransformedTriangleMesh<BasicMesh> {
-	public TransformedBasicMesh ( BasicMesh mesh, Func<Matrix4> matrixGetter ) : base(
+public class TransformedTriangleMesh : TransformedTriangleMesh<ITriangleMesh> {
+	public TransformedTriangleMesh ( ITriangleMesh mesh, Func<Matrix4> matrixGetter ) : base(
 		mesh,
 		getTriangleCount,
 		getVertexCount,
@@ -13,10 +13,27 @@ public class TransformedBasicMesh : TransformedTriangleMesh<BasicMesh> {
 		matrixGetter
 	) { }
 
-	static Func<BasicMesh, int> getTriangleCount = m => m.TriangleCount;
-	static Func<BasicMesh, uint> getVertexCount = m => (uint)m.Vertices.Count;
-	static Func<BasicMesh, int, (uint indexA, uint indexB, uint indexC)> getTriangle = (m, i) => m.GetTriangleIndices( i );
-	static Func<BasicMesh, uint, Vector3> getVertex = (m, i) => m.Vertices[(int)i].Position;
+	static Func<ITriangleMesh, int> getTriangleCount = m => m.TriangleCount;
+	static Func<ITriangleMesh, uint> getVertexCount = m => m.VertexCount;
+	static Func<ITriangleMesh, int, (uint indexA, uint indexB, uint indexC)> getTriangle = ( m, i ) => m.GetTriangleIndices( i );
+	static Func<ITriangleMesh, uint, Vector3> getVertex = ( m, i ) => m.GetVertexPosition( i );
+}
+
+/// <inheritdoc/>
+public class TransformedGeometryMesh : TransformedTriangleMesh<IGeometryMesh> {
+	public TransformedGeometryMesh ( IGeometryMesh mesh, Func<Matrix4> matrixGetter ) : base(
+		mesh,
+		getTriangleCount,
+		getVertexCount,
+		getTriangle,
+		getVertex,
+		matrixGetter
+	) { }
+
+	static Func<IGeometryMesh, int> getTriangleCount = m => 0;
+	static Func<IGeometryMesh, uint> getVertexCount = m => m.VertexCount;
+	static Func<IGeometryMesh, int, (uint indexA, uint indexB, uint indexC)> getTriangle = ( m, i ) => (0, 0, 0);
+	static Func<IGeometryMesh, uint, Vector3> getVertex = ( m, i ) => m.GetVertexPosition( i );
 }
 
 /// <summary>

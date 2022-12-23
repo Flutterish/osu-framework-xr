@@ -31,7 +31,7 @@ public partial class BasicModel : Model<BasicMesh>, IHasCollider {
 		}
 	}
 
-	protected TransformedBasicMesh? ColliderMesh { get; private set; }
+	protected TransformedTriangleMesh? ColliderMesh { get; private set; }
 	ITriangleMesh IHasCollider.ColliderMesh => ColliderMesh ??= new( Mesh, () => Matrix );
 	public bool IsColliderEnabled { get; set; } = false;
 	public ulong PhysicsLayer { get; set; } = 1;
