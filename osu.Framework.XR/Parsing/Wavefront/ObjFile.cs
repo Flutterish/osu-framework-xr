@@ -8,7 +8,7 @@ using System.Globalization;
 namespace osu.Framework.XR.Parsing.Wavefront;
 
 public static class ObjFile {
-	public class ObjMesh : Mesh, IHasBoundingBox {
+	public class ObjMesh : Mesh, ITriangleMesh {
 		public readonly VertexBuffer<PositionVertex> Positions;
 		public readonly VertexBuffer<UvVertex> UVs;
 		public readonly VertexBuffer<PositionVertex> Normals;
@@ -28,9 +28,20 @@ public static class ObjFile {
 
 		public void RecalculateProperties () {
 			var vertices = ElementBuffer.Indices.Select( x => Positions.Data[(int)x] ).Select( x => (Vector3)x );
+			vertexCount = (uint)ElementBuffer.Indices.Count;
 			BoundingBox = new( vertices );
 		}
 		public AABox BoundingBox { get; private set; }
+		uint vertexCount;
+		uint IGeometryMesh.VertexCount => vertexCount;
+
+		public Vector3 GetVertexPosition ( uint index )
+			=> Positions.Data[(int)ElementBuffer.Indices[(int)index]];
+
+		public int TriangleCount => ElementBuffer.Count / 3;
+
+		public (uint indexA, uint indexB, uint indexC) GetTriangleIndices ( int index )
+			=> (ElementBuffer.Indices[index * 3], ElementBuffer.Indices[index * 3 + 1], ElementBuffer.Indices[index * 3 + 2]);
 	}
 
 	public static ImportedMeshCollection Load ( string data ) 
