@@ -151,6 +151,34 @@ public class BasicMesh : Mesh, ITriangleMesh {
 		}
 	}
 
+	public void AddArcedPlane ( Vector3 up, Vector3 forward, float height, float radius, float angle, int? steps = null, Vector3? origin = null ) {
+		forward.Normalize();
+		up.Normalize();
+
+		origin ??= Vector3.Zero;
+		steps ??= (int)( angle / MathF.PI * 128 );
+		if ( steps < 1 ) steps = 1;
+		var deltaAngle = angle / steps.Value;
+
+		(uint a, uint b) addVertices ( float angle ) {
+			var middle = Quaternion.FromAxisAngle( up, angle ).Apply( forward ) * radius + origin.Value;
+			Vertices.Add( new() { Position = middle - up * height / 2 } );
+			Vertices.Add( new() { Position = middle + up * height / 2 } );
+
+			return ((uint)Vertices.Count - 2, (uint)Vertices.Count - 1);
+		}
+
+		var (lastVerticeA, lastVerticeB) = addVertices( 0 );
+		for ( int i = 1; i <= steps; i++ ) {
+			var (a, b) = addVertices( deltaAngle * i );
+
+			AddFace( lastVerticeA, lastVerticeB, b );
+			AddFace( a, b, lastVerticeA );
+
+			(lastVerticeA, lastVerticeB) = (a, b);
+		}
+	}
+
 	public static BasicMesh MakeCube ( float sidelength ) {
 		var v = sidelength / 2;
 
