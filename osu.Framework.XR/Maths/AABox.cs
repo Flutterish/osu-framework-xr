@@ -1,4 +1,6 @@
-﻿namespace osu.Framework.XR.Maths;
+﻿using osu.Framework.XR.Graphics.Meshes;
+
+namespace osu.Framework.XR.Maths;
 
 /// <summary>
 /// A 3D axis-aligned Box.
@@ -13,6 +15,7 @@ public struct AABox {
 	/// </summary>
 	public Vector3 Size;
 	public Vector3 Max => Min + Size;
+	public Vector3 Center => Min + Size / 2;
 
 	public AABox ( Span<Vector3> points ) {
 		Vector3 min = new( float.PositiveInfinity );
@@ -39,6 +42,28 @@ public struct AABox {
 		Vector3 min = new( float.PositiveInfinity );
 		Vector3 max = new( float.NegativeInfinity );
 		foreach ( var v in points ) {
+			if ( v.X > max.X )
+				max.X = v.X;
+			if ( v.X < min.X )
+				min.X = v.X;
+			if ( v.Y > max.Y )
+				max.Y = v.Y;
+			if ( v.Y < min.Y )
+				min.Y = v.Y;
+			if ( v.Z > max.Z )
+				max.Z = v.Z;
+			if ( v.Z < min.Z )
+				min.Z = v.Z;
+		}
+
+		Min = min;
+		Size = max - min;
+	}
+	public AABox ( ITriangleMesh mesh ) {
+		Vector3 min = new( float.PositiveInfinity );
+		Vector3 max = new( float.NegativeInfinity );
+		for ( uint i = 0; i < mesh.VertexCount; i++ ) {
+			var v = mesh.GetVertexPosition( i );
 			if ( v.X > max.X )
 				max.X = v.X;
 			if ( v.X < min.X )

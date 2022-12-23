@@ -8,6 +8,18 @@ public interface ITriangleMesh : IGeometryMesh {
 }
 
 public static class ITriangleMeshExtensions {
+	public static IEnumerable<(uint indexA, uint indexB, uint indexC)> EnumerateTriangleIndices ( this ITriangleMesh mesh ) {
+		for ( int i = 0; i < mesh.TriangleCount; i++ ) {
+			yield return mesh.GetTriangleIndices( i );
+		}
+	}
+
+	public static IEnumerable<Face> EnumerateTriangleFaces ( this ITriangleMesh mesh ) {
+		for ( int i = 0; i < mesh.TriangleCount; i++ ) {
+			yield return mesh.GetTriangleFace( i );
+		}
+	}
+
 	public static Face GetTriangleFace ( this ITriangleMesh self, int triangleIndex ) {
 		var (a, b, c) = self.GetTriangleIndices( triangleIndex );
 		return new(
