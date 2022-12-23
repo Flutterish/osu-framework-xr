@@ -2,6 +2,7 @@
 using osu.Framework.XR.Graphics.Meshes;
 using osu.Framework.XR.Maths;
 using osuTK.Graphics;
+using System.Linq;
 
 namespace osu.Framework.XR.Tests.Parsing;
 
@@ -18,15 +19,19 @@ public partial class TestSceneObjCollectionImport : BasicTestScene {
 			if ( mesh is not ITriangleMesh tringular )
 				continue;
 
-			if ( tringular.FitFlatMesh() is Box3 box ) {
+			if ( tringular.FindFlatMeshPlane() is Plane plane ) {
+				var rotation = plane.Normal.LookRotation();
+				var rotationInverse = rotation.Inverted();
+				var bb = new AABox( tringular.EnumerateVertices().Select( x => rotationInverse.Apply( x ) ) );
+
 				Scene.Add( new Model {
 					Colour = Color4.Green,
 					Alpha = 0.4f,
 					Mesh = BasicMesh.UnitCube,
 					Origin = new( -0.5f ),
-					Position = box.Position,
-					Scale = box.Size,
-					Rotation = box.Rotation
+					Position = rotation.Apply( bb.Min ),
+					Scale = bb.Size,
+					Rotation = rotation
 				} );
 			}
 			else {

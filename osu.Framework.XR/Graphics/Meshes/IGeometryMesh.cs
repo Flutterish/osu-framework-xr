@@ -19,13 +19,12 @@ public static class IGeometryMeshExtensions {
 	}
 
 	/// <summary>
-	/// Fits a box around a flat mesh - that is one which can entirely fit on some plane. 
-	/// This does *not* guarantee the twist of the box to be optimal
+	/// Finds the plane that contains this mesh
 	/// </summary>
 	/// <returns>
-	/// A <see cref="Box3"/> if the mesh is flat (within a tolerance), <see langword="null"/> otherwise
+	/// The <see cref="Plane"/> of the mesh if the mesh is flat (within a tolerance), <see langword="null"/> otherwise
 	/// </returns>
-	public static Box3? FitFlatMesh ( this IGeometryMesh mesh, float tolerance = 0.0001f ) {
+	public static Plane? FindFlatMeshPlane ( this IGeometryMesh mesh, float tolerance = 0.0001f ) {
 		if ( mesh.VertexCount < 2 )
 			return null;
 
@@ -62,14 +61,6 @@ public static class IGeometryMeshExtensions {
 			i++;
 		}
 
-		var rotation = plane.Normal.LookRotation();
-		var rotationInverse = rotation.Inverted();
-		var bb = new AABox( mesh.EnumerateVertices().Select( x => rotationInverse.Apply( x ) ) );
-
-		return new Box3 {
-			Position = rotation.Apply( bb.Min ),
-			Size = bb.Size,
-			Rotation = rotation
-		};
+		return plane;
 	}
 }
