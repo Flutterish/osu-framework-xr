@@ -5,7 +5,7 @@ using osuTK.Graphics.OpenGL4;
 
 namespace osu.Framework.XR.Tests.Parsing;
 
-public partial class TestSceneSimpleObjImport : BasicTestScene {
+public partial class TestSceneSingleObjImport : BasicTestScene {
 	Mesh? mesh;
 
 	protected override void LoadComplete () {

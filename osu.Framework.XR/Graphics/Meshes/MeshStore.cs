@@ -4,9 +4,9 @@ using osu.Framework.XR.Parsing;
 namespace osu.Framework.XR.Graphics.Meshes;
 
 /// <summary>
-/// Provides drawable-ready <see cref="Mesh"/>es and <see cref="ImportedScene"/>s sourced from any number of provided sources.
+/// Provides drawable-ready <see cref="Mesh"/>es and <see cref="ImportedMeshCollection"/>s sourced from any number of provided sources.
 /// </summary>
-public class MeshStore : IResourceStore<Mesh>, IResourceStore<ImportedScene>, IDisposable {
+public class MeshStore : IResourceStore<Mesh>, IResourceStore<ImportedMeshCollection>, IDisposable {
 	public readonly SingleMeshStore SingleMeshStore = new();
 	public readonly MeshCollectionStore MeshCollectionStore = new();
 
@@ -54,34 +54,34 @@ public class MeshStore : IResourceStore<Mesh>, IResourceStore<ImportedScene>, ID
 	#endregion
 	#region Mesh Collection
 	/// <inheritdoc cref="MeshCollectionStore.Get(string)"/>
-	public ImportedScene GetScene ( string name )
+	public ImportedMeshCollection GetCollection ( string name )
 		=> MeshCollectionStore.Get(name );
 
 	/// <inheritdoc cref="MeshCollectionStore.GetAsync(string, CancellationToken)"/>
-	public Task<ImportedScene> GetSceneAsync ( string name, CancellationToken cancellationToken = default )
+	public Task<ImportedMeshCollection> GetCollectionAsync ( string name, CancellationToken cancellationToken = default )
 		=> MeshCollectionStore.GetAsync( name, cancellationToken );
 
 	/// <inheritdoc cref="MeshCollectionStore.GetNew(string)"/>
-	public ImportedScene GetNewScene ( string name )
+	public ImportedMeshCollection GetNewCollection ( string name )
 		=> MeshCollectionStore.GetNew( name );
 
 	/// <inheritdoc cref="MeshCollectionStore.GetNewAsync(string, CancellationToken)"/>
-	public Task<ImportedScene> GetNewSceneAsync ( string name, CancellationToken cancellationToken = default )
+	public Task<ImportedMeshCollection> GetNewCollectionAsync ( string name, CancellationToken cancellationToken = default )
 		=> MeshCollectionStore.GetNewAsync( name, cancellationToken );
 
-	ImportedScene IResourceStore<ImportedScene>.Get ( string name ) 
-		=> GetScene( name );
+	ImportedMeshCollection IResourceStore<ImportedMeshCollection>.Get ( string name ) 
+		=> GetCollection( name );
 
-	Task<ImportedScene> IResourceStore<ImportedScene>.GetAsync ( string name, CancellationToken cancellationToken )
-		=> GetSceneAsync( name, cancellationToken );
+	Task<ImportedMeshCollection> IResourceStore<ImportedMeshCollection>.GetAsync ( string name, CancellationToken cancellationToken )
+		=> GetCollectionAsync( name, cancellationToken );
 
-	Stream IResourceStore<ImportedScene>.GetStream ( string name )
+	Stream IResourceStore<ImportedMeshCollection>.GetStream ( string name )
 		=> MeshCollectionStore.GetStream( name );
 
-	IEnumerable<string> IResourceStore<ImportedScene>.GetAvailableResources ()
+	IEnumerable<string> IResourceStore<ImportedMeshCollection>.GetAvailableResources ()
 		=> MeshCollectionStore.GetAvailableResources();
 
-	public void AddStore ( IResourceStore<ImportedScene> store )
+	public void AddStore ( IResourceStore<ImportedMeshCollection> store )
 		=> MeshCollectionStore.AddStore( store );
 	#endregion
 

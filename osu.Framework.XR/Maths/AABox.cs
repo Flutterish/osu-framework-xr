@@ -14,6 +14,49 @@ public struct AABox {
 	public Vector3 Size;
 	public Vector3 Max => Min + Size;
 
+	public AABox ( Span<Vector3> points ) {
+		Vector3 min = new( float.PositiveInfinity );
+		Vector3 max = new( float.NegativeInfinity );
+		foreach ( var v in points ) {
+			if ( v.X > max.X )
+				max.X = v.X;
+			if ( v.X < min.X )
+				min.X = v.X;
+			if ( v.Y > max.Y )
+				max.Y = v.Y;
+			if ( v.Y < min.Y )
+				min.Y = v.Y;
+			if ( v.Z > max.Z )
+				max.Z = v.Z;
+			if ( v.Z < min.Z )
+				min.Z = v.Z;
+		}
+
+		Min = min;
+		Size = max - min;
+	}
+	public AABox ( IEnumerable<Vector3> points ) {
+		Vector3 min = new( float.PositiveInfinity );
+		Vector3 max = new( float.NegativeInfinity );
+		foreach ( var v in points ) {
+			if ( v.X > max.X )
+				max.X = v.X;
+			if ( v.X < min.X )
+				min.X = v.X;
+			if ( v.Y > max.Y )
+				max.Y = v.Y;
+			if ( v.Y < min.Y )
+				min.Y = v.Y;
+			if ( v.Z > max.Z )
+				max.Z = v.Z;
+			if ( v.Z < min.Z )
+				min.Z = v.Z;
+		}
+
+		Min = min;
+		Size = max - min;
+	}
+
 	public static AABox operator * ( AABox box, Matrix4 matrix ) {
 		var min = box.Min;
 		var max = box.Max;

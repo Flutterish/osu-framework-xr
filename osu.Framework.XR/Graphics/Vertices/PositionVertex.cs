@@ -22,4 +22,7 @@ public struct PositionVertex : IVertex<PositionVertex> {
 		GL.VertexAttribPointer( attribs[0], 3, VertexAttribPointerType.Float, false, Stride, 0 );
 		GL.EnableVertexAttribArray( attribs[0] );
 	}
+
+	public static implicit operator Vector3 ( PositionVertex vertex )
+		=> new( vertex.X, vertex.Y, vertex.Z );
 }

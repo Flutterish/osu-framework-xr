@@ -4,9 +4,9 @@ using osu.Framework.XR.Graphics.Buffers;
 namespace osu.Framework.XR.Parsing;
 
 /// <summary>
-/// An imported scene, including all meshes and their buffers (which are not uploaded automatically), objects and materials
+/// An imported mesh collection, including all meshes and their buffers (which are not uploaded automatically), objects and materials
 /// </summary>
-public class ImportedScene : ImportedCollection {
+public class ImportedMeshCollection : ImportedGroup {
 	public IUpload CreateUploadForAllMeshes () {
 		var span = MemoryPool<IUpload>.Shared.Rent( AllElementBuffers.Count + AllVertexBuffers.Count );
 		for ( int i = 0; i < AllElementBuffers.Count; i++ ) {
@@ -31,7 +31,7 @@ public class ImportedScene : ImportedCollection {
 	public readonly List<ImportedMesh> AllMeshes = new();
 	public readonly List<ImportedMaterial> AllMaterials = new();
 	public readonly List<ImportedObject> AllObjects = new();
-	public readonly List<ImportedCollection> AllCollections = new();
+	public readonly List<ImportedGroup> AllCollections = new();
 
 	public readonly List<IElementBuffer> AllElementBuffers = new();
 	public readonly List<IVertexBuffer> AllVertexBuffers = new();

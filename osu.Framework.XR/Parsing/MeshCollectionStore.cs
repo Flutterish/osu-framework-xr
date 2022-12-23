@@ -4,22 +4,22 @@ using System.Collections.Concurrent;
 namespace osu.Framework.XR.Parsing;
 
 /// <summary>
-/// Provides <see cref="ImportedScene"/>s sourced from any number of provided sources.
+/// Provides <see cref="ImportedMeshCollection"/>s sourced from any number of provided sources.
 /// </summary>
-public class MeshCollectionStore : ResourceStore<ImportedScene> {
+public class MeshCollectionStore : ResourceStore<ImportedMeshCollection> {
 	/// <summary>
-	/// Returns a shared instance of a scene. This instance will be automatically uploaded.
+	/// Returns a shared instance of a mesh collection. This instance will be automatically uploaded.
 	/// </summary>
-	public override ImportedScene Get ( string name ) {
+	public override ImportedMeshCollection Get ( string name ) {
 		return GetAsync( name ).Result;
 	}
 
-	ConcurrentDictionary<string, Task<ImportedScene>> loadTasks = new();
+	ConcurrentDictionary<string, Task<ImportedMeshCollection>> loadTasks = new();
 
 	/// <summary>
-	/// Returns a shared instance of a scene asynchronously. This instance will be automatically uploaded.
+	/// Returns a shared instance of a mesh collection asynchronously. This instance will be automatically uploaded.
 	/// </summary>
-	public override Task<ImportedScene> GetAsync ( string name, CancellationToken cancellationToken = default ) {
+	public override Task<ImportedMeshCollection> GetAsync ( string name, CancellationToken cancellationToken = default ) {
 		return loadTasks.GetOrAdd( name, async name => {
 			var newMesh = await base.GetAsync( name );
 			newMesh.CreateUploadForAllMeshes().Enqueue();
@@ -28,17 +28,17 @@ public class MeshCollectionStore : ResourceStore<ImportedScene> {
 	}
 
 	/// <summary>
-	/// Returns a new instance of a scene.
+	/// Returns a new instance of a mesh collection.
 	/// </summary>
-	public ImportedScene GetNew ( string name ) {
+	public ImportedMeshCollection GetNew ( string name ) {
 		return base.Get( name );
 	}
 
 	/// <summary>
-	/// Returns a new instance of a scene asynchronously.
+	/// Returns a new instance of a mesh collection asynchronously.
 	/// </summary>
-	public Task<ImportedScene> GetNewAsync ( string name, CancellationToken cancellationToken = default ) {
-		return base.GetAsync( name );
+	public Task<ImportedMeshCollection> GetNewAsync ( string name, CancellationToken cancellationToken = default ) {
+		return base.GetAsync( name, cancellationToken );
 	}
 
 	protected override void Dispose ( bool disposing ) {

@@ -3,7 +3,7 @@
 /// <summary>
 /// An importred collection of objects
 /// </summary>
-public class ImportedCollection {
+public class ImportedGroup {
 	public readonly List<ImportedObject> Children = new();
-	public readonly List<ImportedCollection> ChildCollections = new();
+	public readonly List<ImportedGroup> ChildGroups = new();
 }

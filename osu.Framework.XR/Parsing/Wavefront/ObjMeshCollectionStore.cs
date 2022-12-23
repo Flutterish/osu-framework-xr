@@ -3,12 +3,12 @@ using osu.Framework.XR.IO.Stores;
 
 namespace osu.Framework.XR.Parsing.Wavefront;
 
-public class ObjMeshCollectionStore : StringParsingStore<ImportedScene> {
+public class ObjMeshCollectionStore : StringParsingStore<ImportedMeshCollection> {
 	public ObjMeshCollectionStore ( IResourceStore<byte[]> store ) : base( store ) {
 		Store.AddExtension( "obj" );
 	}
 
-	protected override ImportedScene Parse ( string data ) {
+	protected override ImportedMeshCollection Parse ( string data ) {
 		return ObjFile.Load( data );
 	}
 }
