@@ -3,6 +3,8 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Shaders;
+using osu.Framework.Platform;
+using osu.Framework.Platform.Windows;
 using osu.Framework.XR.Graphics.Buffers;
 using osu.Framework.XR.Graphics.Materials;
 using osu.Framework.XR.Graphics.Meshes;
@@ -11,6 +13,7 @@ using osuTK.Graphics;
 using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
 
 namespace osu.Framework.XR.Graphics;
 
@@ -256,21 +259,39 @@ public abstract class DrawNode3D : IDisposable {
 	}
 
 	private static Dictionary<Type, IShader> dummyShaders = new();
-	private static IShader getDummyShader ( IRenderer renderer ) {
+	private static IShader getDummyShader ( IRenderer renderer ) { 
 		if ( !dummyShaders.TryGetValue( renderer.GetType(), out var dummy ) ) {
 			var assembly = typeof( IRenderer ).Assembly;
 			var shader = assembly.GetType( "osu.Framework.Graphics.OpenGL.Shaders.GLShader" )!;
-			var shaderpart = assembly.GetType( "osu.Framework.Graphics.OpenGL.Shaders.GLShaderPart" )!;
-			var list = shaderpart.MakeArrayType();
-			var empty = typeof( Array ).GetMethod( nameof( Array.Empty ), BindingFlags.Static | BindingFlags.Public )!.MakeGenericMethod( shaderpart );
-			var constructor = shader.GetConstructor( BindingFlags.NonPublic | BindingFlags.Instance, new Type[] { renderer.GetType(), typeof( string ), list } )!;
-			dummy = (IShader)constructor.Invoke( new object[] { renderer, "", empty.Invoke( null, new object[] { } )! } );
+			dummy = (IShader)FormatterServices.GetUninitializedObject( shader );
 
 			dummyShaders.Add( renderer.GetType(), dummy );
 		}
 
 		return dummy;
 	}
+
+	private static int[] lastBoundBuffers = new int[2];
+	private static int lastBoundVertexArray;
+	private static FieldInfo? getLastBoundVertexArray;
+	private static FieldInfo? getLastBoundBuffers;
+	private static int safetyVAO;
+	public static void SwitchTo3DContext ( IRenderer renderer ) {
+		if ( safetyVAO == 0 ) {
+			safetyVAO = GL.GenVertexArray();
+		}
+		GL.BindVertexArray( safetyVAO );
+		getLastBoundVertexArray ??= renderer.GetType().GetField( "lastBoundVertexArray", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic )!;
+		getLastBoundBuffers ??= renderer.GetType().GetField( "lastBoundBuffers", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic )!;
+
+		lastBoundVertexArray = (int)getLastBoundVertexArray.GetValue( renderer )!;
+		getLastBoundVertexArray.SetValue( renderer, 0 );
+		var copy = (int[])getLastBoundBuffers.GetValue( renderer )!;
+		lastBoundBuffers[0] = copy[0];
+		lastBoundBuffers[1] = copy[1];
+	}
+
+	private static MethodInfo? _bindVao;
 	private static MethodInfo? _bindBuffer;
 	/// <summary>
 	/// Ensures the 2D draw state is valid, and resets the 3D state
@@ -278,10 +299,11 @@ public abstract class DrawNode3D : IDisposable {
 	public static void SwitchTo2DContext ( IRenderer renderer ) {
 		Shader.Unbind();
 		Material.Unbind();
-		GL.BindVertexArray( 0 );
 		_bindBuffer ??= renderer.GetType().GetMethod( "BindBuffer", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic )!;
-		_bindBuffer.Invoke( renderer, new object[] { osuTK.Graphics.ES30.BufferTarget.ElementArrayBuffer, 0 } );
-		_bindBuffer.Invoke( renderer, new object[] { osuTK.Graphics.ES30.BufferTarget.ArrayBuffer, 0 } );
+		_bindVao ??= renderer.GetType().GetMethod( "BindVertexArray", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic )!;
+		_bindVao.Invoke( renderer, new object[] { lastBoundVertexArray } );
+		_bindBuffer.Invoke( renderer, new object[] { osuTK.Graphics.ES30.BufferTarget.ArrayBuffer, lastBoundBuffers[0] } );
+		_bindBuffer.Invoke( renderer, new object[] { osuTK.Graphics.ES30.BufferTarget.ElementArrayBuffer, lastBoundBuffers[1] } );
 		(renderer as Renderer)!.BindShader( getDummyShader( renderer ) );
 		(renderer as Renderer)!.UnbindShader( getDummyShader( renderer ) );
 	}

@@ -46,6 +46,7 @@ partial class Scene {
 				}
 			}
 
+			DrawNode3D.SwitchTo3DContext( renderer );
 			UploadScheduler.Execute( renderer );
 			DisposeScheduler.Execute();
 

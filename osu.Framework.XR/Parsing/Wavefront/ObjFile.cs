@@ -38,7 +38,7 @@ public static class ObjFile {
 		public Vector3 GetVertexPosition ( uint index )
 			=> Positions.Data[(int)ElementBuffer.Indices[(int)index]];
 
-		public int TriangleCount => ElementBuffer.Count / 3;
+		public int TriangleCount => ElementBuffer.Indices.Count / 3;
 
 		public (uint indexA, uint indexB, uint indexC) GetTriangleIndices ( int index )
 			=> (ElementBuffer.Indices[index * 3], ElementBuffer.Indices[index * 3 + 1], ElementBuffer.Indices[index * 3 + 2]);
