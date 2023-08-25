@@ -129,9 +129,9 @@ public class VirtualGameHost : GameHost {
 	public override VideoDecoder CreateVideoDecoder ( Stream stream ) {
 		return Parent.CreateVideoDecoder( stream );
 	}
-	//protected override Clipboard CreateClipboard () {
-	//	return Parent.GetClipboard();
-	//}
+	protected override Clipboard CreateClipboard () {
+		return Parent.GetClipboard();
+	}
 	public override Storage? GetStorage ( string path ) {
 		return Parent.GetStorage( path );
 	}
