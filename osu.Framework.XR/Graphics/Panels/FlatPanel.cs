@@ -71,6 +71,8 @@ public partial class FlatPanel : Panel { // TODO is broken somehow
 
 			renderer.PopStencilInfo();
 
+			SwitchTo3DContext( renderer );
+
 			VAO.Bind();
 			Material.BindUniforms();
 			Material.Shader.SetUniform( BlitMaterial.Tint, Color4.Transparent );

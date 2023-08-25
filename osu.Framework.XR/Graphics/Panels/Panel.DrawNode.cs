@@ -96,6 +96,8 @@ public partial class Panel {
 			renderer.PopMaskingInfo();
 			FrameBuffer.Unbind();
 
+			SwitchTo3DContext( renderer );
+
 			if ( VAO.Bind() || meshId > Source.linkedMeshId ) {
 				LinkAttributeArray( Mesh, Material );
 				Source.linkedMeshId = meshId;

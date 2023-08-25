@@ -28,6 +28,18 @@ public partial class Scene : CompositeDrawable {
 	Queue<(Drawable3D drawable, bool added, Enum stage)> uploadableQueue = new();
 	HashList<Drawable3D> drawables = new();
 
+	bool renderToScreen = true;
+	/// <summary>
+	/// Controls whether this scene will render to the screen (<see langword="true"/>), or just up update its components (<see langword="false"/>).
+	/// You might want to disable this when rendering to VR. This is enabled by default.
+	/// </summary>
+	public bool RenderToScreen {
+		get => renderToScreen;
+		set {
+			renderToScreen = value;
+			Invalidate( Invalidation.DrawNode );
+		}
+	}
 	Camera? camera;
 	public Camera Camera {
 		get => camera ??= new();

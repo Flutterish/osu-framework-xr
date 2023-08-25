@@ -15,6 +15,7 @@ partial class Scene {
 		protected abstract void RemoveDrawable ( Drawable3D drawable, Enum stage );
 
 		new protected Scene Source => (Scene)base.Source;
+		bool renderToScreen;
 
 		IFrameBuffer? frameBuffer;
 		public RenderPiepline ( Scene source ) : base( source ) { }
@@ -34,6 +35,7 @@ partial class Scene {
 			blitShader = Source.blitShader;
 			size = GetFrameBufferSize();
 			projectionMatrix = Source.Camera.GetProjectionMatrix( size.X, size.Y );
+			renderToScreen = Source.renderToScreen;
 		}
 
 		public sealed override void Draw ( IRenderer renderer ) {
@@ -49,6 +51,10 @@ partial class Scene {
 			DrawNode3D.SwitchTo3DContext( renderer );
 			UploadScheduler.Execute( renderer );
 			DisposeScheduler.Execute();
+			if ( !renderToScreen ) {
+				DrawNode3D.SwitchTo2DContext( renderer );
+				return;
+			}
 
 			frameBuffer ??= renderer.CreateFrameBuffer( new[] { RenderBufferFormat.D32S8 } );
 			frameBuffer.Size = size;
