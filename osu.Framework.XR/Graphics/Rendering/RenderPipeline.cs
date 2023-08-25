@@ -68,7 +68,7 @@ partial class Scene {
 		}
 
 		public void Draw ( IRenderer renderer, IFrameBuffer frameBuffer, Matrix4 projectionMatrix, bool clearFramebuffer = true ) {
-			frameBuffer.Bind();
+			renderer.PushScissorState( false );
 			renderer.PushMaskingInfo( new MaskingInfo {
 				ScreenSpaceAABB = new( 0, 0, (int)frameBuffer.Size.X, (int)frameBuffer.Size.Y ),
 				MaskingRect = new( 0, 0, size.X, size.Y ),
@@ -78,7 +78,7 @@ partial class Scene {
 			}, true );
 			renderer.PushViewport( new( 0, 0, (int)frameBuffer.Size.X, (int)frameBuffer.Size.Y ) );
 			renderer.PushDepthInfo( new( function: BufferTestFunction.LessThan ) );
-			renderer.PushScissorState( false );
+			frameBuffer.Bind();
 			if ( clearFramebuffer )
 				renderer.Clear( new( depth: 1 ) );
 
@@ -89,13 +89,13 @@ partial class Scene {
 				Draw( renderer, read.Index, projectionMatrix );
 			}
 			renderer.PopProjectionMatrix();
+			frameBuffer.Unbind();
 
 			DrawNode3D.SwitchTo2DContext( renderer );
-			renderer.PopScissorState();
 			renderer.PopDepthInfo();
 			renderer.PopViewport();
 			renderer.PopMaskingInfo();
-			frameBuffer.Unbind();
+			renderer.PopScissorState();
 		}
 
 		protected abstract void Draw ( IRenderer renderer, int subtreeIndex, Matrix4 projectionMatrix );

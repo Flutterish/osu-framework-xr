@@ -1,20 +1,10 @@
 ﻿#version 330 core
-#define GAMMA 2.4
 in vec2 uv;
 
 out vec4 FragColor;
 
 uniform vec4 tint;
 uniform sampler2D tex;
-
-lowp float toSRGB ( lowp float color ) {
-    return color < 0.0031308 ? ( 12.92 * color ) : ( 1.055 * pow( color, 1.0 / GAMMA ) - 0.055 );
-}
-
-lowp vec4 toSRGB( lowp vec4 colour )
-{
-    return vec4( toSRGB( colour.r ), toSRGB( colour.g ), toSRGB( colour.b ), colour.a );
-}
 
 // unlit is an opaque shader, therefore we use dithering for transparency
 const float dither[16] = float[](
@@ -33,7 +23,7 @@ float ditherLimit ( vec4 color ) {
 
 void main()
 {
-    vec4 color = toSRGB( texture( tex, uv ) * tint );
+    vec4 color = texture( tex, vec2(uv.x, 1 - uv.y) ) * tint;
 
 	if ( color.a < ditherLimit( color ) )
 		discard;

@@ -9,7 +9,7 @@ namespace osu.Framework.XR.Graphics.Panels;
 /// A <see cref="Panel"/>, which renders directly into 3D space without a frame buffer.
 /// This uses a stencil buffer
 /// </summary>
-public partial class FlatPanel : Panel {
+public partial class FlatPanel : Panel { // TODO is broken somehow
 	protected sealed override void RegenrateMesh () {
 		boundinbgBox = RegenrateMeshWithBounds();
 	}

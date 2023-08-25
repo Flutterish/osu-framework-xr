@@ -158,7 +158,7 @@ public partial class Scene : CompositeDrawable {
 			.SetUniform( UnlitMaterial.Texture, renderer.WhitePixel )
 			.SetUniform( UnlitMaterial.TextureRect, renderer.WhitePixel.GetTextureRect() )
 			.SetUniform( UnlitMaterial.Tint, Color4.White )
-			.SetUniform( UnlitMaterial.UseGamma, true )
+			.SetUniform( UnlitMaterial.UseGamma, false )
 			.SetOnBind( ( m, store ) => {
 				m.Shader.SetUniform( Shader.StandardGlobalProjectionName, store.GetGlobalProperty<Matrix4>( Shader.StandardGlobalProjectionName ) );
 			} )
