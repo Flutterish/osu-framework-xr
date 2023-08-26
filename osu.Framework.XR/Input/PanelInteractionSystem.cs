@@ -22,6 +22,7 @@ public class PanelInteractionSystem {
 		}
 
 		sources.Add( source );
+		PanelGainedFocusSource?.Invoke( panel, source );
 	}
 	void blur ( Source source, Panel panel ) {
 		var sources = focusedPanels[panel];
@@ -33,6 +34,8 @@ public class PanelInteractionSystem {
 			panel.Content.HasFocus = false;
 			PanelBlurred?.Invoke( panel );
 		}
+
+		PanelLostFocusSource?.Invoke( panel, source );
 	}
 
 	Dictionary<object, Source> sources = new();
@@ -42,6 +45,9 @@ public class PanelInteractionSystem {
 
 		return v;
 	}
+
+	public event Action<Panel, Source>? PanelGainedFocusSource;
+	public event Action<Panel, Source>? PanelLostFocusSource;
 
 	public event Action<Panel>? PanelFocused;
 	public event Action<Panel>? PanelBlurred;
