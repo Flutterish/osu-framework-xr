@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <RootNamespace>osu.Framework.XR</RootNamespace>
 	<AssemblyName>osu.Framework.XR</AssemblyName>
-	<Version>2023.825.2</Version>
+	<Version>2023.826.0</Version>
 	<Authors>PeriTheGee</Authors>
 	<Description>A 3D extension of osu!framework with VR capabilities
 (o!f 2023.815.0)</Description>
