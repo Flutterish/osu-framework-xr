@@ -272,10 +272,10 @@ public abstract class DrawNode3D : IDisposable {
 		return dummy;
 	}
 
-	private static int[] lastBoundBuffers = new int[2];
+	//private static int[] lastBoundBuffers = new int[2];
 	private static int lastBoundVertexArray;
 	private static FieldInfo? getLastBoundVertexArray;
-	private static FieldInfo? getLastBoundBuffers;
+	//private static FieldInfo? getLastBoundBuffers;
 	private static int safetyVAO;
 	private static Type rendererType = typeof(Host).Assembly.GetType( "osu.Framework.Graphics.OpenGL.GLRenderer" )!;
 	public static void SwitchTo3DContext ( IRenderer renderer ) {
@@ -285,13 +285,13 @@ public abstract class DrawNode3D : IDisposable {
 		GL.BindVertexArray( safetyVAO );
 
 		getLastBoundVertexArray ??= rendererType.GetField( "lastBoundVertexArray", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic )!;
-		getLastBoundBuffers ??= rendererType.GetField( "lastBoundBuffers", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic )!;
+		//getLastBoundBuffers ??= rendererType.GetField( "lastBoundBuffers", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic )!;
 
 		lastBoundVertexArray = (int)getLastBoundVertexArray.GetValue( renderer )!;
 		getLastBoundVertexArray.SetValue( renderer, 0 );
-		var copy = (int[])getLastBoundBuffers.GetValue( renderer )!;
-		lastBoundBuffers[0] = copy[0];
-		lastBoundBuffers[1] = copy[1];
+		//var copy = (int[])getLastBoundBuffers.GetValue( renderer )!;
+		//lastBoundBuffers[0] = copy[0];
+		//lastBoundBuffers[1] = copy[1];
 	}
 
 	private static MethodInfo? _bindVao;
@@ -302,11 +302,11 @@ public abstract class DrawNode3D : IDisposable {
 	public static void SwitchTo2DContext ( IRenderer renderer ) {
 		Shader.Unbind();
 		Material.Unbind();
-		_bindBuffer ??= rendererType.GetMethod( "BindBuffer", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic )!;
+		//_bindBuffer ??= rendererType.GetMethod( "BindBuffer", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic )!;
 		_bindVao ??= rendererType.GetMethod( "BindVertexArray", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic )!;
 		_bindVao.Invoke( renderer, new object[] { lastBoundVertexArray } );
-		_bindBuffer.Invoke( renderer, new object[] { osuTK.Graphics.ES30.BufferTarget.ArrayBuffer, lastBoundBuffers[0] } );
-		_bindBuffer.Invoke( renderer, new object[] { osuTK.Graphics.ES30.BufferTarget.ElementArrayBuffer, lastBoundBuffers[1] } );
+		//_bindBuffer.Invoke( renderer, new object[] { osuTK.Graphics.ES30.BufferTarget.ArrayBuffer, lastBoundBuffers[0] } );
+		//_bindBuffer.Invoke( renderer, new object[] { osuTK.Graphics.ES30.BufferTarget.ElementArrayBuffer, lastBoundBuffers[1] } );
 		(renderer as Renderer)!.BindShader( getDummyShader( renderer ) );
 		(renderer as Renderer)!.UnbindShader( getDummyShader( renderer ) );
 	}

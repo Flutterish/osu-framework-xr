@@ -178,6 +178,8 @@ public partial class Panel : Drawable3D, IHasCollider, IEnumerable<Drawable> {
 		public RootContainer () {
 			AddInternal( platformActions = new() );
 			RelativeSizeAxes = Axes.None;
+
+			ForceLocalVertexBatch = true;
 		}
 
 		public override bool UpdateSubTree () {

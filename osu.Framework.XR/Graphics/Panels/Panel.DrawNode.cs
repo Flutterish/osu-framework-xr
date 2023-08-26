@@ -25,6 +25,7 @@ public partial class Panel {
 
 	protected IFrameBuffer? FrameBuffer; // shared data
 	AttributeArray VAO = new();
+	ulong lastRenderedFrame;
 	protected class PanelDrawNode : DrawNode3D {
 		protected DrawNode? SourceDrawNode { get; private set; }
 
@@ -61,6 +62,11 @@ public partial class Panel {
 		}
 
 		public override void Draw ( IRenderer renderer, object? ctx = null ) {
+			if ( Source.lastRenderedFrame >= renderer.FrameIndex ) {
+				goto blit;
+			}
+
+			Source.lastRenderedFrame = renderer.FrameIndex;
 			SwitchTo2DContext( renderer );
 			Vector2I size = new( (int)Size.X, (int)Size.Y );
 			RectangleI rect = new( 0, 0, size.X, size.Y );
@@ -98,6 +104,7 @@ public partial class Panel {
 
 			SwitchTo3DContext( renderer );
 
+			blit:
 			if ( VAO.Bind() || meshId > Source.linkedMeshId ) {
 				LinkAttributeArray( Mesh, Material );
 				Source.linkedMeshId = meshId;
