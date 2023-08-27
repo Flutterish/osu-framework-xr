@@ -11,6 +11,8 @@ public partial class VrPlayer : CompositeDrawable3D {
 	[Resolved]
 	public VrCompositor Compositor { get; private set; } = null!;
 
+	public ulong RenderMask = ulong.MaxValue;
+
 	public Vector3 PositionOffset;
 	public Quaternion RotationOffset = Quaternion.Identity;
 

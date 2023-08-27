@@ -195,8 +195,9 @@ public partial class VrCompositor : Drawable {
 			var rEye = context.GetEyeToHeadMatrix( Valve.VR.EVREye.Eye_Right ).ToOsuTk().Inverted();
 			var rProj = context.GetProjectionMatrix( Valve.VR.EVREye.Eye_Right, 0.01f, 1000f ).ToOsuTk();
 
-			pipeline.Draw( renderer, left, headTransform.Inverted() * lEye * Matrix4.CreateScale( 1, 1, -1 ) * lProj );
-			pipeline.Draw( renderer, right, headTransform.Inverted() * rEye * Matrix4.CreateScale( 1, 1, -1 ) * rProj );
+			var mask = player.RenderMask;
+			pipeline.Draw( renderer, left, headTransform.Inverted() * lEye * Matrix4.CreateScale( 1, 1, -1 ) * lProj, mask );
+			pipeline.Draw( renderer, right, headTransform.Inverted() * rEye * Matrix4.CreateScale( 1, 1, -1 ) * rProj, mask );
 
 			context.SubmitFrame( Valve.VR.EVREye.Eye_Left, new() { eColorSpace = Valve.VR.EColorSpace.Linear, eType = Valve.VR.ETextureType.OpenGL, handle = GetTexturePointer( left.Texture ) } );
 			context.SubmitFrame( Valve.VR.EVREye.Eye_Right, new() { eColorSpace = Valve.VR.EColorSpace.Linear, eType = Valve.VR.ETextureType.OpenGL, handle = GetTexturePointer( right.Texture ) } );

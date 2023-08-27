@@ -9,6 +9,15 @@ using osu.Framework.XR.Maths;
 namespace osu.Framework.XR.Graphics.Rendering;
 
 partial class Scene {
+	ulong screenRenderMask = ulong.MaxValue;
+	public ulong ScreenRenderMask {
+		get => screenRenderMask;
+		set {
+			screenRenderMask = value;
+			Invalidate( Invalidation.DrawNode );
+		}
+	}
+
 	public abstract class RenderPiepline : DrawNode, ICompositeDrawNode {
 		protected MaterialStore MaterialStore => Source.MaterialStore;
 		protected abstract void AddDrawable ( Drawable3D drawable, Enum stage );
@@ -28,6 +37,7 @@ partial class Scene {
 		Vector2 size;
 		IShader blitShader = null!;
 		Matrix4 projectionMatrix;
+		ulong screenRenderMask;
 		public override void ApplyState () {
 			base.ApplyState();
 
@@ -36,6 +46,7 @@ partial class Scene {
 			size = GetFrameBufferSize();
 			projectionMatrix = Source.Camera.GetProjectionMatrix( size.X, size.Y );
 			renderToScreen = Source.renderToScreen;
+			screenRenderMask = Source.screenRenderMask;
 		}
 
 		public sealed override void Draw ( IRenderer renderer ) {
@@ -58,7 +69,7 @@ partial class Scene {
 
 			frameBuffer ??= renderer.CreateFrameBuffer( new[] { RenderBufferFormat.D32S8 } );
 			frameBuffer.Size = size;
-			Draw( renderer, frameBuffer, projectionMatrix );
+			Draw( renderer, frameBuffer, projectionMatrix, screenRenderMask );
 
 			base.Draw( renderer );
 			blitShader.Bind();
@@ -73,7 +84,7 @@ partial class Scene {
 			blitShader.Unbind();
 		}
 
-		public void Draw ( IRenderer renderer, IFrameBuffer frameBuffer, Matrix4 projectionMatrix, bool clearFramebuffer = true ) {
+		public void Draw ( IRenderer renderer, IFrameBuffer frameBuffer, Matrix4 projectionMatrix, ulong mask, bool clearFramebuffer = true ) {
 			renderer.PushScissorState( false );
 			renderer.PushMaskingInfo( new MaskingInfo {
 				ScreenSpaceAABB = new( 0, 0, (int)frameBuffer.Size.X, (int)frameBuffer.Size.Y ),
@@ -92,7 +103,7 @@ partial class Scene {
 			MaterialStore.SetGlobalProperty( Shader.StandardGlobalProjectionName, projectionMatrix );
 			MaterialStore.SetGlobalProperty( "viewPos", projectionMatrix.ExtractCameraPosition() );
 			using ( var read = Source.tripleBuffer.GetForRead() ) {
-				Draw( renderer, read.Index, projectionMatrix );
+				Draw( renderer, read.Index, projectionMatrix, mask );
 			}
 			renderer.PopProjectionMatrix();
 			frameBuffer.Unbind();
@@ -104,7 +115,7 @@ partial class Scene {
 			renderer.PopScissorState();
 		}
 
-		protected abstract void Draw ( IRenderer renderer, int subtreeIndex, Matrix4 projectionMatrix );
+		protected abstract void Draw ( IRenderer renderer, int subtreeIndex, Matrix4 projectionMatrix, ulong mask );
 
 		protected override void Dispose ( bool isDisposing ) {
 			frameBuffer?.Dispose();

@@ -30,7 +30,7 @@ public partial class TestingScene : BasicTestScene.TestResourcesScene {
 		new protected TestingScene Source => (TestingScene)base.Source;
 		public TestingRenderPiepline ( TestingScene source ) : base( source ) { }
 
-		protected override void Draw ( IRenderer renderer, int subtreeIndex, Matrix4 projectionMatrix ) {
+		protected override void Draw ( IRenderer renderer, int subtreeIndex, Matrix4 projectionMatrix, ulong mask ) {
 			foreach ( var stage in RenderStages ) {
 				if ( stage is TestingRenderStage.SusieCubeBatch ) {
 					DrawCubes( renderer, subtreeIndex, projectionMatrix, GetRenderStage( stage ) );

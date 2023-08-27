@@ -111,7 +111,7 @@ public partial class Panel {
 			}
 
 			Material.Bind( SubtreeIndex );
-			Material.Shader.SetUniform( Material.StandardTextureName, FrameBuffer.Texture );
+			Material.Shader.SetUniform( Material.StandardTextureName, FrameBuffer!.Texture );
 			Material.Shader.SetUniform( Shader.StandardLocalMatrixName, ref Matrix );
 			BeforeBlit( renderer, ctx );
 			Mesh.Draw();

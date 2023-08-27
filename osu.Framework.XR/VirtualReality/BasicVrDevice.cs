@@ -56,6 +56,10 @@ public partial class BasicVrDevice : CompositeDrawable3D {
 	protected override void Update () {
 		Position = compositor.ActivePlayer?.InGlobalSpace( Source.Position ) ?? Source.Position;
 		Rotation = compositor.ActivePlayer?.InGlobalSpace( Source.Rotation ) ?? Source.Rotation;
+
+		foreach ( var i in components ) {
+			i.RenderLayer = RenderLayer;
+		}
 	}
 
 	public partial class BasicVrDeviceComponent : BasicModel {

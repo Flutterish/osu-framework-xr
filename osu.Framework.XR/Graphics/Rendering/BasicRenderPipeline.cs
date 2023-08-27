@@ -34,10 +34,11 @@ public class BasicRenderPiepline : Scene.RenderPiepline {
 
 	public BasicRenderPiepline ( Scene source ) : base( source ) { }
 
-	protected override void Draw ( IRenderer renderer, int subtreeIndex, Matrix4 projectionMatrix ) {
+	protected override void Draw ( IRenderer renderer, int subtreeIndex, Matrix4 projectionMatrix, ulong mask ) {
 		foreach ( var stage in RenderStages ) {
 			foreach ( var i in GetRenderStage( stage ) ) {
-				i.GetDrawNodeAtSubtree( subtreeIndex )?.Draw( renderer );
+				if ( (i.RenderLayer & mask) != 0 ) 
+					i.GetDrawNodeAtSubtree( subtreeIndex )?.Draw( renderer );
 			}
 		}
 	}
