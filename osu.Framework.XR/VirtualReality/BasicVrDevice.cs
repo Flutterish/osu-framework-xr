@@ -54,8 +54,8 @@ public partial class BasicVrDevice : CompositeDrawable3D {
 	}
 
 	protected override void Update () {
-		Position = compositor.ActivePlayer?.InGlobalSpace( Source.Position ) ?? Source.Position;
-		Rotation = compositor.ActivePlayer?.InGlobalSpace( Source.Rotation ) ?? Source.Rotation;
+		Position = Source.GlobalPosition;
+		Rotation = Source.GlobalRotation;
 
 		foreach ( var i in components ) {
 			i.RenderLayer = RenderLayer;
@@ -135,8 +135,8 @@ public partial class BasicVrDevice : CompositeDrawable3D {
 								* Matrix4.CreateTranslation( state.Position.ToOsuTk() );
 					}
 
-					Matrix *= Matrix4.CreateFromQuaternion( rotationOffset * Source.Device.RenderRotation )
-							* Matrix4.CreateTranslation( rotationOffset.Apply( Source.Device.RenderPosition ) + positionOffset );
+					Matrix *= Matrix4.CreateFromQuaternion( rotationOffset * Source.Device.LocalRenderRotation )
+							* Matrix4.CreateTranslation( rotationOffset.Apply( Source.Device.LocalRenderPosition ) + positionOffset );
 				}
 				
 				base.Draw( renderer, ctx );

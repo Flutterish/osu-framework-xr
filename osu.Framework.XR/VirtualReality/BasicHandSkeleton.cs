@@ -30,8 +30,8 @@ public partial class BasicHandSkeleton : BasicModel {
 			return;
 		}
 
-		Position = compositor.ActivePlayer?.InGlobalSpace( controller.Position ) ?? controller.Position;
-		Rotation = compositor.ActivePlayer?.InGlobalSpace( controller.Rotation ) ?? controller.Rotation;
+		Position = controller.GlobalPosition;
+		Rotation = controller.GlobalRotation;
 		var offset = Vector3.UnitY * 0.0007f;
 
 		Mesh.Clear();

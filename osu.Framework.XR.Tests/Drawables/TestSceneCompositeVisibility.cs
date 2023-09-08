@@ -1,6 +1,6 @@
-﻿using osu.Framework.XR.Graphics.Meshes;
-using osu.Framework.XR.Graphics;
+﻿using osu.Framework.XR.Graphics;
 using osu.Framework.XR.Graphics.Containers;
+using osu.Framework.XR.Graphics.Meshes;
 
 namespace osu.Framework.XR.Tests.Drawables;
 

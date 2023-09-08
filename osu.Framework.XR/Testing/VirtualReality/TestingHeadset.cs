@@ -23,15 +23,15 @@ public class TestingHeadset : Headset {
 	public readonly Bindable<Vector3> PositionBindable = new();
 	public readonly Bindable<Quaternion> RotationBindable = new();
 
-	public override Vector3 Position => PositionBindable.Value;
-	public override Vector3 RenderPosition => PositionBindable.Value;
+	public override Vector3 LocalPosition => PositionBindable.Value;
+	public override Vector3 LocalRenderPosition => PositionBindable.Value;
 
-	public override Quaternion Rotation => RotationBindable.Value;
-	public override Quaternion RenderRotation => RotationBindable.Value;
+	public override Quaternion LocalRotation => RotationBindable.Value;
+	public override Quaternion LocalRenderRotation => RotationBindable.Value;
 
 	public override OpenVR.NET.Devices.DeviceModel? Model => null;
-	public override Vector3 AngularVelocity => Vector3.Zero;
-	public override Vector3 Velocity => Vector3.Zero;
+	public override Vector3 LocalAngularVelocity => Vector3.Zero;
+	public override Vector3 LocalVelocity => Vector3.Zero;
 	public override bool GetBool ( ETrackedDeviceProperty property ) => default;
 	public override T GetEnum<T> ( ETrackedDeviceProperty property ) => default;
 	public override float GetFloat ( ETrackedDeviceProperty property ) => default;

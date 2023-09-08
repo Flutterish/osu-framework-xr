@@ -32,6 +32,15 @@ public partial class VrCompositor : Drawable {
 		}
 	}
 
+	/// <inheritdoc cref="VrPlayer.ToGlobalSpace(Vector3)"/>
+	public Vector3 PlayerSpaceToGlobalSpace ( Vector3 vector ) {
+		return ActivePlayer?.ToGlobalSpace( vector ) ?? vector;
+	}
+	/// <inheritdoc cref="VrPlayer.ToGlobalSpace(Quaternion)"/>
+	public Quaternion PlayerSpaceToGlobalSpace ( Quaternion rotation ) {
+		return ActivePlayer?.ToGlobalSpace( rotation ) ?? rotation;
+	}
+
 	public VrCompositor () {
 		Input = CreateInput();
 		DeviceDetected += device => {

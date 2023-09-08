@@ -1,11 +1,8 @@
-﻿using NuGet.ProjectModel;
-using osu.Framework.Graphics;
+﻿using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Shaders;
-using osu.Framework.Platform;
-using osu.Framework.Platform.Windows;
 using osu.Framework.XR.Graphics.Buffers;
 using osu.Framework.XR.Graphics.Materials;
 using osu.Framework.XR.Graphics.Meshes;

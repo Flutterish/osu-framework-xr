@@ -2,8 +2,8 @@
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.XR.Graphics.Meshes;
-using System.Collections.Concurrent;
 using osu.Framework.XR.Maths;
+using System.Collections.Concurrent;
 
 namespace osu.Framework.XR.VirtualReality;
 

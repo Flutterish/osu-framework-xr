@@ -1,14 +1,14 @@
-﻿using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics;
+﻿using osu.Framework.Graphics;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Utils;
 using osu.Framework.XR.Graphics.Panels;
-using osuTK.Graphics;
+using osu.Framework.XR.Input;
 using osu.Framework.XR.Physics;
 using osu.Framework.XR.Testing;
 using osuTK;
-using osu.Framework.XR.Input;
+using osuTK.Graphics;
 
 namespace osu.Framework.XR.Tests.Panels;
 

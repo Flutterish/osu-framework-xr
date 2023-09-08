@@ -1,10 +1,10 @@
-﻿using osu.Framework.XR.Graphics.Containers;
+﻿using osu.Framework.Graphics;
 using osu.Framework.XR.Graphics;
-using osu.Framework.XR.Testing;
+using osu.Framework.XR.Graphics.Containers;
 using osu.Framework.XR.Graphics.Meshes;
-using osuTK;
 using osu.Framework.XR.Maths;
-using osu.Framework.Graphics;
+using osu.Framework.XR.Testing;
+using osuTK;
 
 namespace osu.Framework.XR.Tests.Maths;
 

@@ -26,17 +26,56 @@ public class VrDevice {
 	}
 
 	/// <inheritdoc cref="OpenVR.NET.Devices.VrDevice.Position"/>
-	public virtual Vector3 Position => Source.Position.ToOsuTk();
+	/// <remarks>
+	/// This value is in player space.
+	/// </remarks>
+	public virtual Vector3 LocalPosition => Source.Position.ToOsuTk();
 	/// <inheritdoc cref="OpenVR.NET.Devices.VrDevice.Velocity"/>
-	public virtual Vector3 Velocity => Source.Velocity.ToOsuTk();
+	/// <remarks>
+	/// This value is in player space.
+	/// </remarks>
+	public virtual Vector3 LocalVelocity => Source.Velocity.ToOsuTk();
 	/// <inheritdoc cref="OpenVR.NET.Devices.VrDevice.Rotation"/>
-	public virtual Quaternion Rotation => Source.Rotation.ToOsuTk();
+	/// <remarks>
+	/// This value is in player space.
+	/// </remarks>
+	public virtual Quaternion LocalRotation => Source.Rotation.ToOsuTk();
 	/// <inheritdoc cref="OpenVR.NET.Devices.VrDevice.AngularVelocity"/>
-	public virtual Vector3 AngularVelocity => Source.AngularVelocity.ToOsuTk();
+	/// <remarks>
+	/// This value is in player space.
+	/// </remarks>
+	public virtual Vector3 LocalAngularVelocity => Source.AngularVelocity.ToOsuTk();
 	/// <inheritdoc cref="OpenVR.NET.Devices.VrDevice.RenderPosition"/>
-	public virtual Vector3 RenderPosition => Source.RenderPosition.ToOsuTk();
+	/// <remarks>
+	/// This value is in player space.
+	/// </remarks>
+	public virtual Vector3 LocalRenderPosition => Source.RenderPosition.ToOsuTk();
 	/// <inheritdoc cref="OpenVR.NET.Devices.VrDevice.RenderRotation"/>
-	public virtual Quaternion RenderRotation => Source.RenderRotation.ToOsuTk();
+	/// <remarks>
+	/// This value is in player space.
+	/// </remarks>
+	public virtual Quaternion LocalRenderRotation => Source.RenderRotation.ToOsuTk();
+
+	/// <inheritdoc cref="OpenVR.NET.Devices.VrDevice.Position"/>
+	/// <remarks>
+	/// This value is in global space.
+	/// </remarks>
+	public Vector3 GlobalPosition => VR.PlayerSpaceToGlobalSpace( Source.Position.ToOsuTk() );
+	/// <inheritdoc cref="OpenVR.NET.Devices.VrDevice.Velocity"/>
+	/// <remarks>
+	/// This value is in global space.
+	/// </remarks>
+	public Vector3 GlobalVelocity => VR.PlayerSpaceToGlobalSpace( Source.Velocity.ToOsuTk() );
+	/// <inheritdoc cref="OpenVR.NET.Devices.VrDevice.Rotation"/>
+	/// <remarks>
+	/// This value is in global space.
+	/// </remarks>
+	public Quaternion GlobalRotation => VR.PlayerSpaceToGlobalSpace( Source.Rotation.ToOsuTk() );
+	/// <inheritdoc cref="OpenVR.NET.Devices.VrDevice.AngularVelocity"/>
+	/// <remarks>
+	/// This value is in global space.
+	/// </remarks>
+	public Vector3 GlobalAngularVelocity => VR.PlayerSpaceToGlobalSpace( Source.AngularVelocity.ToOsuTk() );
 
 	public readonly BindableBool IsEnabled = new();
 	public readonly Bindable<ETrackingResult> TrackingState = new();

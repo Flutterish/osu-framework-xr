@@ -1,9 +1,9 @@
-﻿using osu.Framework.XR.Graphics.Meshes;
-using osu.Framework.XR.Graphics;
-using osu.Framework.XR.Testing;
-using System;
+﻿using osu.Framework.XR.Graphics;
+using osu.Framework.XR.Graphics.Meshes;
 using osu.Framework.XR.Physics;
+using osu.Framework.XR.Testing;
 using osuTK;
+using System;
 
 namespace osu.Framework.XR.Tests.Physics.Raycast;
 
