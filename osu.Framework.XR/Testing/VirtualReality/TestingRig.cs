@@ -13,8 +13,10 @@ public partial class TestingRig : CompositeDrawable {
 	public readonly BindableFloat ShoulderSpan = new( 0.4f );
 	public readonly BindableFloat HipSpan = new( 0.3f );
 
-	LineIndicator leftLeg;
-	LineIndicator rightLeg;
+	LineIndicator leftThigh;
+	LineIndicator rightThigh;
+	LineIndicator leftCalf;
+	LineIndicator rightCalf;
 	LineIndicator hips;
 	LineIndicator torso;
 	LineIndicator shoulders;
@@ -32,8 +34,10 @@ public partial class TestingRig : CompositeDrawable {
 	public readonly TransformIndicator Head;
 
 	public TestingRig ( Scene scene ) {
-		AddInternal( leftLeg = new( scene ) { Kind = Kind.Result } );
-		AddInternal( rightLeg = new( scene ) { Kind = Kind.Result } );
+		AddInternal( leftThigh = new( scene ) { Kind = Kind.Result } );
+		AddInternal( rightThigh = new( scene ) { Kind = Kind.Result } );
+		AddInternal( leftCalf = new( scene ) { Kind = Kind.Result } );
+		AddInternal( rightCalf = new( scene ) { Kind = Kind.Result } );
 		AddInternal( hips = new( scene ) { Kind = Kind.Result } );
 		AddInternal( torso = new( scene ) { Kind = Kind.Result } );
 		AddInternal( shoulders = new( scene ) { Kind = Kind.Result } );
@@ -88,33 +92,31 @@ public partial class TestingRig : CompositeDrawable {
 		} );
 	}
 
-	(Vector3 hand, Vector3 elbow) armIK ( Vector3 shoulder, Vector3 target, float totalLength ) {
-		var dir = target - shoulder;
+	(Vector3 result, Vector3 joint) jointIK ( Vector3 attachment, Vector3 target, float totalLength ) {
+		var dir = target - attachment;
 		var distance = Math.Min( dir.Length, totalLength );
 
 		var down = Transform.RotationBindable.Value.Apply( Transform.RotationBindable.Value.Inverted().Apply( dir ).AnyOrthogonal() );
 		var h = MathF.Sqrt( totalLength * totalLength / 4 - distance * distance / 4 );
 
-		return (shoulder + dir.Normalized() * distance, shoulder + dir.Normalized() * distance / 2 - h * down);
+		return (attachment + dir.Normalized() * distance, attachment + dir.Normalized() * distance / 2 - h * down);
 	}
 
 	Vector3 leftShoulderPosition => apply(Vector3.UnitY * ( LegLength.Value + TorsoLength.Value ) - Vector3.UnitX * ShoulderSpan.Value / 2);
 	Vector3 rightShoulderPosition => apply(Vector3.UnitY * ( LegLength.Value + TorsoLength.Value ) + Vector3.UnitX * ShoulderSpan.Value / 2);
+	public void SetIKTarget ( Vector3 attachment, Vector3 targetPosition, Bindable<Vector3> target, float totalLength, Bindable<Vector3> jointA, Bindable<Vector3> jointB, Bindable<Vector3> result ) {
+		var (resultPosition, joint) = jointIK( attachment, targetPosition, totalLength );
+		jointA.Value = jointB.Value = joint;
+		result.Value = resultPosition;
 
-	public void SetLeftArmTarget ( Vector3 position ) {
-		var (hand, elbow) = armIK( leftShoulderPosition, position, ArmLength.Value );
-		leftForearm.PointB.Value = leftArm.PointA.Value = elbow;
-		leftArm.PointB.Value = hand;
-
-		LeftTarget.PositionBindable.Value = hand;
+		target.Value = resultPosition;
 	}
 
+	public void SetLeftArmTarget ( Vector3 position ) {
+		SetIKTarget( leftShoulderPosition, position, LeftTarget.PositionBindable, ArmLength.Value, leftArm.PointA, leftForearm.PointB, leftArm.PointB );
+	}
 	public void SetRightArmTarget ( Vector3 position ) {
-		var (hand, elbow) = armIK( rightShoulderPosition, position, ArmLength.Value );
-		rightForearm.PointB.Value = rightArm.PointA.Value = elbow;
-		rightArm.PointB.Value = hand;
-
-		RightTarget.PositionBindable.Value = hand;
+		SetIKTarget( rightShoulderPosition, position, RightTarget.PositionBindable, ArmLength.Value, rightArm.PointA, rightForearm.PointB, rightArm.PointB );
 	}
 
 	Vector3 apply ( Vector3 v ) {
@@ -124,11 +126,14 @@ public partial class TestingRig : CompositeDrawable {
 	protected override void Update () {
 		base.Update();
 
-		rightLeg.PointA.Value = hips.PointA.Value = apply(Vector3.UnitY * LegLength.Value + Vector3.UnitX * HipSpan.Value / 2);
-		leftLeg.PointA.Value = hips.PointB.Value = apply(Vector3.UnitY * LegLength.Value - Vector3.UnitX * HipSpan.Value / 2);
+		rightThigh.PointA.Value = hips.PointA.Value = apply(Vector3.UnitY * LegLength.Value + Vector3.UnitX * HipSpan.Value / 2);
+		leftThigh.PointA.Value = hips.PointB.Value = apply(Vector3.UnitY * LegLength.Value - Vector3.UnitX * HipSpan.Value / 2);
 
-		rightLeg.PointB.Value = apply(Vector3.UnitX * HipSpan.Value / 2);
-		leftLeg.PointB.Value = apply(- Vector3.UnitX * HipSpan.Value / 2);
+		rightCalf.PointB.Value = apply(Vector3.UnitX * HipSpan.Value / 2);
+		leftCalf.PointB.Value = apply(- Vector3.UnitX * HipSpan.Value / 2);
+
+		rightThigh.PointB.Value = rightCalf.PointA.Value = (rightThigh.PointA.Value + rightCalf.PointB.Value) / 2;
+		leftThigh.PointB.Value = leftCalf.PointA.Value = (leftThigh.PointA.Value + leftCalf.PointB.Value) / 2;
 
 		torso.PointA.Value = apply(Vector3.UnitY * LegLength.Value);
 		torso.PointB.Value = apply(Vector3.UnitY * ( LegLength.Value + TorsoLength.Value ));
