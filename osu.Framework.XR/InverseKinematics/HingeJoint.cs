@@ -1,6 +1,7 @@
 ﻿using osu.Framework.XR.Maths;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -16,21 +17,25 @@ public class HingeJoint : Joint {
 	float[] xTangents = new float[4];
 	float[] yTangents = new float[4];
 
-	public required Vector2 AngleLimitX {
+	public required Vector2 AngleLimitLeftRight {
 		get => angleLimitX;
 		set {
 			angleLimitX = value;
-			xTangents[1] = xTangents[2] = float.Tan( value.X );
-			xTangents[0] = xTangents[3] = float.Tan( value.Y );
+			var tanx = float.Tan( value.X );
+			var tany = float.Tan( value.Y );
+			xTangents[1] = xTangents[2] = tanx is < 0 or > 9999 ? 9999 : tanx;
+			xTangents[0] = xTangents[3] = tany is < 0 or > 9999 ? 9999 : tany;
 		}
 	}
 
-	public required Vector2 AngleLimitY {
+	public required Vector2 AngleLimitBackFront {
 		get => angleLimitY;
 		set {
 			angleLimitY = value;
-			yTangents[0] = yTangents[1] = float.Tan( value.X );
-			yTangents[2] = yTangents[3] = float.Tan( value.Y );
+			var tanx = float.Tan( value.X );
+			var tany = float.Tan( value.Y );
+			yTangents[2] = yTangents[3] = tanx is < 0 or > 9999 ? 9999 : tanx;
+			yTangents[0] = yTangents[1] = tany is < 0 or > 9999 ? 9999 : tany;
 		}
 	}
 
@@ -44,6 +49,8 @@ public class HingeJoint : Joint {
 	};
 
 	float getEllipseRadius ( Vector2 vector, float a, float b ) {
+		// sqrt(a^2b^2 / (b^2x^2 + a^2y^2))
+
 		if ( a == 0 && b == 0 )
 			return 0;
 
@@ -52,17 +59,20 @@ public class HingeJoint : Joint {
 		return a * b * float.ReciprocalSqrtEstimate( vector.LengthSquared );
 	}
 
-	bool getConstrainedPosition ( Joint parent, Quaternion rot, out Vector3 constrained ) {
+	bool getConstrainedPosition ( Joint parent, out Vector3 constrained, out Quaternion orientationOffset ) {
+		var rot = parent.Rotation * NeutralRotation;
 		var ourRelativePosition = rot.Inverted().Apply( Position - parent.Position );
 
-		if ( ourRelativePosition.Z < 0 ) { // TODO implement hinge angled > 90 deg
+		bool flipped = ourRelativePosition.Z < 0;
+		if ( flipped ) { // TODO implement hinge angled > 90 deg
 			ourRelativePosition.Z = -ourRelativePosition.Z;
 		}
 
 		var distance = ourRelativePosition.Z;
 		var vector = ourRelativePosition.Xy;
-		if ( vector.X == 0 && vector.Y == 0 ) {
+		if ( distance == 0 || ( vector.X == 0 && vector.Y == 0) ) {
 			constrained = Position;
+			orientationOffset = Quaternion.Identity;
 			return false;
 		}
 
@@ -71,24 +81,35 @@ public class HingeJoint : Joint {
 		var quadrant = getQuadrant( vector );
 
 		var ellipseRadius = distance * getEllipseRadius( normalized, xTangents[quadrant], yTangents[quadrant] );
-		if ( vectorLength <= ellipseRadius ) {
+		if ( !flipped && (vectorLength <= ellipseRadius) ) {
 			constrained = Position;
+			orientationOffset = ourRelativePosition.LookRotation();
+			why( orientationOffset );
 			return false;
 		}
 
 		ourRelativePosition.Xy = normalized * ellipseRadius;
 		constrained = rot.Apply( ourRelativePosition ) + parent.Position;
+		orientationOffset = ourRelativePosition.LookRotation();
+		why( orientationOffset );
 		return true;
 	}
 
-	public override void ConstrainParent ( Joint parent ) {
-		if ( getConstrainedPosition( parent, parent.Rotation * NeutralRotation, out var position ) ) {
-			parent.Position += Position - position;
+	void why ( Quaternion q ) {
+		if ( !float.IsFinite( q.W ) || !float.IsFinite( q.X ) || !float.IsFinite( q.Y ) || !float.IsFinite( q.X ) ) {
+
 		}
 	}
 
+	public override void ConstrainParent ( Joint parent ) {
+		if ( getConstrainedPosition( parent, out var position, out var orientation ) ) {
+			parent.Position += Position - position;
+		}
+		Rotation = parent.Rotation * NeutralRotation * orientation;
+	}
+
 	public override void ConstrainSelf ( Joint parent ) {
-		Rotation = parent.Rotation * NeutralRotation;
-		getConstrainedPosition( parent, parent.Rotation * NeutralRotation, out Position );
+		getConstrainedPosition( parent, out Position, out var orientation );
+		Rotation = parent.Rotation * NeutralRotation * orientation;
 	}
 }

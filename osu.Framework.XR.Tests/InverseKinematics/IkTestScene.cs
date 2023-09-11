@@ -18,6 +18,8 @@ public abstract partial class IkTestScene : BasicTestScene {
 		solver = new( root );
 
 		visit( root, (from, to) => {
+			to.Target.Position = from.Position + to.Target.Rotation.Apply( new osuTK.Vector3( 0, 0, to.Length ) );
+
 			var line = new LineIndicator( Scene ) { Kind = Kind.Result };
 			Add( line );
 			links.Add( (from, to.Target), line );
