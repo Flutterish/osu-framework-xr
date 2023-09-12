@@ -1,11 +1,5 @@
 ﻿using osu.Framework.XR.InverseKinematics;
 using osuTK;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace osu.Framework.XR.Tests.InverseKinematics;
 

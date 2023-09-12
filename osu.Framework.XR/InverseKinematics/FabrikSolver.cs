@@ -1,6 +1,4 @@
-﻿using osu.Framework.Graphics.Primitives;
-using osu.Framework.XR.Maths;
-using SharpGen.Runtime;
+﻿using osu.Framework.XR.Maths;
 
 namespace osu.Framework.XR.InverseKinematics;
 
