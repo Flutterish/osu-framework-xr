@@ -1,4 +1,4 @@
-﻿using osu.Framework.Development;
+﻿using System.Diagnostics;
 
 namespace osu.Framework.XR.Graphics.Buffers;
 
@@ -32,8 +32,11 @@ public interface IAttributeArray : IDisposable {
 /// <inheritdoc cref="IAttributeArray"/>
 public class AttributeArray : IAttributeArray {
 	public GlHandle Handle { get; private set; }
+	bool isDisposed;
 
 	public bool Bind () {
+		throwIfDisposed();
+
 		if ( Handle == 0 ) {
 			GL.BindVertexArray( Handle = GL.GenVertexArray() );
 			return true;
@@ -44,7 +47,9 @@ public class AttributeArray : IAttributeArray {
 	}
 
 	public void Clear () {
-		if ( Handle == 0 )
+		throwIfDisposed();
+
+		if ( Handle == 0 || isDisposed )
 			return;
 
 		GL.DeleteVertexArray( Handle );
@@ -52,6 +57,7 @@ public class AttributeArray : IAttributeArray {
 	}
 
 	public void Dispose () {
+		isDisposed = true;
 		DisposeScheduler.Enqueue( this, static v => {
 			GL.DeleteVertexArray( v.Handle );
 			v.Handle = 0;
@@ -60,11 +66,18 @@ public class AttributeArray : IAttributeArray {
 	}
 
 	~AttributeArray () {
-		if ( Handle == 0 )
-			return;
+		throwIfNotDisposed();
+	}
 
-		if ( DebugUtils.IsDebugBuild )
+	[Conditional("DEBUG")]
+	void throwIfDisposed () {
+		if ( isDisposed )
+			throw new InvalidOperationException( $"Used an {nameof( AttributeArray )} after disposal" );
+	}
+
+	[Conditional("DEBUG")]
+	void throwIfNotDisposed () {
+		if ( !isDisposed )
 			throw new InvalidOperationException( $"An {nameof( AttributeArray )} has not been disposed correctly" );
-		Dispose();
 	}
 }

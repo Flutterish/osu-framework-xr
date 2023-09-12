@@ -1,7 +1,7 @@
-﻿using osu.Framework.Development;
-using osu.Framework.Extensions.TypeExtensions;
+﻿using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.XR.Allocation;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace osu.Framework.XR.Graphics.Buffers;
@@ -64,6 +64,7 @@ public class ElementBuffer<Tindex> : IElementBuffer where Tindex : unmanaged {
 	public GlHandle Handle { get; private set; }
 
 	public int Count { get; private set; }
+	bool isDisposed;
 
 	static ElementBuffer () {
 		Stride = Marshal.SizeOf<Tindex>();
@@ -80,6 +81,8 @@ public class ElementBuffer<Tindex> : IElementBuffer where Tindex : unmanaged {
 	}
 
 	public void Bind () {
+		throwIfDisposed();
+
 		if ( Handle == 0 )
 			Handle = GL.GenBuffer();
 
@@ -100,6 +103,7 @@ public class ElementBuffer<Tindex> : IElementBuffer where Tindex : unmanaged {
 	}
 
 	public void Dispose () {
+		isDisposed = true;
 		DisposeScheduler.Enqueue( this, v => {
 			GL.DeleteBuffer( Handle );
 			v.Handle = 0;
@@ -109,9 +113,19 @@ public class ElementBuffer<Tindex> : IElementBuffer where Tindex : unmanaged {
 	}
 
 	~ElementBuffer () {
-		if ( DebugUtils.IsDebugBuild )
-			throw new InvalidOperationException( $"An {nameof( ElementBuffer<Tindex> )} has not been disposed correctly" );
-		Dispose();
+		throwIfNotDisposed();
+	}
+
+	[Conditional( "DEBUG" )]
+	void throwIfDisposed () {
+		if ( isDisposed )
+			throw new InvalidOperationException( $"Used an {nameof( AttributeArray )} after disposal" );
+	}
+
+	[Conditional( "DEBUG" )]
+	void throwIfNotDisposed () {
+		if ( !isDisposed )
+			throw new InvalidOperationException( $"An {nameof( AttributeArray )} has not been disposed correctly" );
 	}
 
 	class Upload : IUpload {

@@ -1,8 +1,8 @@
-﻿using osu.Framework.Development;
-using osu.Framework.Graphics.Rendering;
+﻿using osu.Framework.Graphics.Rendering;
 using osu.Framework.XR.Allocation;
 using osu.Framework.XR.Graphics.Shaders;
 using osu.Framework.XR.Graphics.Vertices;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace osu.Framework.XR.Graphics.Buffers;
@@ -49,8 +49,11 @@ public class VertexBuffer<Tvertex> : IVertexBuffer where Tvertex : struct, IVert
 	public int Count { get; private set; }
 
 	public int Stride => default( Tvertex ).Stride;
+	bool isDisposed;
 
 	public void Link ( Shader shader, Span<int> attribs ) {
+		throwIfDisposed();
+
 		if ( Handle == 0 )
 			Handle = GL.GenBuffer();
 
@@ -68,6 +71,7 @@ public class VertexBuffer<Tvertex> : IVertexBuffer where Tvertex : struct, IVert
 	}
 
 	public void Dispose () {
+		isDisposed = true;
 		DisposeScheduler.Enqueue( this, v => {
 			GL.DeleteBuffer( Handle );
 			v.Handle = 0;
@@ -77,9 +81,19 @@ public class VertexBuffer<Tvertex> : IVertexBuffer where Tvertex : struct, IVert
 	}
 
 	~VertexBuffer () {
-		if ( DebugUtils.IsDebugBuild )
-			throw new InvalidOperationException( $"A {nameof( VertexBuffer<Tvertex> )} has not been disposed correctly" );
-		Dispose();
+		throwIfNotDisposed();
+	}
+
+	[Conditional( "DEBUG" )]
+	void throwIfDisposed () {
+		if ( isDisposed )
+			throw new InvalidOperationException( $"Used an {nameof( AttributeArray )} after disposal" );
+	}
+
+	[Conditional( "DEBUG" )]
+	void throwIfNotDisposed () {
+		if ( !isDisposed )
+			throw new InvalidOperationException( $"An {nameof( AttributeArray )} has not been disposed correctly" );
 	}
 
 	class Upload : IUpload {
