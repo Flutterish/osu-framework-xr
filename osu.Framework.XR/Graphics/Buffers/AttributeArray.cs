@@ -13,7 +13,7 @@ namespace osu.Framework.XR.Graphics.Buffers;
 /// shader uniforms, for example to render the same mesh in multiple places or with different textures,
 /// or even different animation progresses
 /// </remarks>
-public interface IAttributeArray : IDisposable {
+public interface IAttributeArray : IDisposable { // TODO refit into "input layout"
 	/// <summary>
 	/// Binds the <see cref="IAttributeArray"/>. 
 	/// All <see cref="IVertexBuffer"/> link calls will be linked to this attribute array.
